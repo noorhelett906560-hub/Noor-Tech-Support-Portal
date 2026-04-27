@@ -1,119 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Noor-Tech CRM</title>
-  <style>
-    body { font-family: Arial; background: #f0f2f5; padding: 20px; }
-    .crm-card { background: white; max-width: 700px; margin: auto; padding: 20px; border-radius: 10px; }
-    input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; }
-    button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; }
-    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-    th, td { border: 1px solid #ccc; padding: 8px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Noor-Tech Professional CRM</title>
+    <style>
+        :root { --primary: #4e73df; --success: #1cc88a; --warning: #f6c23e; --danger: #e74a3b; --dark: #5a5c69; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fc; margin: 0; display: flex; }
+        
+        /* Sidebar Like Ainvox */
+        .sidebar { width: 220px; background: #224abe; height: 100vh; color: white; padding: 20px; position: fixed; }
+        .main-content { margin-left: 260px; padding: 30px; width: 100%; }
+        
+        /* Stats Cards */
+        .stats-container { display: flex; gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 10px; flex: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid var(--primary); }
+        
+        /* Form & Table */
+        .form-section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        input, select, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; }
+        
+        table { width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        th { background: #f4f6f9; padding: 15px; text-align: left; color: var(--dark); }
+        td { padding: 15px; border-top: 1px solid #eee; }
+        
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; }
+        .bg-pending { background: var(--warning); }
+        .bg-progress { background: var(--primary); }
+        .bg-resolved { background: var(--success); }
+        
+        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .search-bar { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid var(--primary); }
+    </style>
 </head>
 <body>
 
-<div class="crm-card">
-  <h2>Noor Tech CRM</h2>
+<div class="sidebar">
+    <h3>Noor-Tech</h3>
+    <p>📊 Dashboard</p>
+    <p>📞 Call Logs</p>
+    <p>⚙️ Settings</p>
+</div>
 
-  <form id="crmForm">
-    <input type="text" id="name" placeholder="Customer Name" required>
-    <input type="text" id="phone" placeholder="Phone" required>
-    <input type="text" id="sku" placeholder="Product SKU / Model" required>
-    <input type="text" id="serial" placeholder="Serial Number">
+<div class="main-content">
+    <h2>IT Support Dashboard</h2>
 
-    <select id="warranty">
-      <option>In Warranty</option>
-      <option>Out of Warranty</option>
-    </select>
+    <div class="stats-container">
+        <div class="card">Total Issues <h3 id="countTotal">0</h3></div>
+        <div class="card" style="border-left-color: var(--warning)">Pending <h3 id="countPending">0</h3></div>
+        <div class="card" style="border-left-color: var(--success)">Resolved <h3 id="countResolved">0</h3></div>
+    </div>
 
-    <textarea id="issue" placeholder="Issue Details"></textarea>
+    <div class="form-section">
+        <h3>Add New Case</h3>
+        <form id="crmForm">
+            <div class="grid-inputs">
+                <input type="text" id="name" placeholder="Customer Name" required>
+                <input type="text" id="phone" placeholder="Phone Number" required>
+                <input type="text" id="sku" placeholder="Model / SKU" required>
+                <input type="text" id="serial" placeholder="Serial Number">
+                <select id="warranty">
+                    <option>In Warranty</option>
+                    <option>Out of Warranty</option>
+                </select>
+                <select id="status">
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <textarea id="issue" placeholder="Issue Details" style="margin-top:10px; height: 60px;"></textarea>
+            <button type="submit" style="margin-top: 10px;">Save to Dashboard</button>
+        </form>
+    </div>
 
-    <select id="status">
-      <option>Pending</option>
-      <option>In Progress</option>
-      <option>Resolved</option>
-    </select>
+    <input type="text" id="search" class="search-bar" placeholder="🔍 Search by Name, Phone or Serial Number...">
 
-    <textarea id="notes" placeholder="Remarks / Notes"></textarea>
-
-    <button type="submit">Add</button>
-  </form>
-
-  <input type="text" id="search" placeholder="Search name / phone / SKU">
-
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>SKU</th>
-        <th>Warranty</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Contact</th>
+                <th>S/N</th>
+                <th>Warranty</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
 </div>
 
 <script>
-let data = JSON.parse(localStorage.getItem("crmData")) || [];
+    let crmData = JSON.parse(localStorage.getItem("noorCrmData")) || [];
 
-function displayData(filter="") {
-  let table = document.getElementById("tableBody");
-  table.innerHTML = "";
+    function updateStats() {
+        document.getElementById("countTotal").innerText = crmData.length;
+        document.getElementById("countPending").innerText = crmData.filter(x => x.status === "Pending").length;
+        document.getElementById("countResolved").innerText = crmData.filter(x => x.status === "Resolved").length;
+    }
 
-  data
-    .filter(item =>
-      item.name.toLowerCase().includes(filter.toLowerCase()) ||
-      item.phone.includes(filter) ||
-      item.sku.toLowerCase().includes(filter.toLowerCase())
-    )
-    .forEach((item, index) => {
-      table.innerHTML += `
-        <tr>
-          <td>${item.name}</td>
-          <td>${item.phone}</td>
-          <td>${item.sku}</td>
-          <td>${item.warranty}</td>
-          <td>${item.status}</td>
-          <td><button onclick="deleteData(${index})">Delete</button></td>
-        </tr>`;
+    function renderTable(filter = "") {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+
+        crmData.filter(item => 
+            item.name.toLowerCase().includes(filter.toLowerCase()) || 
+            item.phone.includes(filter) || 
+            item.serial.toLowerCase().includes(filter.toLowerCase())
+        ).forEach((item, index) => {
+            const statusClass = item.status === "Pending" ? "bg-pending" : (item.status === "Resolved" ? "bg-resolved" : "bg-progress");
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${item.name}</strong><br><small>${item.sku}</small></td>
+                    <td>${item.phone}</td>
+                    <td>${item.serial}</td>
+                    <td>${item.warranty}</td>
+                    <td><span class="badge ${statusClass}">${item.status}</span></td>
+                    <td>${item.date}</td>
+                </tr>
+            `;
+        });
+        updateStats();
+    }
+
+    document.getElementById("crmForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const entry = {
+            name: document.getElementById("name").value,
+            phone: document.getElementById("phone").value,
+            sku: document.getElementById("sku").value,
+            serial: document.getElementById("serial").value,
+            warranty: document.getElementById("warranty").value,
+            status: document.getElementById("status").value,
+            date: new Date().toLocaleDateString(),
+            id: Date.now()
+        };
+        crmData.unshift(entry); // Newest on top
+        localStorage.setItem("noorCrmData", JSON.stringify(crmData));
+        renderTable();
+        e.target.reset();
     });
-}
 
-function deleteData(index) {
-  data.splice(index, 1);
-  localStorage.setItem("crmData", JSON.stringify(data));
-  displayData();
-}
+    document.getElementById("search").addEventListener("input", (e) => renderTable(e.target.value));
 
-document.getElementById("crmForm").addEventListener("submit", function(e){
-  e.preventDefault();
-
-  let newData = {
-    name: name.value,
-    phone: phone.value,
-    sku: sku.value,
-    serial: serial.value,
-    warranty: warranty.value,
-    issue: issue.value,
-    status: status.value,
-    notes: notes.value
-  };
-
-  data.push(newData);
-  localStorage.setItem("crmData", JSON.stringify(data));
-  displayData();
-  this.reset();
-});
-
-document.getElementById("search").addEventListener("input", function(){
-  displayData(this.value);
-});
-
-displayData();
+    renderTable();
 </script>
 
 </body>
