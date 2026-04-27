@@ -1,115 +1,135 @@
-<!-- SAME HEAD + CSS (tumhara rehne do, niche JS + table update kar raha hoon) -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Noor CRM Pro</title>
 
-<!-- 🔥 TABLE UPDATE -->
+<style>
+body { font-family: Arial; background:#f5f6fa; margin:0; display:flex; }
+
+.sidebar { width:220px; background:#2f3e9e; color:white; padding:20px; height:100vh; }
+.main { margin-left:220px; padding:20px; width:100%; }
+
+.card-box { display:flex; gap:10px; margin-bottom:20px; }
+.card { flex:1; background:white; padding:15px; border-radius:10px; text-align:center; }
+
+input,select,textarea { width:100%; padding:8px; margin:5px 0; }
+button { padding:8px 12px; background:blue; color:white; border:none; cursor:pointer; }
+
+table { width:100%; margin-top:20px; border-collapse:collapse; }
+th,td { border:1px solid #ccc; padding:8px; }
+
+.badge { padding:4px 8px; color:white; border-radius:5px; }
+.pending { background:orange; }
+.progress { background:blue; }
+.resolved { background:green; }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h3>Noor CRM</h3>
+<p>Dashboard</p>
+</div>
+
+<div class="main">
+
+<div class="card-box">
+<div class="card">Total <h3 id="total">0</h3></div>
+<div class="card">Pending <h3 id="pending">0</h3></div>
+<div class="card">Resolved <h3 id="resolved">0</h3></div>
+</div>
+
+<form id="form">
+<input id="name" placeholder="Name" required>
+<input id="phone" placeholder="Phone">
+<input id="sku" placeholder="SKU">
+<select id="status">
+<option>Pending</option>
+<option>In Progress</option>
+<option>Resolved</option>
+</select>
+<textarea id="issue" placeholder="Issue"></textarea>
+<button>Add</button>
+</form>
+
+<input id="search" placeholder="Search">
+
+<table>
 <thead>
 <tr>
-    <th>ID</th>
-    <th>Customer</th>
-    <th>Contact</th>
-    <th>S/N</th>
-    <th>Warranty</th>
-    <th>Status</th>
-    <th>Priority</th>
-    <th>Date</th>
-    <th>Action</th>
+<th>Name</th><th>Phone</th><th>SKU</th><th>Status</th><th>Action</th>
 </tr>
 </thead>
-<tbody id="tableBody"></tbody>
+<tbody id="table"></tbody>
+</table>
+
+</div>
 
 <script>
-let crmData = JSON.parse(localStorage.getItem("noorCrmData")) || [];
+let data = JSON.parse(localStorage.getItem("crm")) || [];
 
-function updateStats() {
-    document.getElementById("countTotal").innerText = crmData.length;
-    document.getElementById("countPending").innerText = crmData.filter(x => x.status === "Pending").length;
-    document.getElementById("countResolved").innerText = crmData.filter(x => x.status === "Resolved").length;
+function update(){
+document.getElementById("total").innerText=data.length;
+document.getElementById("pending").innerText=data.filter(x=>x.status=="Pending").length;
+document.getElementById("resolved").innerText=data.filter(x=>x.status=="Resolved").length;
 }
 
-function renderTable(filter = "") {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-
-    crmData
-    .filter(item =>
-        item.name.toLowerCase().includes(filter.toLowerCase()) ||
-        item.phone.includes(filter) ||
-        item.sku.toLowerCase().includes(filter.toLowerCase()) ||
-        item.serial.toLowerCase().includes(filter.toLowerCase())
-    )
-    .forEach((item, index) => {
-
-        let statusClass = item.status === "Pending" ? "bg-pending" :
-                         item.status === "Resolved" ? "bg-resolved" : "bg-progress";
-
-        let warrantyColor = item.warranty === "Out of Warranty" ? "red" : "green";
-
-        tbody.innerHTML += `
-        <tr>
-            <td>#${item.id}</td>
-            <td><strong>${item.name}</strong><br><small>${item.sku}</small></td>
-            <td>${item.phone}</td>
-            <td>${item.serial}</td>
-            <td style="color:${warrantyColor}">${item.warranty}</td>
-            <td><span class="badge ${statusClass}">${item.status}</span></td>
-            <td>${item.priority || "Normal"}</td>
-            <td>${item.date}</td>
-            <td>
-                <button onclick="editData(${index})">✏️</button>
-                <button onclick="deleteData(${index})">❌</button>
-            </td>
-        </tr>`;
-    });
-
-    updateStats();
-}
-
-function deleteData(index) {
-    if(confirm("Delete this record?")){
-        crmData.splice(index,1);
-        localStorage.setItem("noorCrmData", JSON.stringify(crmData));
-        renderTable();
-    }
-}
-
-function editData(index){
-    let item = crmData[index];
-
-    name.value = item.name;
-    phone.value = item.phone;
-    sku.value = item.sku;
-    serial.value = item.serial;
-    warranty.value = item.warranty;
-    status.value = item.status;
-    issue.value = item.issue;
-
-    crmData.splice(index,1);
-}
-
-document.getElementById("crmForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const entry = {
-        id: Date.now(),
-        name: name.value,
-        phone: phone.value,
-        sku: sku.value,
-        serial: serial.value,
-        warranty: warranty.value,
-        status: status.value,
-        issue: issue.value,
-        priority: "Normal",
-        date: new Date().toLocaleString()
-    };
-
-    crmData.unshift(entry);
-
-    localStorage.setItem("noorCrmData", JSON.stringify(crmData));
-
-    renderTable();
-    e.target.reset();
+function render(filter=""){
+let html="";
+data.filter(x=>x.name.toLowerCase().includes(filter.toLowerCase()))
+.forEach((d,i)=>{
+let cls = d.status=="Pending"?"pending":d.status=="Resolved"?"resolved":"progress";
+html+=`<tr>
+<td>${d.name}</td>
+<td>${d.phone}</td>
+<td>${d.sku}</td>
+<td><span class="badge ${cls}">${d.status}</span></td>
+<td>
+<button onclick="edit(${i})">Edit</button>
+<button onclick="del(${i})">Delete</button>
+</td>
+</tr>`;
 });
+document.getElementById("table").innerHTML=html;
+update();
+}
 
-document.getElementById("search").addEventListener("input", (e) => renderTable(e.target.value));
+function del(i){
+data.splice(i,1);
+localStorage.setItem("crm",JSON.stringify(data));
+render();
+}
 
-renderTable();
+function edit(i){
+let d=data[i];
+name.value=d.name;
+phone.value=d.phone;
+sku.value=d.sku;
+status.value=d.status;
+issue.value=d.issue;
+data.splice(i,1);
+}
+
+document.getElementById("form").onsubmit=e=>{
+e.preventDefault();
+data.push({
+name:name.value,
+phone:phone.value,
+sku:sku.value,
+status:status.value,
+issue:issue.value
+});
+localStorage.setItem("crm",JSON.stringify(data));
+render();
+e.target.reset();
+};
+
+document.getElementById("search").oninput=e=>render(e.target.value);
+
+render();
 </script>
+
+</body>
+</html>
