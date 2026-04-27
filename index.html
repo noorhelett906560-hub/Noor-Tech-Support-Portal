@@ -4,8 +4,8 @@
   <title>Noor-Tech CRM</title>
   <style>
     body { font-family: Arial; background: #f0f2f5; padding: 20px; }
-    .crm-card { background: white; max-width: 600px; margin: auto; padding: 20px; border-radius: 10px; }
-    input, select { width: 100%; padding: 8px; margin: 5px 0; }
+    .crm-card { background: white; max-width: 700px; margin: auto; padding: 20px; border-radius: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; }
     button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; }
     table { width: 100%; margin-top: 20px; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 8px; }
@@ -19,15 +19,15 @@
   <form id="crmForm">
     <input type="text" id="name" placeholder="Customer Name" required>
     <input type="text" id="phone" placeholder="Phone" required>
+    <input type="text" id="sku" placeholder="Product SKU / Model" required>
     <input type="text" id="serial" placeholder="Serial Number">
-    <input type="text" id="location" placeholder="City & State">
 
-    <select id="type">
-      <option>Warranty</option>
-      <option>Technical</option>
-      <option>Replacement</option>
-      <option>Repair</option>
+    <select id="warranty">
+      <option>In Warranty</option>
+      <option>Out of Warranty</option>
     </select>
+
+    <textarea id="issue" placeholder="Issue Details"></textarea>
 
     <select id="status">
       <option>Pending</option>
@@ -35,19 +35,20 @@
       <option>Resolved</option>
     </select>
 
+    <textarea id="notes" placeholder="Remarks / Notes"></textarea>
+
     <button type="submit">Add</button>
   </form>
 
-  <input type="text" id="search" placeholder="Search...">
+  <input type="text" id="search" placeholder="Search name / phone / SKU">
 
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Phone</th>
-        <th>Serial</th>
-        <th>Location</th>
-        <th>Type</th>
+        <th>SKU</th>
+        <th>Warranty</th>
         <th>Status</th>
         <th>Action</th>
       </tr>
@@ -64,15 +65,18 @@ function displayData(filter="") {
   table.innerHTML = "";
 
   data
-    .filter(item => item.name.toLowerCase().includes(filter.toLowerCase()))
+    .filter(item =>
+      item.name.toLowerCase().includes(filter.toLowerCase()) ||
+      item.phone.includes(filter) ||
+      item.sku.toLowerCase().includes(filter.toLowerCase())
+    )
     .forEach((item, index) => {
       table.innerHTML += `
         <tr>
           <td>${item.name}</td>
           <td>${item.phone}</td>
-          <td>${item.serial}</td>
-          <td>${item.location}</td>
-          <td>${item.type}</td>
+          <td>${item.sku}</td>
+          <td>${item.warranty}</td>
           <td>${item.status}</td>
           <td><button onclick="deleteData(${index})">Delete</button></td>
         </tr>`;
@@ -91,10 +95,12 @@ document.getElementById("crmForm").addEventListener("submit", function(e){
   let newData = {
     name: name.value,
     phone: phone.value,
+    sku: sku.value,
     serial: serial.value,
-    location: location.value,
-    type: type.value,
-    status: status.value
+    warranty: warranty.value,
+    issue: issue.value,
+    status: status.value,
+    notes: notes.value
   };
 
   data.push(newData);
