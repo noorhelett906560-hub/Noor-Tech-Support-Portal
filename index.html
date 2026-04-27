@@ -1,25 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Noor CRM Pro</title>
+<title>Noor-Tech Ultimate CRM</title>
 
 <style>
-body { font-family: Arial; background:#f5f6fa; margin:0; display:flex; }
+:root { --primary:#4e73df; --success:#1cc88a; --warning:#f6c23e; --danger:#e74a3b; }
 
-.sidebar { width:220px; background:#2f3e9e; color:white; padding:20px; height:100vh; }
-.main { margin-left:220px; padding:20px; width:100%; }
+body { font-family:'Segoe UI'; background:#f8f9fc; margin:0; display:flex; }
 
-.card-box { display:flex; gap:10px; margin-bottom:20px; }
+.sidebar { width:220px; background:#224abe; color:white; padding:20px; height:100vh; }
+.main { margin-left:240px; padding:20px; width:100%; }
+
+.stats { display:flex; gap:10px; margin-bottom:20px; }
 .card { flex:1; background:white; padding:15px; border-radius:10px; text-align:center; }
 
-input,select,textarea { width:100%; padding:8px; margin:5px 0; }
-button { padding:8px 12px; background:blue; color:white; border:none; cursor:pointer; }
+.form { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
 
-table { width:100%; margin-top:20px; border-collapse:collapse; }
-th,td { border:1px solid #ccc; padding:8px; }
+.grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 
-.badge { padding:4px 8px; color:white; border-radius:5px; }
+input,select,textarea { width:100%; padding:8px; }
+
+button { background:var(--primary); color:white; border:none; padding:8px; cursor:pointer; }
+
+table { width:100%; background:white; border-collapse:collapse; }
+th,td { padding:10px; border-bottom:1px solid #eee; }
+
+.badge { padding:4px 8px; border-radius:5px; color:white; }
 .pending { background:orange; }
 .progress { background:blue; }
 .resolved { background:green; }
@@ -29,37 +36,65 @@ th,td { border:1px solid #ccc; padding:8px; }
 <body>
 
 <div class="sidebar">
-<h3>Noor CRM</h3>
+<h3>Noor-Tech</h3>
 <p>Dashboard</p>
 </div>
 
 <div class="main">
 
-<div class="card-box">
+<h2>CRM Dashboard</h2>
+
+<div class="stats">
 <div class="card">Total <h3 id="total">0</h3></div>
 <div class="card">Pending <h3 id="pending">0</h3></div>
+<div class="card">Progress <h3 id="progress">0</h3></div>
 <div class="card">Resolved <h3 id="resolved">0</h3></div>
 </div>
 
+<div class="form">
 <form id="form">
-<input id="name" placeholder="Name" required>
+<div class="grid">
+<input id="name" placeholder="Customer Name" required>
 <input id="phone" placeholder="Phone">
 <input id="sku" placeholder="SKU">
+<input id="serial" placeholder="Serial">
+<select id="warranty">
+<option>In Warranty</option>
+<option>Out of Warranty</option>
+</select>
 <select id="status">
 <option>Pending</option>
 <option>In Progress</option>
 <option>Resolved</option>
 </select>
-<textarea id="issue" placeholder="Issue"></textarea>
-<button>Add</button>
-</form>
+</div>
 
-<input id="search" placeholder="Search">
+<textarea id="issue" placeholder="Issue"></textarea>
+
+<select id="priority">
+<option>Normal</option>
+<option>High</option>
+<option>Urgent</option>
+</select>
+
+<button>Add Case</button>
+</form>
+</div>
+
+<input id="search" placeholder="Search Name / Phone / SKU / Serial" style="width:100%; padding:10px; margin-bottom:10px;">
 
 <table>
 <thead>
 <tr>
-<th>Name</th><th>Phone</th><th>SKU</th><th>Status</th><th>Action</th>
+<th>ID</th>
+<th>Name</th>
+<th>Phone</th>
+<th>SKU</th>
+<th>Status</th>
+<th>Warranty</th>
+<th>Priority</th>
+<th>Date</th>
+<th>Action</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
@@ -68,38 +103,55 @@ th,td { border:1px solid #ccc; padding:8px; }
 </div>
 
 <script>
-let data = JSON.parse(localStorage.getItem("crm")) || [];
+let data = JSON.parse(localStorage.getItem("crmData")) || [];
 
-function update(){
-document.getElementById("total").innerText=data.length;
-document.getElementById("pending").innerText=data.filter(x=>x.status=="Pending").length;
-document.getElementById("resolved").innerText=data.filter(x=>x.status=="Resolved").length;
+function updateStats(){
+total.innerText=data.length;
+pending.innerText=data.filter(x=>x.status=="Pending").length;
+progress.innerText=data.filter(x=>x.status=="In Progress").length;
+resolved.innerText=data.filter(x=>x.status=="Resolved").length;
 }
 
 function render(filter=""){
 let html="";
-data.filter(x=>x.name.toLowerCase().includes(filter.toLowerCase()))
+data.filter(x=>
+x.name.toLowerCase().includes(filter.toLowerCase()) ||
+x.phone.includes(filter) ||
+x.sku.toLowerCase().includes(filter.toLowerCase()) ||
+x.serial.toLowerCase().includes(filter.toLowerCase())
+)
 .forEach((d,i)=>{
+
 let cls = d.status=="Pending"?"pending":d.status=="Resolved"?"resolved":"progress";
-html+=`<tr>
+let wColor = d.warranty=="Out of Warranty"?"red":"green";
+
+html+=`
+<tr>
+<td>#${d.id}</td>
 <td>${d.name}</td>
 <td>${d.phone}</td>
 <td>${d.sku}</td>
 <td><span class="badge ${cls}">${d.status}</span></td>
+<td style="color:${wColor}">${d.warranty}</td>
+<td>${d.priority}</td>
+<td>${d.date}</td>
 <td>
-<button onclick="edit(${i})">Edit</button>
-<button onclick="del(${i})">Delete</button>
+<button onclick="edit(${i})">✏️</button>
+<button onclick="del(${i})">❌</button>
 </td>
 </tr>`;
 });
-document.getElementById("table").innerHTML=html;
-update();
+
+table.innerHTML=html;
+updateStats();
 }
 
 function del(i){
+if(confirm("Delete?")){
 data.splice(i,1);
-localStorage.setItem("crm",JSON.stringify(data));
+localStorage.setItem("crmData",JSON.stringify(data));
 render();
+}
 }
 
 function edit(i){
@@ -107,26 +159,36 @@ let d=data[i];
 name.value=d.name;
 phone.value=d.phone;
 sku.value=d.sku;
+serial.value=d.serial;
+warranty.value=d.warranty;
 status.value=d.status;
 issue.value=d.issue;
+priority.value=d.priority;
 data.splice(i,1);
 }
 
-document.getElementById("form").onsubmit=e=>{
+form.onsubmit=e=>{
 e.preventDefault();
-data.push({
+
+data.unshift({
+id:Date.now(),
 name:name.value,
 phone:phone.value,
 sku:sku.value,
+serial:serial.value,
+warranty:warranty.value,
 status:status.value,
-issue:issue.value
+issue:issue.value,
+priority:priority.value,
+date:new Date().toLocaleString()
 });
-localStorage.setItem("crm",JSON.stringify(data));
+
+localStorage.setItem("crmData",JSON.stringify(data));
 render();
-e.target.reset();
+form.reset();
 };
 
-document.getElementById("search").oninput=e=>render(e.target.value);
+search.oninput=e=>render(e.target.value);
 
 render();
 </script>
