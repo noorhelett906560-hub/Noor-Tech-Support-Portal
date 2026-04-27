@@ -1,53 +1,114 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Noor-Tech CRM v2</title>
+  <title>Noor-Tech CRM</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; }
-    .crm-card { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    h2 { color: #1a73e8; text-align: center; }
-    label { font-weight: bold; display: block; margin-top: 15px; color: #5f6368; }
-    input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #dadce0; border-radius: 5px; box-sizing: border-box; }
-    button { width: 100%; background-color: #1a73e8; color: white; padding: 12px; border: none; border-radius: 5px; margin-top: 25px; cursor: pointer; font-size: 16px; font-weight: bold; }
-    button:hover { background-color: #1557b0; }
+    body { font-family: Arial; background: #f0f2f5; padding: 20px; }
+    .crm-card { background: white; max-width: 600px; margin: auto; padding: 20px; border-radius: 10px; }
+    input, select { width: 100%; padding: 8px; margin: 5px 0; }
+    button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
   </style>
 </head>
 <body>
 
 <div class="crm-card">
-  <h2>Noor Tech Support</h2>
-  <form id="crmForm" action="APNA_SCRIPT_URL_YAHAN_PASTE_KAREIN" method="POST">
-    
-    <label>Customer Name</label>
-    <input type="text" name="name" placeholder="Enter name" required>
+  <h2>Noor Tech CRM</h2>
 
-    <label>Phone Number</label>
-    <input type="text" name="phone" placeholder="Enter mobile number" required>
+  <form id="crmForm">
+    <input type="text" id="name" placeholder="Customer Name" required>
+    <input type="text" id="phone" placeholder="Phone" required>
+    <input type="text" id="serial" placeholder="Serial Number">
+    <input type="text" id="location" placeholder="City & State">
 
-    <label>Product Serial Number (S/N)</label>
-    <input type="text" name="serial" placeholder="e.g. NT2026-XXXX" required>
-
-    <label>City & State</label>
-    <input type="text" name="location" placeholder="e.g. Thiruvalla, Kerala" required>
-
-    <label>Issue Type</label>
-    <select name="type">
-      <option value="Warranty Check">Warranty Registration</option>
-      <option value="Technical Issue">Technical Issue</option>
-      <option value="Replacement Request">Replacement Request</option>
-      <option value="Repair Service">Repair Service</option>
+    <select id="type">
+      <option>Warranty</option>
+      <option>Technical</option>
+      <option>Replacement</option>
+      <option>Repair</option>
     </select>
 
-    <label>Status</label>
-    <select name="status">
-      <option value="Pending">Pending</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Resolved">Resolved</option>
+    <select id="status">
+      <option>Pending</option>
+      <option>In Progress</option>
+      <option>Resolved</option>
     </select>
 
-    <button type="submit">Submit to Dashboard</button>
+    <button type="submit">Add</button>
   </form>
+
+  <input type="text" id="search" placeholder="Search...">
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Serial</th>
+        <th>Location</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
 </div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("crmData")) || [];
+
+function displayData(filter="") {
+  let table = document.getElementById("tableBody");
+  table.innerHTML = "";
+
+  data
+    .filter(item => item.name.toLowerCase().includes(filter.toLowerCase()))
+    .forEach((item, index) => {
+      table.innerHTML += `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.phone}</td>
+          <td>${item.serial}</td>
+          <td>${item.location}</td>
+          <td>${item.type}</td>
+          <td>${item.status}</td>
+          <td><button onclick="deleteData(${index})">Delete</button></td>
+        </tr>`;
+    });
+}
+
+function deleteData(index) {
+  data.splice(index, 1);
+  localStorage.setItem("crmData", JSON.stringify(data));
+  displayData();
+}
+
+document.getElementById("crmForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  let newData = {
+    name: name.value,
+    phone: phone.value,
+    serial: serial.value,
+    location: location.value,
+    type: type.value,
+    status: status.value
+  };
+
+  data.push(newData);
+  localStorage.setItem("crmData", JSON.stringify(data));
+  displayData();
+  this.reset();
+});
+
+document.getElementById("search").addEventListener("input", function(){
+  displayData(this.value);
+});
+
+displayData();
+</script>
 
 </body>
 </html>
