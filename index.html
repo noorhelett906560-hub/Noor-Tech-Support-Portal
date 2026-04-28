@@ -1,98 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Noor-Tech Ultimate CRM</title>
+<title>Noor-Tech Pro CRM</title>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVXygnMOKaPVbadqlX9AgWiuUdKW6mTOc",
+  authDomain: "noor-crm.firebaseapp.com",
+  projectId: "noor-crm",
+  storageBucket: "noor-crm.firebasestorage.app",
+  messagingSenderId: "147857712332",
+  appId: "1:147857712332:web:4cae3b8b9c00009aa0ce69"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let allData = [];
+
+async function loadData(){
+const querySnapshot = await getDocs(collection(db, "crm"));
+allData = [];
+querySnapshot.forEach(docSnap=>{
+allData.push({id: docSnap.id, ...docSnap.data()});
+});
+render();
+updateStats();
+}
+
+function render(filter=""){
+let html="";
+allData
+.filter(x => x.name.toLowerCase().includes(filter.toLowerCase()) || x.phone.includes(filter))
+.forEach(d=>{
+html+=`
+<tr>
+<td><b>${d.name}</b><br><small>${d.sku}</small></td>
+<td>${d.phone}</td>
+<td>${d.issue || "-"}</td>
+<td>${d.warranty || "-"}</td>
+<td><span class="badge ${d.status}">${d.status}</span></td>
+<td>${d.date}</td>
+<td>
+<button onclick="deleteData('${d.id}')">❌</button>
+</td>
+</tr>`;
+});
+document.getElementById("table").innerHTML=html;
+}
+
+function updateStats(){
+document.getElementById("total").innerText = allData.length;
+document.getElementById("pending").innerText = allData.filter(x=>x.status==="Pending").length;
+document.getElementById("resolved").innerText = allData.filter(x=>x.status==="Resolved").length;
+}
+
+window.addData = async function(){
+await addDoc(collection(db,"crm"),{
+name:name.value,
+phone:phone.value,
+sku:sku.value,
+issue:issue.value,
+warranty:warranty.value,
+status:status.value,
+date:new Date().toLocaleString()
+});
+loadData();
+form.reset();
+}
+
+window.deleteData = async function(id){
+if(confirm("Delete this record?")){
+await deleteDoc(doc(db,"crm",id));
+loadData();
+}
+}
+
+window.searchData = function(val){
+render(val);
+}
+
+window.onload = loadData;
+</script>
 
 <style>
-:root { --primary:#4e73df; --success:#1cc88a; --warning:#f6c23e; --danger:#e74a3b; }
-
-body { font-family:'Segoe UI'; background:#f8f9fc; margin:0; display:flex; }
-
+body { font-family:Segoe UI; background:#f4f6f9; margin:0; display:flex; }
 .sidebar { width:220px; background:#224abe; color:white; padding:20px; height:100vh; }
-.main { margin-left:240px; padding:20px; width:100%; }
+.main { flex:1; padding:20px; }
 
-.stats { display:flex; gap:10px; margin-bottom:20px; }
-.card { flex:1; background:white; padding:15px; border-radius:10px; text-align:center; }
+.card { background:white; padding:15px; margin:10px; border-radius:10px; display:inline-block; width:30%; }
+input,select,textarea { width:100%; padding:8px; margin:5px 0; }
+button { padding:8px 12px; background:#224abe; color:white; border:none; cursor:pointer; }
 
-.form { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
-
-.grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-
-input,select,textarea { width:100%; padding:8px; }
-
-button { background:var(--primary); color:white; border:none; padding:8px; cursor:pointer; }
-
-table { width:100%; background:white; border-collapse:collapse; }
+table { width:100%; margin-top:20px; border-collapse:collapse; background:white; }
 th,td { padding:10px; border-bottom:1px solid #eee; }
 
-.badge { padding:4px 8px; border-radius:5px; color:white; }
-.pending { background:orange; }
-.progress { background:blue; }
-.resolved { background:green; }
+.badge { padding:5px 10px; border-radius:10px; color:white; }
+.Pending { background:orange; }
+.Resolved { background:green; }
 </style>
+
 </head>
 
 <body>
 
 <div class="sidebar">
-<h3>Noor-Tech</h3>
-<p>Dashboard</p>
+<h2>Noor CRM</h2>
+<p>📊 Dashboard</p>
+<p>📞 Calls</p>
+<p>⚙️ Settings</p>
 </div>
 
 <div class="main">
 
-<h2>CRM Dashboard</h2>
+<h2>Dashboard</h2>
 
-<div class="stats">
 <div class="card">Total <h3 id="total">0</h3></div>
 <div class="card">Pending <h3 id="pending">0</h3></div>
-<div class="card">Progress <h3 id="progress">0</h3></div>
 <div class="card">Resolved <h3 id="resolved">0</h3></div>
-</div>
 
-<div class="form">
-<form id="form">
-<div class="grid">
+<h3>Add Case</h3>
+
+<form id="form" onsubmit="event.preventDefault(); addData();">
 <input id="name" placeholder="Customer Name" required>
 <input id="phone" placeholder="Phone">
-<input id="sku" placeholder="SKU">
-<input id="serial" placeholder="Serial">
+<input id="sku" placeholder="SKU / Model">
 <select id="warranty">
 <option>In Warranty</option>
 <option>Out of Warranty</option>
 </select>
 <select id="status">
 <option>Pending</option>
-<option>In Progress</option>
 <option>Resolved</option>
 </select>
-</div>
-
-<textarea id="issue" placeholder="Issue"></textarea>
-
-<select id="priority">
-<option>Normal</option>
-<option>High</option>
-<option>Urgent</option>
-</select>
-
+<textarea id="issue" placeholder="Issue Details"></textarea>
 <button>Add Case</button>
 </form>
-</div>
 
-<input id="search" placeholder="Search Name / Phone / SKU / Serial" style="width:100%; padding:10px; margin-bottom:10px;">
+<input placeholder="🔍 Search" oninput="searchData(this.value)">
 
 <table>
 <thead>
 <tr>
-<th>ID</th>
-<th>Name</th>
+<th>Customer</th>
 <th>Phone</th>
-<th>SKU</th>
-<th>Status</th>
+<th>Issue</th>
 <th>Warranty</th>
-<th>Priority</th>
+<th>Status</th>
 <th>Date</th>
 <th>Action</th>
 </tr>
@@ -101,97 +159,6 @@ th,td { padding:10px; border-bottom:1px solid #eee; }
 </table>
 
 </div>
-
-<script>
-let data = JSON.parse(localStorage.getItem("crmData")) || [];
-
-function updateStats(){
-total.innerText=data.length;
-pending.innerText=data.filter(x=>x.status=="Pending").length;
-progress.innerText=data.filter(x=>x.status=="In Progress").length;
-resolved.innerText=data.filter(x=>x.status=="Resolved").length;
-}
-
-function render(filter=""){
-let html="";
-data.filter(x=>
-x.name.toLowerCase().includes(filter.toLowerCase()) ||
-x.phone.includes(filter) ||
-x.sku.toLowerCase().includes(filter.toLowerCase()) ||
-x.serial.toLowerCase().includes(filter.toLowerCase())
-)
-.forEach((d,i)=>{
-
-let cls = d.status=="Pending"?"pending":d.status=="Resolved"?"resolved":"progress";
-let wColor = d.warranty=="Out of Warranty"?"red":"green";
-
-html+=`
-<tr>
-<td>#${d.id}</td>
-<td>${d.name}</td>
-<td>${d.phone}</td>
-<td>${d.sku}</td>
-<td><span class="badge ${cls}">${d.status}</span></td>
-<td style="color:${wColor}">${d.warranty}</td>
-<td>${d.priority}</td>
-<td>${d.date}</td>
-<td>
-<button onclick="edit(${i})">✏️</button>
-<button onclick="del(${i})">❌</button>
-</td>
-</tr>`;
-});
-
-table.innerHTML=html;
-updateStats();
-}
-
-function del(i){
-if(confirm("Delete?")){
-data.splice(i,1);
-localStorage.setItem("crmData",JSON.stringify(data));
-render();
-}
-}
-
-function edit(i){
-let d=data[i];
-name.value=d.name;
-phone.value=d.phone;
-sku.value=d.sku;
-serial.value=d.serial;
-warranty.value=d.warranty;
-status.value=d.status;
-issue.value=d.issue;
-priority.value=d.priority;
-data.splice(i,1);
-}
-
-form.onsubmit=e=>{
-e.preventDefault();
-
-data.unshift({
-id:Date.now(),
-name:name.value,
-phone:phone.value,
-sku:sku.value,
-serial:serial.value,
-warranty:warranty.value,
-status:status.value,
-issue:issue.value,
-priority:priority.value,
-date:new Date().toLocaleString()
-});
-
-localStorage.setItem("crmData",JSON.stringify(data));
-render();
-form.reset();
-};
-
-search.oninput=e=>render(e.target.value);
-
-render();
-</script>
 
 </body>
 </html>
