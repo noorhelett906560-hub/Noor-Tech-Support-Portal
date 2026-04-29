@@ -2,17 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Noor-Tech Pro CRM</title>
+<title>Noor CRM</title>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCVXygnMOKaPVbadqlX9AgWiuUdKW6mTOc",
+  apiKey: "PASTE_YOUR_KEY",
   authDomain: "noor-crm.firebaseapp.com",
   projectId: "noor-crm",
-  storageBucket: "noor-crm.firebasestorage.app",
+  storageBucket: "noor-crm.appspot.com",
   messagingSenderId: "147857712332",
   appId: "1:147857712332:web:4cae3b8b9c00009aa0ce69"
 };
@@ -20,145 +20,78 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let allData = [];
+let data = [];
 
 async function loadData(){
-const querySnapshot = await getDocs(collection(db, "crm"));
-allData = [];
-querySnapshot.forEach(docSnap=>{
-allData.push({id: docSnap.id, ...docSnap.data()});
-});
-render();
-updateStats();
+  const query = await getDocs(collection(db,"crm"));
+  data=[];
+  query.forEach(doc=>data.push(doc.data()));
+  render();
 }
 
 function render(filter=""){
-let html="";
-allData
-.filter(x => x.name.toLowerCase().includes(filter.toLowerCase()) || x.phone.includes(filter))
-.forEach(d=>{
-html+=`
-<tr>
-<td><b>${d.name}</b><br><small>${d.sku}</small></td>
-<td>${d.phone}</td>
-<td>${d.issue || "-"}</td>
-<td>${d.warranty || "-"}</td>
-<td><span class="badge ${d.status}">${d.status}</span></td>
-<td>${d.date}</td>
-<td>
-<button onclick="deleteData('${d.id}')">❌</button>
-</td>
-</tr>`;
-});
-document.getElementById("table").innerHTML=html;
+  let html="";
+  data.filter(x=>x.name.toLowerCase().includes(filter.toLowerCase()))
+  .forEach(d=>{
+    html+=`
+    <tr>
+      <td>${d.name}</td>
+      <td>${d.phone}</td>
+      <td>${d.sku}</td>
+      <td>${d.status}</td>
+    </tr>`;
+  });
+  document.getElementById("table").innerHTML=html;
 }
 
-function updateStats(){
-document.getElementById("total").innerText = allData.length;
-document.getElementById("pending").innerText = allData.filter(x=>x.status==="Pending").length;
-document.getElementById("resolved").innerText = allData.filter(x=>x.status==="Resolved").length;
+window.addData = async ()=>{
+  await addDoc(collection(db,"crm"),{
+    name:name.value,
+    phone:phone.value,
+    sku:sku.value,
+    status:status.value
+  });
+  loadData();
 }
 
-window.addData = async function(){
-await addDoc(collection(db,"crm"),{
-name:name.value,
-phone:phone.value,
-sku:sku.value,
-issue:issue.value,
-warranty:warranty.value,
-status:status.value,
-date:new Date().toLocaleString()
-});
-loadData();
-form.reset();
-}
+window.searchData=(v)=>render(v);
 
-window.deleteData = async function(id){
-if(confirm("Delete this record?")){
-await deleteDoc(doc(db,"crm",id));
-loadData();
-}
-}
-
-window.searchData = function(val){
-render(val);
-}
-
-window.onload = loadData;
+window.onload=loadData;
 </script>
 
 <style>
-body { font-family:Segoe UI; background:#f4f6f9; margin:0; display:flex; }
-.sidebar { width:220px; background:#224abe; color:white; padding:20px; height:100vh; }
-.main { flex:1; padding:20px; }
-
-.card { background:white; padding:15px; margin:10px; border-radius:10px; display:inline-block; width:30%; }
-input,select,textarea { width:100%; padding:8px; margin:5px 0; }
-button { padding:8px 12px; background:#224abe; color:white; border:none; cursor:pointer; }
-
-table { width:100%; margin-top:20px; border-collapse:collapse; background:white; }
-th,td { padding:10px; border-bottom:1px solid #eee; }
-
-.badge { padding:5px 10px; border-radius:10px; color:white; }
-.Pending { background:orange; }
-.Resolved { background:green; }
+body{font-family:Arial;padding:20px;background:#f5f6fa;}
+input,select{width:100%;padding:8px;margin:5px 0;}
+button{padding:10px;background:blue;color:white;border:none;}
+table{width:100%;margin-top:20px;border-collapse:collapse;}
+td,th{border:1px solid #ccc;padding:8px;}
 </style>
 
 </head>
 
 <body>
 
-<div class="sidebar">
-<h2>Noor CRM</h2>
-<p>📊 Dashboard</p>
-<p>📞 Calls</p>
-<p>⚙️ Settings</p>
-</div>
+<h2>Noor CRM 🚀</h2>
 
-<div class="main">
-
-<h2>Dashboard</h2>
-
-<div class="card">Total <h3 id="total">0</h3></div>
-<div class="card">Pending <h3 id="pending">0</h3></div>
-<div class="card">Resolved <h3 id="resolved">0</h3></div>
-
-<h3>Add Case</h3>
-
-<form id="form" onsubmit="event.preventDefault(); addData();">
-<input id="name" placeholder="Customer Name" required>
+<input id="name" placeholder="Name">
 <input id="phone" placeholder="Phone">
-<input id="sku" placeholder="SKU / Model">
-<select id="warranty">
-<option>In Warranty</option>
-<option>Out of Warranty</option>
-</select>
+<input id="sku" placeholder="SKU">
+
 <select id="status">
 <option>Pending</option>
 <option>Resolved</option>
 </select>
-<textarea id="issue" placeholder="Issue Details"></textarea>
-<button>Add Case</button>
-</form>
 
-<input placeholder="🔍 Search" oninput="searchData(this.value)">
+<button onclick="addData()">Save</button>
+
+<input placeholder="Search" oninput="searchData(this.value)">
 
 <table>
 <thead>
-<tr>
-<th>Customer</th>
-<th>Phone</th>
-<th>Issue</th>
-<th>Warranty</th>
-<th>Status</th>
-<th>Date</th>
-<th>Action</th>
-</tr>
+<tr><th>Name</th><th>Phone</th><th>SKU</th><th>Status</th></tr>
 </thead>
 <tbody id="table"></tbody>
 </table>
-
-</div>
 
 </body>
 </html>
