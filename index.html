@@ -1,97 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Noor CRM</title>
+    <meta charset="UTF-8">
+    <title>Noor-Tech Advanced CRM</title>
+    <style>
+        :root { --sidebar-bg: #1a237e; --main-bg: #f8f9fa; --card-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--main-bg); margin: 0; display: flex; }
+        
+        /* Sidebar Navigation */
+        .sidebar { width: 220px; background: var(--sidebar-bg); height: 100vh; color: white; padding: 20px; position: fixed; }
+        .sidebar h2 { font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .sidebar-link { padding: 12px; cursor: pointer; border-radius: 5px; transition: 0.3s; }
+        .sidebar-link:hover { background: rgba(255,255,255,0.1); }
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        /* Main Dashboard Area */
+        .main-content { margin-left: 260px; padding: 30px; width: calc(100% - 260px); }
+        
+        /* Top Statistics Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--card-shadow); text-align: center; }
+        .stat-card h3 { margin: 0; color: #555; font-size: 0.9rem; }
+        .stat-card div { font-size: 1.8rem; font-weight: bold; margin-top: 10px; color: #1a237e; }
 
-const firebaseConfig = {
-  apiKey: "PASTE_YOUR_KEY",
-  authDomain: "noor-crm.firebaseapp.com",
-  projectId: "noor-crm",
-  storageBucket: "noor-crm.appspot.com",
-  messagingSenderId: "147857712332",
-  appId: "1:147857712332:web:4cae3b8b9c00009aa0ce69"
-};
+        /* Input Form Section */
+        .form-section { background: white; padding: 25px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 25px; }
+        .grid-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        input, select, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; }
+        textarea { grid-column: span 3; height: 80px; }
+        
+        /* Buttons */
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+        .btn-save { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-export { background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-let data = [];
-
-async function loadData(){
-  const query = await getDocs(collection(db,"crm"));
-  data=[];
-  query.forEach(doc=>data.push(doc.data()));
-  render();
-}
-
-function render(filter=""){
-  let html="";
-  data.filter(x=>x.name.toLowerCase().includes(filter.toLowerCase()))
-  .forEach(d=>{
-    html+=`
-    <tr>
-      <td>${d.name}</td>
-      <td>${d.phone}</td>
-      <td>${d.sku}</td>
-      <td>${d.status}</td>
-    </tr>`;
-  });
-  document.getElementById("table").innerHTML=html;
-}
-
-window.addData = async ()=>{
-  await addDoc(collection(db,"crm"),{
-    name:name.value,
-    phone:phone.value,
-    sku:sku.value,
-    status:status.value
-  });
-  loadData();
-}
-
-window.searchData=(v)=>render(v);
-
-window.onload=loadData;
-</script>
-
-<style>
-body{font-family:Arial;padding:20px;background:#f5f6fa;}
-input,select{width:100%;padding:8px;margin:5px 0;}
-button{padding:10px;background:blue;color:white;border:none;}
-table{width:100%;margin-top:20px;border-collapse:collapse;}
-td,th{border:1px solid #ccc;padding:8px;}
-</style>
-
+        /* Table Style */
+        table { width: 100%; background: white; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: var(--card-shadow); }
+        th { background: #f1f3f9; padding: 15px; text-align: left; font-size: 0.85rem; color: #666; }
+        td { padding: 15px; border-top: 1px solid #eee; font-size: 0.9rem; }
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: white; }
+        .bg-pending { background: #ffc107; color: #000; }
+        .bg-resolved { background: #28a745; }
+    </style>
 </head>
-
 <body>
 
-<h2>Noor CRM 🚀</h2>
+<div class="sidebar">
+    <h2>Noor-Tech</h2>
+    <div class="sidebar-link">🏠 Dashboard</div>
+    <div class="sidebar-link">📂 All Tickets</div>
+    <div class="sidebar-link">📈 Reports</div>
+</div>
 
-<input id="name" placeholder="Name">
-<input id="phone" placeholder="Phone">
-<input id="sku" placeholder="SKU">
+<div class="main-content">
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Total Tickets</h3><div id="totalTickets">0</div></div>
+        <div class="stat-card"><h3>Pending</h3><div id="pendingTickets" style="color: #ffc107;">0</div></div>
+        <div class="stat-card"><h3>Replacement</h3><div id="replaceTickets" style="color: #dc3545;">0</div></div>
+        <div class="stat-card"><h3>Resolved</h3><div id="resolvedTickets" style="color: #28a745;">0</div></div>
+    </div>
 
-<select id="status">
-<option>Pending</option>
-<option>Resolved</option>
-</select>
+    <div class="form-section">
+        <h3>Raise New Ticket</h3>
+        <form id="ticketForm">
+            <div class="grid-layout">
+                <input type="text" id="custName" placeholder="Customer Name" required>
+                <input type="text" id="custPhone" placeholder="Phone Number" required>
+                <input type="text" id="custSerial" placeholder="Serial Number (S/N)">
+                
+                <select id="issueType">
+                    <option value="Enquiry">Enquiry</option>
+                    <option value="Complaint">Complaint / Ticket</option>
+                    <option value="Repair">Repair Request</option>
+                    <option value="Replacement">Replacement Request</option>
+                </select>
 
-<button onclick="addData()">Save</button>
+                <select id="warrantyStatus">
+                    <option value="In Warranty">In Warranty</option>
+                    <option value="Out of Warranty">Out of Warranty</option>
+                </select>
 
-<input placeholder="Search" oninput="searchData(this.value)">
+                <select id="ticketStatus">
+                    <option value="Pending">Pending / Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved / Closed</option>
+                </select>
 
-<table>
-<thead>
-<tr><th>Name</th><th>Phone</th><th>SKU</th><th>Status</th></tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
+                <textarea id="issueNote" placeholder="Explain the technical issue or remarks..."></textarea>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-save">➕ Save & Update</button>
+                <button type="button" class="btn-export" onclick="exportData()">📥 Export Excel (CSV)</button>
+            </div>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Customer / SKU</th>
+                <th>Contact</th>
+                <th>S/N</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="ticketTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('noorCRM_DB')) || [];
+
+    function updateDashboard() {
+        document.getElementById('totalTickets').innerText = db.length;
+        document.getElementById('pendingTickets').innerText = db.filter(t => t.status === 'Pending').length;
+        document.getElementById('replaceTickets').innerText = db.filter(t => t.type === 'Replacement').length;
+        document.getElementById('resolvedTickets').innerText = db.filter(t => t.status === 'Resolved').length;
+
+        const tableBody = document.getElementById('ticketTableBody');
+        tableBody.innerHTML = '';
+
+        db.forEach(item => {
+            const statusColor = item.status === 'Resolved' ? 'bg-resolved' : 'bg-pending';
+            tableBody.innerHTML += `
+                <tr>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.phone}</td>
+                    <td>${item.serial}</td>
+                    <td>${item.type}</td>
+                    <td><span class="status-badge ${statusColor}">${item.status}</span></td>
+                    <td>${item.date}</td>
+                </tr>
+            `;
+        });
+    }
+
+    document.getElementById('ticketForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const ticket = {
+            name: document.getElementById('custName').value,
+            phone: document.getElementById('custPhone').value,
+            serial: document.getElementById('custSerial').value,
+            type: document.getElementById('issueType').value,
+            warranty: document.getElementById('warrantyStatus').value,
+            status: document.getElementById('ticketStatus').value,
+            note: document.getElementById('issueNote').value,
+            date: new Date().toLocaleDateString()
+        };
+        db.unshift(ticket);
+        localStorage.setItem('noorCRM_DB', JSON.stringify(db));
+        updateDashboard();
+        this.reset();
+    });
+
+    function exportData() {
+        if(db.length === 0) return alert("Pehle data toh daalo bhai!");
+        let csv = "Name,Phone,Serial,Type,Warranty,Status,Date\n";
+        db.forEach(r => {
+            csv += `${r.name},${r.phone},${r.serial},${r.type},${r.warranty},${r.status},${r.date}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'Noor-Tech-Data.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    updateDashboard();
+</script>
 
 </body>
 </html>
