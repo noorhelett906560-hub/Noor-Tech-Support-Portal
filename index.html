@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noor-Tech Cloud CRM PRO</title>
+    <title>Noor-Tech Cloud CRM PRO - Enterprise Edition</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -26,11 +26,13 @@
         .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--secondary); }
         .form-section { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
         .grid-layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        input, select, textarea { padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; outline: none; }
+        .grid-layout label { font-size: 0.8rem; font-weight: 600; color: #64748b; margin-bottom: -10px; }
+        input, select, textarea { padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; outline: none; font-size: 0.9rem; }
         textarea { grid-column: span 4; height: 80px; }
         .btn-group { margin-top: 20px; display: flex; gap: 12px; }
         .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-save { background: var(--success); color: white; }
+        .btn-update { background: var(--secondary); color: white; }
         .btn-export { background: var(--primary); color: white; }
         .table-container { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
@@ -41,9 +43,10 @@
         .status-Pending { background: #fef3c7; color: #92400e; }
         .status-Resolved { background: #d1fae5; color: #065f46; }
         .status-InProgress { background: #dbeafe; color: #1e40af; }
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 8% auto; padding: 35px; width: 450px; border-radius: 20px; position: relative; }
-        .close { position: absolute; right: 25px; top: 20px; font-size: 28px; cursor: pointer; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); overflow-y: auto; }
+        .modal-content { background: var(--bg); margin: 2% auto; padding: 30px; width: 80%; max-width: 900px; border-radius: 20px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .close { position: absolute; right: 25px; top: 20px; font-size: 28px; cursor: pointer; color: var(--danger); }
+        .modal-header { border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; padding-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -59,14 +62,14 @@
 <div class="main">
     <div id="dashboard" class="page-content active">
         <div class="stats-grid">
-            <div class="stat-card"><h4>Total Tickets</h4><div id="countTotal" style="font-size:1.8rem; font-weight:800;">0</div></div>
+            <div class="stat-card"><h4>Inbound Tickets</h4><div id="countTotal" style="font-size:1.8rem; font-weight:800;">0</div></div>
             <div class="stat-card" style="border-left-color: var(--warning)"><h4>Pending</h4><div id="countPending" style="font-size:1.8rem; font-weight:800;">0</div></div>
             <div class="stat-card" style="border-left-color: var(--success)"><h4>Resolved</h4><div id="countResolved" style="font-size:1.8rem; font-weight:800; color: var(--success)">0</div></div>
             <div class="stat-card" style="border-left-color: var(--danger)"><h4>Replacements</h4><div id="countReplace" style="font-size:1.8rem; font-weight:800; color: var(--danger)">0</div></div>
         </div>
 
         <div class="form-section">
-            <h3><i class="fas fa-plus-circle"></i> Create New Cloud Ticket</h3>
+            <h3><i class="fas fa-plus-circle"></i> Create New Inbound Ticket</h3>
             <form id="crmForm">
                 <div class="grid-layout">
                     <input type="text" id="custName" placeholder="Customer Name" required>
@@ -76,6 +79,11 @@
                     <input type="text" id="sku" placeholder="SKU/Model" required>
                     <input type="text" id="serial" placeholder="Serial Number (S/N)">
                     
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <label>Purchase Date</label>
+                        <input type="date" id="purchaseDate">
+                    </div>
+
                     <select id="priority">
                         <option value="Low">Priority: Low</option>
                         <option value="Medium">Priority: Medium</option>
@@ -104,18 +112,17 @@
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-save"><i class="fas fa-cloud-upload-alt"></i> Save to Google Cloud</button>
-                    <button type="button" class="btn btn-export" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Export Excel</button>
                 </div>
             </form>
         </div>
     </div>
 
     <div id="tickets" class="page-content">
-        <h3><i class="fas fa-list"></i> Ticket Management (Cloud)</h3>
+        <h3><i class="fas fa-list"></i> Inbound Management</h3>
         <input type="text" id="search" style="padding:15px; margin-bottom:20px; border-radius:12px; border:2px solid #e2e8f0; width:100%;" placeholder="🔍 Search by Name, Phone, or Invoice...">
         <div class="table-container">
             <table>
-                <thead><tr><th>ID</th><th>Customer Details</th><th>Product / SKU</th><th>Status</th><th>Date</th></tr></thead>
+                <thead><tr><th>ID</th><th>Customer Details</th><th>Product / SKU</th><th>Status</th><th>Log Date</th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
@@ -135,18 +142,57 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <h3>Update Ticket Status</h3>
-        <p id="modalTicketID" style="font-weight:bold; color:var(--secondary);"></p>
-        <select id="editStatus" style="font-size:1rem; padding:15px; margin-top:10px;">
-            <option value="Pending">Pending ⏳</option>
-            <option value="In Progress">In Progress ⚙️</option>
-            <option value="Resolved">Resolved ✅</option>
-        </select>
-        <button class="btn btn-save" onclick="saveUpdate()" style="width:100%; margin-top:20px; justify-content:center;">Update Cloud</button>
+        <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> Edit Full Ticket Details</h3>
+            <p id="modalTicketID" style="font-weight:bold; color:var(--secondary);"></p>
+        </div>
+        <form id="editForm">
+            <div class="grid-layout">
+                <div style="grid-column: span 1"><label>Name</label><input type="text" id="editCustName"></div>
+                <div style="grid-column: span 1"><label>Phone</label><input type="text" id="editCustPhone"></div>
+                <div style="grid-column: span 1"><label>Email</label><input type="text" id="editCustEmail"></div>
+                <div style="grid-column: span 1"><label>Invoice No</label><input type="text" id="editInvNo"></div>
+                <div style="grid-column: span 1"><label>SKU/Model</label><input type="text" id="editSku"></div>
+                <div style="grid-column: span 1"><label>Serial No</label><input type="text" id="editSerial"></div>
+                <div style="grid-column: span 1"><label>Purchase Date</label><input type="date" id="editPurchaseDate"></div>
+                <div style="grid-column: span 1">
+                    <label>Status</label>
+                    <select id="editStatus">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 1">
+                    <label>Priority</label>
+                    <select id="editPriority">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 1">
+                    <label>Issue Type</label>
+                    <select id="editIssueType">
+                        <option value="Technical">Technical</option>
+                        <option value="Replacement">Replacement</option>
+                        <option value="Repair">Repair</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2">
+                    <label>Notes</label>
+                    <textarea id="editIssueNote" style="height:60px;"></textarea>
+                </div>
+            </div>
+            <button type="button" class="btn btn-update" onclick="saveFullUpdate()" style="width:100%; margin-top:20px; justify-content:center;">
+                <i class="fas fa-check-circle"></i> Update Changes to Cloud
+            </button>
+        </form>
     </div>
 </div>
 
 <script>
+    // Your Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyCVXygnMOKaPVbadqlX9AgWiuUdKW6mTOc",
         authDomain: "noor-crm.firebaseapp.com",
@@ -209,6 +255,7 @@
             inv: document.getElementById('invNo').value,
             sku: document.getElementById('sku').value,
             sn: document.getElementById('serial').value || 'N/A',
+            purchaseDate: document.getElementById('purchaseDate').value || 'N/A',
             priority: document.getElementById('priority').value,
             issueType: document.getElementById('issueType').value,
             status: document.getElementById('status').value,
@@ -222,27 +269,61 @@
         this.reset();
     });
 
+    // OPEN FULL EDIT MODAL
     function openModal(id) {
         currentEditingID = id;
         const ticket = allTickets.find(t => t.id == id);
-        document.getElementById('modalTicketID').innerText = `Ticket #${id.toString().slice(-4)} - ${ticket.name}`;
+        
+        document.getElementById('modalTicketID').innerText = `Editing Ticket #${id.toString().slice(-4)}`;
+        
+        // Fill Modal Fields
+        document.getElementById('editCustName').value = ticket.name;
+        document.getElementById('editCustPhone').value = ticket.phone;
+        document.getElementById('editCustEmail').value = ticket.email;
+        document.getElementById('editInvNo').value = ticket.inv;
+        document.getElementById('editSku').value = ticket.sku;
+        document.getElementById('editSerial').value = ticket.sn;
+        document.getElementById('editPurchaseDate').value = ticket.purchaseDate !== 'N/A' ? ticket.purchaseDate : '';
         document.getElementById('editStatus').value = ticket.status;
+        document.getElementById('editPriority').value = ticket.priority;
+        document.getElementById('editIssueType').value = ticket.issueType;
+        document.getElementById('editIssueNote').value = ticket.note;
+
         document.getElementById('editModal').style.display = "block";
     }
+
     function closeModal() { document.getElementById('editModal').style.display = "none"; }
-    function saveUpdate() {
-        db.child(currentEditingID).update({ status: document.getElementById('editStatus').value });
+
+    // SAVE FULL UPDATE
+    function saveFullUpdate() {
+        const updatedData = {
+            name: document.getElementById('editCustName').value,
+            phone: document.getElementById('editCustPhone').value,
+            email: document.getElementById('editCustEmail').value,
+            inv: document.getElementById('editInvNo').value,
+            sku: document.getElementById('editSku').value,
+            sn: document.getElementById('editSerial').value,
+            purchaseDate: document.getElementById('editPurchaseDate').value || 'N/A',
+            status: document.getElementById('editStatus').value,
+            priority: document.getElementById('editPriority').value,
+            issueType: document.getElementById('editIssueType').value,
+            note: document.getElementById('editIssueNote').value
+        };
+
+        db.child(currentEditingID).update(updatedData);
         closeModal();
-        alert("Cloud Updated!");
+        alert("Success: Full Ticket Updated on Cloud!");
     }
 
     function exportExcel() {
         if(allTickets.length === 0) return alert("No data to export!");
-        let csv = "ID,Name,Phone,Email,Invoice,SKU,SN,Priority,Issue,Status,Warranty,Source,Date\n";
-        allTickets.forEach(t => { csv += `${t.id},${t.name},${t.phone},${t.email},${t.inv},${t.sku},${t.sn},${t.priority},${t.issueType},${t.status},${t.warranty},${t.source},${t.date}\n`; });
+        let csv = "ID,Name,Phone,Email,Invoice,SKU,SN,PurchaseDate,Priority,Issue,Status,Warranty,Source,LogDate\n";
+        allTickets.forEach(t => { 
+            csv += `${t.id},${t.name},${t.phone},${t.email},${t.inv},${t.sku},${t.sn},${t.purchaseDate},${t.priority},${t.issueType},${t.status},${t.warranty},${t.source},${t.date}\n`; 
+        });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-        a.download = 'Noor-Cloud-Database.csv'; a.click();
+        a.download = 'Noor-Inbound-Report.csv'; a.click();
     }
 
     document.getElementById('search').addEventListener('input', function(e) {
