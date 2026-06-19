@@ -3,196 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Helett - Corporate Review & Feedback Matrix</title>
+    <title>Helett - Amazon Feedback Control Centre</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    </style>
 </head>
 <body class="bg-[#0b0f19] text-gray-200 font-sans antialiased min-h-screen">
 
-    <header class="bg-[#111827]/80 backdrop-blur-md border-b border-gray-800/60 sticky top-0 z-50 px-6 py-4">
+    <header class="bg-[#111827]/90 backdrop-blur-md border-b border-gray-800/80 sticky top-0 z-50 px-6 py-4">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3.5">
-                <div class="bg-gradient-to-tr from-amber-500 to-orange-600 p-2.5 rounded-xl shadow-lg shadow-orange-500/10">
+                <div class="bg-gradient-to-tr from-amber-500 to-orange-600 p-2.5 rounded-xl shadow-lg shadow-orange-500/20">
                     <i class="fa-brands fa-amazon text-xl text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tight text-white">HELETT <span class="text-amber-500 font-medium text-lg">MARKETPLACE MATRIX</span></h1>
-                    <p class="text-[11px] text-gray-400 font-mono tracking-wider">LIVE REVIEWS & PERFORMANCE ENGINE</p>
+                    <h1 class="text-xl font-black tracking-tight text-white">HELETT <span class="text-amber-500 font-medium text-lg">FEEDBACK CONTROL CENTRE</span></h1>
+                    <p class="text-[11px] text-gray-400 font-mono tracking-wider">REVIEWS AUDIT & QUALITY ASSURANCE ENGINE</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <span class="flex items-center text-xs bg-emerald-950/40 text-emerald-400 border border-emerald-800/60 px-3 py-1.5 rounded-lg font-medium">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Management Access Active
-                </span>
+            <div class="text-sm bg-gray-800/60 px-3 py-1.5 rounded-full border border-gray-700 text-gray-300">
+                <i class="fa-solid fa-lock text-green-400 mr-1"></i> Shared Executive Access Mode
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div class="bg-[#111c30] p-5 rounded-xl border border-blue-900/40 relative overflow-hidden">
-                <p class="text-xs font-bold uppercase text-blue-400/80 tracking-wider">Total Follow-ups</p>
-                <p class="text-3xl font-black text-white mt-1" id="countTotal">0</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div class="bg-[#111c30] p-6 rounded-xl border border-blue-900/40 relative overflow-hidden">
+                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Total Call Logs</h3>
+                <div class="text-3xl font-black text-white" id="statTotal">0</div>
                 <i class="fa-solid fa-phone-volume text-4xl text-blue-500/10 absolute right-4 bottom-3"></i>
             </div>
-            <div class="bg-[#1c1912] p-5 rounded-xl border border-amber-900/40 relative overflow-hidden">
-                <p class="text-xs font-bold uppercase text-amber-400/80 tracking-wider">Pending Reflect</p>
-                <p class="text-3xl font-black text-amber-400 mt-1" id="countPending">0</p>
+            <div class="bg-[#1c1912] p-6 rounded-xl border border-amber-900/40 relative overflow-hidden">
+                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Pending Reflect (2-3 Days Wait)</h3>
+                <div class="text-3xl font-black text-amber-400" id="statPending">0</div>
                 <i class="fa-solid fa-hourglass-half text-4xl text-amber-500/10 absolute right-4 bottom-3"></i>
             </div>
-            <div class="bg-[#101c17] p-5 rounded-xl border border-emerald-900/40 relative overflow-hidden">
-                <p class="text-xs font-bold uppercase text-emerald-400/80 tracking-wider">Reviews Secured</p>
-                <p class="text-3xl font-black text-emerald-400 mt-1" id="countAgreed">0</p>
+            <div class="bg-[#101c17] p-6 rounded-xl border border-emerald-900/40 relative overflow-hidden">
+                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Live On Amazon ✔</h3>
+                <div class="text-3xl font-black text-green-400" id="statLive">0</div>
                 <i class="fa-solid fa-circle-check text-4xl text-emerald-500/10 absolute right-4 bottom-3"></i>
             </div>
-            <div class="bg-[#1e1215] p-5 rounded-xl border border-rose-900/40 relative overflow-hidden">
-                <p class="text-xs font-bold uppercase text-rose-400/80 tracking-wider">No Response / Cut</p>
-                <p class="text-3xl font-black text-rose-400 mt-1" id="countNoResp">0</p>
-                <i class="fa-solid fa-phone-slash text-4xl text-rose-500/10 absolute right-4 bottom-3"></i>
-            </div>
         </div>
 
-        <div class="bg-[#111827] border border-gray-800/80 rounded-xl p-4 mb-8 flex flex-wrap items-center gap-2.5">
-            <span class="text-xs uppercase font-bold text-gray-400 mr-2"><i class="fa-solid fa-filter text-amber-500 mr-1"></i> Quick SKU Filters:</span>
-            <button onclick="filterSku('ALL')" class="sku-btn active bg-amber-500 text-gray-950 text-xs font-bold px-3 py-1.5 rounded-lg transition">ALL DATA</button>
-            <button onclick="filterSku('HT210')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">HT210</button>
-            <button onclick="filterSku('Ht20')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">HT20 / PRO</button>
-            <button onclick="filterSku('H30cpro')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">H30C PRO</button>
-            <button onclick="filterSku('H30clite')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">H30C LITE</button>
-            <button onclick="filterSku('Infinistick')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">INFINISTICK</button>
-            <button onclick="filterSku('Travel-Fi')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">TRAVEL-FI</button>
-            <button onclick="filterSku('H80i')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">H80i</button>
-            <button onclick="filterSku('Xyz')" class="sku-btn bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg transition">UNMAPPED (XYZ)</button>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="space-y-6">
+                <div class="bg-[#111827] p-6 rounded-xl border border-gray-800/80 shadow-xl">
+                    <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plus-circle text-blue-500"></i> Log Customer Call</h2>
+                    <form id="reviewForm" class="space-y-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Product SKU</label>
+                            <select id="skuSelect" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none">
+                                <option value="HT15">Helett HT15 (Desktop Scanner)</option>
+                                <option value="HT20">Helett HT20 (Wireless Scanner)</option>
+                                <option value="HT20PRO">Helett HT20 Pro (Wireless Premium)</option>
+                                <option value="HT210">Helett HT210 (Sensor Scanner)</option>
+                                <option value="HT410">Helett HT410 (Handheld Wired)</option>
+                                <option value="HE24">Helett HE24 (Business Tech)</option>
+                                <option value="H30C">Helett H30C (Adjustable Lite)</option>
+                                <option value="H30CPRO">Helett H30C Pro (Shipping Label)</option>
+                                <option value="H80i">Helett H80i (POS Printer)</option>
+                                <option value="Infinistick">infiniStick™ (Android TV)</option>
+                                <option value="Travel-Fi">Travel-Fi (Portable Device)</option>
+                                <option value="Xyz">Unmapped Brand / XYZ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Customer Contact / Phone</label>
+                            <input type="text" id="custPhone" placeholder="e.g. 919876543210" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none font-mono" required>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Technical Logs / Client Remarks</label>
+                            <textarea id="custComment" placeholder="e.g. Alignment issue fixed, agreed to give review..." class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none h-20 resize-none" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Review Follow-up Status</label>
+                            <select id="initialStatus" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none">
+                                <option value="Pending">🟡 Pending Reflect (Waiting 2-3 Days)</option>
+                                <option value="Live">🟢 Live On Amazon (Reflected)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold py-2.5 px-4 rounded-lg text-xs tracking-wide uppercase transition duration-200">
+                            <i class="fa-solid fa-save mr-2"></i>Commit Entry to Matrix
+                        </button>
+                    </form>
+                </div>
 
-        <div class="bg-[#111827] border border-gray-800/80 rounded-2xl overflow-hidden shadow-2xl">
-            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-900/40">
-                <div>
-                    <h2 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-database text-purple-500"></i> Operational Excel Feed Matrix</h2>
-                    <p class="text-xs text-gray-400 mt-0.5">Real-time parsed log timeline directly representation of your operational worksheets.</p>
+                <div class="bg-[#111827] p-5 rounded-xl border border-gray-800/80 shadow-xl">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3"><i class="fa-brands fa-amazon text-amber-500 mr-1"></i> Global SKU Directory</h3>
+                    <div class="text-[11px] text-gray-400 mb-3">Click to open official live listing for verification:</div>
+                    <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+                        <a href="https://www.amazon.in/HT15-Hands-Free-Exposure-Scanning-Warranty/dp/B0FGCT1MWB" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>HT15 Desktop</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                        <a href="https://www.amazon.in/HT20-Wireless-Connectivity-Induction-Supermarket/dp/B0CPDPTHVN" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>HT20 Wireless</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                        <a href="https://www.amazon.in/RapidLabelTM-BT-Bluetooth-Shipping-Wireless/dp/B0GYSTLWT3" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>H30C PRO</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                        <a href="https://www.amazon.in/helett-HT410-Handheld-Indicator-Induction/dp/B0CBC9G7W2" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>HT410 Handheld</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                        <a href="https://www.amazon.in/H80i-Compatible-Printing-Resolution-Warranty/dp/B0CZ99K438" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>H80i POS</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                        <a href="https://www.amazon.in/infiniStickTM-Android-Based-Bluetooth-Quad-Core-Processor/dp/B0GDKY6QHN" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>infiniStick TV</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                    </div>
                 </div>
             </div>
-            
-            <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[900px]">
-                    <thead>
-                        <tr class="bg-gray-900/70 border-b border-gray-800 text-gray-400 text-[11px] uppercase tracking-wider font-bold">
-                            <th class="py-3.5 px-4 text-center w-12">No.</th>
-                            <th class="py-3.5 px-4 w-28">Date Log</th>
-                            <th class="py-3.5 px-4 w-28">Product SKU</th>
-                            <th class="py-3.5 px-4 w-40">Client Contact</th>
-                            <th class="py-3.5 px-4">Technical Logs / Client Remarks</th>
-                            <th class="py-3.5 px-4 w-44">Operational Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="masterTableBody" class="divide-y divide-gray-800/40 text-sm">
-                        </tbody>
-                </table>
-            </div>
-        </div>
 
+            <div class="lg:col-span-2 bg-[#111827] p-6 rounded-xl border border-gray-800/80 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-800 pb-4 mb-4 gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-list-check text-purple-500"></i> Executive Audit Timeline</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">Real-time parsed follow-ups. Click actions to modify status safely.</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="border-b border-gray-800 text-gray-400 text-[10px] uppercase font-bold tracking-wider">
+                                <th class="py-3 px-2">SKU / Model</th>
+                                <th class="py-3 px-2">Client Identity</th>
+                                <th class="py-3 px-2">Follow-up Summary</th>
+                                <th class="py-3 px-2 text-center">Audit Status</th>
+                                <th class="py-3 px-2 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTableBody" class="divide-y divide-gray-800/40 text-xs">
+                            </tbody>
+                    </table>
+                    <div id="emptyMessage" class="text-center text-gray-500 py-12 hidden">
+                        <i class="fa-solid fa-folder-open text-3xl mb-2 block text-gray-600"></i> No customer logs entered yet. Start managing from the left module!
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </main>
 
     <script>
-        // Your real parsed WPS data structure directly mapped dynamically
-        const rawWpsData = [
-            { id: 3, date: "26/09/2025", sku: "HT210", phone: "919764580968", comment: "Sensor is not working", remarks: "No response", status: "N" },
-            { id: 4, date: "26/09/2025", sku: "HT210", phone: "919344291819", comment: "Not working with finger", remarks: "No response", status: "N" },
-            { id: 5, date: "24/09/2025", sku: "HT210", phone: "919354962466", comment: "Home service he want", remarks: "No response", status: "N" },
-            { id: 6, date: "22/09/2025", sku: "HT210", phone: "919999048807", comment: "Installation video", remarks: "No response", status: "N" },
-            { id: 7, date: "17/09/2025", sku: "HT210", phone: "919033656968", comment: "Fingerprint register issue", remarks: "No response", status: "N" },
-            { id: 8, date: "06/10/2025", sku: "Xyz", phone: "919557294419", comment: "Other brand scanner complain", remarks: "Not our product", status: "N" },
-            { id: 19, date: "24/11/2025", sku: "Xyz", phone: "917488944761", comment: "Thermal printer details inquiry", remarks: "Details provided", status: "N" },
-            { id: 2, date: "31/01/2026", sku: "Ht20", phone: "917003166483", comment: "Asking about factory reset QR", remarks: "No response", status: "N" },
-            { id: 10, date: "29/01/2026", sku: "Ht20", phone: "918423853904", comment: "QR sent, working fine now", remarks: "No response", status: "N" },
-            { id: 8, date: "27/01/2026", sku: "H30cpro", phone: "917709815909", comment: "Alignment issue fixed via WhatsApp", remarks: "He already given the review", status: "Live" },
-            { id: 3, date: "29/01/2026", sku: "H30cpro", phone: "917989558275", comment: "Printing issue resolved on call", remarks: "He agree to give review", status: "Agreed" },
-            { id: 5, date: "27/01/2025", sku: "H30clite", phone: "918802483502", comment: "Alignment issue resolved", remarks: "He already given the review", status: "Live" },
-            { id: 13, date: "22/12/2025", sku: "H30clite", phone: "919022763831", comment: "Print Quality issue resolved", remarks: "He agree to give review", status: "Agreed" },
-            { id: 9, date: "09/12/2025", sku: "Infinistick", phone: "9998091010", comment: "Infinistick TV connection issue", remarks: "Fixed on video call", status: "N" },
-            { id: 18, date: "15/01/2026", sku: "Travel-Fi", phone: "9787074251", comment: "Follow-up support", remarks: "He agree to give review", status: "Agreed" },
-            { id: 27, date: "02/02/2026", sku: "Travel-Fi", phone: "919302552296", comment: "How to change password", remarks: "He already given the review", status: "Live" },
-            { id: 5, date: "10/02/2026", sku: "H80i", phone: "916371224785", comment: "Installation process done", remarks: "No response", status: "N" }
-        ];
+        // Utilizing localStorage so your data inputs remain completely safe on refresh
+        let localAuditLogs = JSON.parse(localStorage.getItem('helett_audit_matrix')) || [];
 
-        function renderMatrix(filterSKU = 'ALL') {
-            const tbody = document.getElementById('masterTableBody');
-            tbody.innerHTML = '';
+        const form = document.getElementById('reviewForm');
+        const tableBody = document.getElementById('auditTableBody');
+        const emptyMessage = document.getElementById('emptyMessage');
 
-            let total = rawWpsData.length;
-            let pending = 0;
-            let agreed = 0;
-            let noResp = 0;
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newEntry = {
+                id: Date.now(),
+                sku: document.getElementById('skuSelect').value,
+                phone: document.getElementById('custPhone').value,
+                comment: document.getElementById('custComment').value,
+                status: document.getElementById('initialStatus').value,
+                date: new Date().toLocaleDateString('en-IN')
+            };
 
-            rawWpsData.forEach(item => {
-                // Global status counting
-                if (item.status === 'Live') agreed++;
-                else if (item.status === 'Agreed') pending++;
-                else noResp++;
+            localAuditLogs.unshift(newEntry);
+            saveAndRender();
+            form.reset();
+        });
 
-                // Apply dynamic filter match
-                if (filterSKU !== 'ALL' && !item.sku.toLowerCase().includes(filterSKU.toLowerCase())) {
-                    return;
+        function toggleStatus(id) {
+            localAuditLogs = localAuditLogs.map(item => {
+                if(item.id === id) {
+                    item.status = item.status === 'Pending' ? 'Live' : 'Pending';
                 }
+                return item;
+            });
+            saveAndRender();
+        }
 
-                // Render dynamic operational badges
-                let badgeStyle = "";
-                if (item.status === 'Live' || item.remarks.includes('already given')) {
-                    badgeStyle = `<span class="bg-emerald-950/50 text-emerald-400 border border-emerald-800/50 text-[11px] px-2.5 py-1 rounded-md font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> Live on Amazon</span>`;
-                } else if (item.status === 'Agreed' || item.remarks.includes('agree to give')) {
-                    badgeStyle = `<span class="bg-amber-950/50 text-amber-400 border border-amber-800/50 text-[11px] px-2.5 py-1 rounded-md font-semibold"><i class="fa-solid fa-hourglass-start mr-1"></i> Pending Reflect</span>`;
+        // Delete row securely
+        function removeEntry(id) {
+            if(confirm('Confirm deletion of this client file from records?')) {
+                localAuditLogs = localAuditLogs.filter(item => item.id !== id);
+                saveAndRender();
+            }
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('helett_audit_matrix', JSON.stringify(localAuditLogs));
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            tableBody.innerHTML = '';
+            
+            if(localAuditLogs.length === 0) {
+                emptyMessage.classList.remove('hidden');
+                syncCounters(0, 0, 0);
+                return;
+            } else {
+                emptyMessage.classList.add('hidden');
+            }
+
+            let total = localAuditLogs.length;
+            let pending = 0;
+            let live = 0;
+
+            localAuditLogs.forEach(item => {
+                let statusBadge = '';
+                let actionBtn = '';
+                
+                if(item.status === 'Pending') {
+                    pending++;
+                    statusBadge = `<span class="bg-amber-950/60 text-amber-400 border border-amber-900/40 text-[10px] px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-clock mr-1 animate-pulse"></i>Pending Reflect</span>`;
+                    actionBtn = `<button onclick="toggleStatus(${item.id})" class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold py-1 px-2 rounded hover:bg-emerald-900 transition"><i class="fa-solid fa-check mr-1"></i>Mark Live</button>`;
                 } else {
-                    badgeStyle = `<span class="bg-gray-800 text-gray-400 text-[11px] px-2.5 py-1 rounded-md font-medium"><i class="fa-solid fa-phone mr-1"></i> Logged Call</span>`;
+                    live++;
+                    statusBadge = `<span class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 text-[10px] px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-circle-check mr-1"></i>Live on Amazon</span>`;
+                    actionBtn = `<button onclick="toggleStatus(${item.id})" class="text-[10px] bg-gray-800 text-gray-300 border border-gray-700 font-bold py-1 px-2 rounded hover:bg-gray-700 transition"><i class="fa-solid fa-rotate-left mr-1"></i>Revert</button>`;
                 }
 
                 const row = document.createElement('tr');
-                row.className = "hover:bg-gray-950/60 transition duration-150 group";
+                row.className = "hover:bg-gray-900/30 transition group";
                 row.innerHTML = `
-                    <td class="py-3.5 px-4 text-center font-mono text-gray-500 font-semibold">${item.id}</td>
-                    <td class="py-3.5 px-4 text-xs font-mono text-gray-400">${item.date}</td>
-                    <td class="py-3.5 px-4">
-                        <span class="bg-gray-800 group-hover:bg-amber-950/30 group-hover:text-amber-400 group-hover:border-amber-900/50 transition border border-gray-700 text-gray-200 font-mono text-xs px-2 py-0.5 rounded font-bold">${item.sku}</span>
+                    <td class="py-3 px-2">
+                        <span class="bg-gray-900 border border-gray-800 text-gray-300 font-mono font-bold text-[11px] px-1.5 py-0.5 rounded group-hover:border-amber-500/30 transition">${item.sku}</span>
                     </td>
-                    <td class="py-3.5 px-4">
-                        <div class="font-bold text-gray-300 font-mono text-xs"><i class="fa-solid fa-square-phone text-gray-500 mr-1"></i>+${item.phone}</div>
+                    <td class="py-3 px-2 font-mono text-gray-300 font-semibold">
+                        +${item.phone}
+                        <div class="text-[10px] text-gray-500 font-normal mt-0.5"><i class="fa-regular fa-calendar text-[9px]"></i> ${item.date}</div>
                     </td>
-                    <td class="py-3.5 px-4 text-xs">
-                        <div class="text-gray-200 font-medium">${item.comment || '<span class="text-gray-600 font-normal">No issue noted</span>'}</div>
-                        <div class="text-[11px] text-gray-400 mt-0.5"><i class="fa-solid fa-reply text-[9px] text-purple-400 mr-1"></i>${item.remarks}</div>
+                    <td class="py-3 px-2 text-gray-300 max-w-xs truncate" title="${item.comment}">
+                        ${item.comment}
                     </td>
-                    <td class="py-3.5 px-4 text-left">${badgeStyle}</td>
+                    <td class="py-3 px-2 text-center">
+                        ${statusBadge}
+                    </td>
+                    <td class="py-3 px-2 text-right space-x-1.5 whitespace-nowrap">
+                        ${actionBtn}
+                        <button onclick="removeEntry(${item.id})" class="text-red-400 hover:text-red-300 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 p-1 px-2 rounded transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
                 `;
-                tbody.appendChild(row);
+                tableBody.appendChild(row);
             });
 
-            // Sync overview metrics numbers
-            document.getElementById('countTotal').innerText = total;
-            document.getElementById('countPending').innerText = pending;
-            document.getElementById('countAgreed').innerText = agreed;
-            document.getElementById('countNoResp').innerText = noResp;
+            syncCounters(total, pending, live);
         }
 
-        function filterSku(sku) {
-            // Manage clean UI tab toggles
-            document.querySelectorAll('.sku-btn').forEach(btn => {
-                btn.classList.remove('bg-amber-500', 'text-gray-950', 'active');
-                btn.classList.add('bg-gray-800', 'text-gray-300');
-            });
-            const activeBtn = event.target;
-            activeBtn.classList.remove('bg-gray-800', 'text-gray-300');
-            activeBtn.classList.add('bg-amber-500', 'text-gray-950', 'active');
-
-            renderMatrix(sku);
+        // Update real executive layout stats counters
+        function syncCounters(t, p, l) {
+            document.getElementById('statTotal').innerText = t;
+            document.getElementById('statPending').innerText = p;
+            document.getElementById('statLive').innerText = l;
         }
 
-        // Initialize display stream on load
-        renderMatrix();
+        // Initialize display stream
+        renderDashboard();
     </script>
 </body>
 </html>
