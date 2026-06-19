@@ -3,131 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Helett - Amazon Feedback Control Centre</title>
+    <title>Helett - Amazon Intelligence & Review Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-[#0b0f19] text-gray-200 font-sans antialiased min-h-screen">
+<body class="bg-[#060814] text-gray-200 font-sans antialiased min-h-screen">
 
-    <header class="bg-[#111827]/90 backdrop-blur-md border-b border-gray-800/80 sticky top-0 z-50 px-6 py-4">
+    <header class="bg-[#0f1123]/90 border-b border-gray-800/80 sticky top-0 z-50 px-6 py-4">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3.5">
-                <div class="bg-gradient-to-tr from-amber-500 to-orange-600 p-2.5 rounded-xl shadow-lg shadow-orange-500/20">
-                    <i class="fa-brands fa-amazon text-xl text-white"></i>
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 p-2 rounded-xl shadow-lg shadow-amber-500/20 text-gray-950">
+                    <i class="fa-brands fa-amazon text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tight text-white">HELETT <span class="text-amber-500 font-medium text-lg">FEEDBACK CONTROL CENTRE</span></h1>
-                    <p class="text-[11px] text-gray-400 font-mono tracking-wider">REVIEWS AUDIT & QUALITY ASSURANCE ENGINE</p>
+                    <h1 class="text-lg font-black tracking-tight text-white">HELETT <span class="text-amber-500 font-normal">AMAZON INTEL HUB</span></h1>
+                    <p class="text-[10px] text-gray-400 font-mono tracking-wider">LIVE ASIN MONITORING & FEEDBACK PIPELINE</p>
                 </div>
             </div>
-            <div class="text-sm bg-gray-800/60 px-3 py-1.5 rounded-full border border-gray-700 text-gray-300">
-                <i class="fa-solid fa-lock text-green-400 mr-1"></i> Shared Executive Access Mode
+            <div class="flex items-center space-x-3 bg-gray-900/80 px-4 py-2 rounded-xl border border-gray-800">
+                <i class="fa-regular fa-clock text-amber-500 text-sm animate-pulse"></i>
+                <div class="text-right">
+                    <div id="liveTime" class="text-xs font-mono font-bold text-white">00:00:00 PM</div>
+                    <div id="liveDate" class="text-[10px] text-gray-400 font-mono">19 June 2026</div>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-            <div class="bg-[#111c30] p-6 rounded-xl border border-blue-900/40 relative overflow-hidden">
-                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Total Call Logs</h3>
-                <div class="text-3xl font-black text-white" id="statTotal">0</div>
-                <i class="fa-solid fa-phone-volume text-4xl text-blue-500/10 absolute right-4 bottom-3"></i>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+            <div class="bg-[#0f1329] p-5 rounded-xl border border-blue-900/40 relative overflow-hidden">
+                <p class="text-[11px] font-bold uppercase text-blue-400/80 tracking-wider">Total Reviews Tracked</p>
+                <p class="text-3xl font-black text-white mt-1" id="statTotal">0</p>
+                <i class="fa-solid fa-calculator text-4xl text-blue-500/5 absolute right-4 bottom-3"></i>
             </div>
-            <div class="bg-[#1c1912] p-6 rounded-xl border border-amber-900/40 relative overflow-hidden">
-                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Pending Reflect (2-3 Days Wait)</h3>
-                <div class="text-3xl font-black text-amber-400" id="statPending">0</div>
-                <i class="fa-solid fa-hourglass-half text-4xl text-amber-500/10 absolute right-4 bottom-3"></i>
+            <div class="bg-[#241318] p-5 rounded-xl border border-rose-900/40 relative overflow-hidden">
+                <p class="text-[11px] font-bold uppercase text-rose-400/80 tracking-wider font-mono">⚠️ Negative Feedbacks</p>
+                <p class="text-3xl font-black text-rose-400 mt-1" id="statNegative">0</p>
+                <i class="fa-solid fa-triangle-exclamation text-4xl text-rose-500/5 absolute right-4 bottom-3"></i>
             </div>
-            <div class="bg-[#101c17] p-6 rounded-xl border border-emerald-900/40 relative overflow-hidden">
-                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Live On Amazon ✔</h3>
-                <div class="text-3xl font-black text-green-400" id="statLive">0</div>
-                <i class="fa-solid fa-circle-check text-4xl text-emerald-500/10 absolute right-4 bottom-3"></i>
+            <div class="bg-[#101c15] p-5 rounded-xl border border-emerald-900/40 relative overflow-hidden">
+                <p class="text-[11px] font-bold uppercase text-emerald-400/80 tracking-wider">Reflected & Resolved</p>
+                <p class="text-3xl font-black text-emerald-400 mt-1" id="statResolved">0</p>
+                <i class="fa-solid fa-square-check text-4xl text-emerald-500/5 absolute right-4 bottom-3"></i>
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4"><i class="fa-solid fa-layer-group text-amber-500 mr-1"></i> ASIN Separated Micro-Dashboards</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                
+                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: HT15</span><span class="text-amber-500 font-bold">★ 4.2</span></div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">HT15 Desktop</div>
+                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0FGCT1MWB</div>
+                    <a href="https://www.amazon.in/HT15-Hands-Free-Exposure-Scanning-Warranty/dp/B0FGCT1MWB" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
+                </div>
+
+                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: HT20</span><span class="text-amber-500 font-bold">★ 4.0</span></div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">HT20 Wireless</div>
+                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0CPDPTHVN</div>
+                    <a href="https://www.amazon.in/HT20-Wireless-Connectivity-Induction-Supermarket/dp/B0CPDPTHVN" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
+                </div>
+
+                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: H30C</span><span class="text-amber-500 font-bold">★ 3.9</span></div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">H30C Printer</div>
+                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0DW8DX2M9</div>
+                    <a href="https://www.amazon.in/H30C-Shipping-Adjustable-Resolution-Compatible/dp/B0DW8DX2M9" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
+                </div>
+
+                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: H80i</span><span class="text-amber-500 font-bold">★ 4.3</span></div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">H80i POS</div>
+                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0CZ99K438</div>
+                    <a href="https://www.amazon.in/H80i-Compatible-Printing-Resolution-Warranty/dp/B0CZ99K438" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
+                </div>
+
+                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: HE24</span><span class="text-amber-500 font-bold">★ 4.1</span></div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">HE24 Scanner</div>
+                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0DDL3TR1L</div>
+                    <a href="https://www.amazon.in/HE24-Wireless-Bluetooth-Business-warranty/dp/B0DDL3TR1L" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
+                </div>
+
+                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: TV-STK</span><span class="text-amber-500 font-bold">★ 4.5</span></div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">infiniStick™</div>
+                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0GDKY6QHN</div>
+                    <a href="https://www.amazon.in/infiniStickTM-Android-Based-Bluetooth-Quad-Core-Processor/dp/B0GDKY6QHN" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
+                </div>
+
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="space-y-6">
-                <div class="bg-[#111827] p-6 rounded-xl border border-gray-800/80 shadow-xl">
-                    <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plus-circle text-blue-500"></i> Log Customer Call</h2>
-                    <form id="reviewForm" class="space-y-4">
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Select Product SKU</label>
-                            <select id="skuSelect" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none">
-                                <option value="HT15">Helett HT15 (Desktop Scanner)</option>
-                                <option value="HT20">Helett HT20 (Wireless Scanner)</option>
-                                <option value="HT20PRO">Helett HT20 Pro (Wireless Premium)</option>
-                                <option value="HT210">Helett HT210 (Sensor Scanner)</option>
-                                <option value="HT410">Helett HT410 (Handheld Wired)</option>
-                                <option value="HE24">Helett HE24 (Business Tech)</option>
-                                <option value="H30C">Helett H30C (Adjustable Lite)</option>
-                                <option value="H30CPRO">Helett H30C Pro (Shipping Label)</option>
-                                <option value="H80i">Helett H80i (POS Printer)</option>
-                                <option value="Infinistick">infiniStick™ (Android TV)</option>
-                                <option value="Travel-Fi">Travel-Fi (Portable Device)</option>
-                                <option value="Xyz">Unmapped Brand / XYZ</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Customer Contact / Phone</label>
-                            <input type="text" id="custPhone" placeholder="e.g. 919876543210" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none font-mono" required>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Technical Logs / Client Remarks</label>
-                            <textarea id="custComment" placeholder="e.g. Alignment issue fixed, agreed to give review..." class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none h-20 resize-none" required></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 uppercase mb-1">Review Follow-up Status</label>
-                            <select id="initialStatus" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 focus:border-blue-500 outline-none">
-                                <option value="Pending">🟡 Pending Reflect (Waiting 2-3 Days)</option>
-                                <option value="Live">🟢 Live On Amazon (Reflected)</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold py-2.5 px-4 rounded-lg text-xs tracking-wide uppercase transition duration-200">
-                            <i class="fa-solid fa-save mr-2"></i>Commit Entry to Matrix
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-[#111827] p-5 rounded-xl border border-gray-800/80 shadow-xl">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3"><i class="fa-brands fa-amazon text-amber-500 mr-1"></i> Global SKU Directory</h3>
-                    <div class="text-[11px] text-gray-400 mb-3">Click to open official live listing for verification:</div>
-                    <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                        <a href="https://www.amazon.in/HT15-Hands-Free-Exposure-Scanning-Warranty/dp/B0FGCT1MWB" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>HT15 Desktop</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
-                        <a href="https://www.amazon.in/HT20-Wireless-Connectivity-Induction-Supermarket/dp/B0CPDPTHVN" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>HT20 Wireless</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
-                        <a href="https://www.amazon.in/RapidLabelTM-BT-Bluetooth-Shipping-Wireless/dp/B0GYSTLWT3" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>H30C PRO</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
-                        <a href="https://www.amazon.in/helett-HT410-Handheld-Indicator-Induction/dp/B0CBC9G7W2" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>HT410 Handheld</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
-                        <a href="https://www.amazon.in/H80i-Compatible-Printing-Resolution-Warranty/dp/B0CZ99K438" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>H80i POS</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
-                        <a href="https://www.amazon.in/infiniStickTM-Android-Based-Bluetooth-Quad-Core-Processor/dp/B0GDKY6QHN" target="_blank" class="block bg-gray-950 p-2 rounded border border-gray-800 hover:border-amber-500/50 text-gray-300 font-mono flex justify-between items-center"><span>infiniStick TV</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+            <div class="bg-[#101222] p-6 rounded-xl border border-gray-800 shadow-2xl h-fit">
+                <h2 class="text-sm font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-bug text-rose-500"></i> Log Amazon Review File</h2>
+                <form id="auditForm" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Target Product SKU</label>
+                        <select id="skuSelect" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none">
+                            <option value="HT15">HT15 (Desktop Scanner)</option>
+                            <option value="HT20">HT20 (Wireless Scanner)</option>
+                            <option value="H30C">H30C (Adjustable Lite)</option>
+                            <option value="H80i">H80i (POS Printer)</option>
+                            <option value="HE24">HE24 (Business Tech)</option>
+                            <option value="Infinistick">infiniStick™ TV</option>
+                        </select>
                     </div>
-                </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Customer Details / Order ID</label>
+                        <input type="text" id="custDetail" placeholder="e.g. Order #403-1234567" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Review Type / Classification</label>
+                        <select id="reviewType" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none">
+                            <option value="Negative">🔴 Critical / Negative Feedback (1-3 Star)</option>
+                            <option value="Positive">🟢 Positive Feedback Secured (4-5 Star)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Issue / Feedback Log Comment</label>
+                        <textarea id="issueComment" placeholder="e.g. Sensor pairing issue, customer left 1-star comment..." class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none h-20 resize-none" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-950 font-extrabold py-2 px-4 rounded-lg text-xs uppercase tracking-wider transition">
+                        Add Review to Monitor Queue
+                    </button>
+                </form>
             </div>
 
-            <div class="lg:col-span-2 bg-[#111827] p-6 rounded-xl border border-gray-800/80 shadow-xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-800 pb-4 mb-4 gap-2">
-                    <div>
-                        <h2 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-list-check text-purple-500"></i> Executive Audit Timeline</h2>
-                        <p class="text-xs text-gray-400 mt-0.5">Real-time parsed follow-ups. Click actions to modify status safely.</p>
-                    </div>
-                </div>
-
+            <div class="lg:col-span-2 bg-[#101222] p-6 rounded-xl border border-gray-800 shadow-2xl">
+                <h2 class="text-sm font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-purple-500"></i> Amazon Escalation Matrix Matrix</h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[600px]">
+                    <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-gray-800 text-gray-400 text-[10px] uppercase font-bold tracking-wider">
-                                <th class="py-3 px-2">SKU / Model</th>
-                                <th class="py-3 px-2">Client Identity</th>
-                                <th class="py-3 px-2">Follow-up Summary</th>
-                                <th class="py-3 px-2 text-center">Audit Status</th>
-                                <th class="py-3 px-2 text-right">Actions</th>
+                            <tr class="border-b border-gray-800 text-gray-500 text-[10px] uppercase font-bold tracking-wider">
+                                <th class="py-2.5 px-2">Product SKU</th>
+                                <th class="py-2.5 px-2">Order/Client Identity</th>
+                                <th class="py-2.5 px-2">Review Content Log</th>
+                                <th class="py-2.5 px-2 text-center">Status Badge</th>
+                                <th class="py-2.5 px-2 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="auditTableBody" class="divide-y divide-gray-800/40 text-xs">
+                        <tbody id="matrixTableBody" class="divide-y divide-gray-800/40 text-xs">
                             </tbody>
                     </table>
-                    <div id="emptyMessage" class="text-center text-gray-500 py-12 hidden">
-                        <i class="fa-solid fa-folder-open text-3xl mb-2 block text-gray-600"></i> No customer logs entered yet. Start managing from the left module!
+                    <div id="emptyMsg" class="text-center text-gray-600 py-12 hidden">
+                        <i class="fa-solid fa-fingerprint text-2xl mb-2 block"></i> No Amazon audit files logged yet.
                     </div>
                 </div>
             </div>
@@ -136,120 +162,114 @@
     </main>
 
     <script>
-        // Utilizing localStorage so your data inputs remain completely safe on refresh
-        let localAuditLogs = JSON.parse(localStorage.getItem('helett_audit_matrix')) || [];
+        // Setup state persistence inside LocalStorage
+        let intelligenceLogs = JSON.parse(localStorage.getItem('helett_intel_data')) || [];
 
-        const form = document.getElementById('reviewForm');
-        const tableBody = document.getElementById('auditTableBody');
-        const emptyMessage = document.getElementById('emptyMessage');
+        const form = document.getElementById('auditForm');
+        const tableBody = document.getElementById('matrixTableBody');
+        const emptyMsg = document.getElementById('emptyMsg');
+
+        // Clock Logic
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const newEntry = {
+            const entry = {
                 id: Date.now(),
                 sku: document.getElementById('skuSelect').value,
-                phone: document.getElementById('custPhone').value,
-                comment: document.getElementById('custComment').value,
-                status: document.getElementById('initialStatus').value,
-                date: new Date().toLocaleDateString('en-IN')
+                detail: document.getElementById('custDetail').value,
+                type: document.getElementById('reviewType').value,
+                comment: document.getElementById('issueComment').value,
+                resolved: false,
+                timestamp: new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'})
             };
-
-            localAuditLogs.unshift(newEntry);
+            intelligenceLogs.unshift(entry);
             saveAndRender();
             form.reset();
         });
 
-        function toggleStatus(id) {
-            localAuditLogs = localAuditLogs.map(item => {
-                if(item.id === id) {
-                    item.status = item.status === 'Pending' ? 'Live' : 'Pending';
-                }
+        function toggleResolve(id) {
+            intelligenceLogs = intelligenceLogs.map(item => {
+                if(item.id === id) item.resolved = !item.resolved;
                 return item;
             });
             saveAndRender();
         }
 
-        // Delete row securely
-        function removeEntry(id) {
-            if(confirm('Confirm deletion of this client file from records?')) {
-                localAuditLogs = localAuditLogs.filter(item => item.id !== id);
+        function deleteEntry(id) {
+            if(confirm('Securely purge this audit file?')) {
+                intelligenceLogs = intelligenceLogs.filter(item => item.id !== id);
                 saveAndRender();
             }
         }
 
         function saveAndRender() {
-            localStorage.setItem('helett_audit_matrix', JSON.stringify(localAuditLogs));
-            renderDashboard();
+            localStorage.setItem('helett_intel_data', JSON.stringify(intelligenceLogs));
+            renderTable();
         }
 
-        function renderDashboard() {
+        function renderTable() {
             tableBody.innerHTML = '';
-            
-            if(localAuditLogs.length === 0) {
-                emptyMessage.classList.remove('hidden');
-                syncCounters(0, 0, 0);
+            if(intelligenceLogs.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                updateCounters(0, 0, 0);
                 return;
-            } else {
-                emptyMessage.classList.add('hidden');
             }
+            emptyMsg.classList.add('hidden');
 
-            let total = localAuditLogs.length;
-            let pending = 0;
-            let live = 0;
+            let total = intelligenceLogs.length;
+            let negative = 0;
+            let resolved = 0;
 
-            localAuditLogs.forEach(item => {
-                let statusBadge = '';
+            intelligenceLogs.forEach(item => {
+                if(item.type === 'Negative' && !item.resolved) negative++;
+                if(item.resolved) resolved++;
+
+                let badge = '';
                 let actionBtn = '';
-                
-                if(item.status === 'Pending') {
-                    pending++;
-                    statusBadge = `<span class="bg-amber-950/60 text-amber-400 border border-amber-900/40 text-[10px] px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-clock mr-1 animate-pulse"></i>Pending Reflect</span>`;
-                    actionBtn = `<button onclick="toggleStatus(${item.id})" class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold py-1 px-2 rounded hover:bg-emerald-900 transition"><i class="fa-solid fa-check mr-1"></i>Mark Live</button>`;
+
+                if(item.resolved) {
+                    badge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Resolved / Fixed</span>`;
+                    actionBtn = `<button onclick="toggleResolve(${item.id})" class="text-[10px] bg-gray-800 text-gray-400 py-0.5 px-2 rounded hover:bg-gray-700">Reopen</button>`;
                 } else {
-                    live++;
-                    statusBadge = `<span class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 text-[10px] px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-circle-check mr-1"></i>Live on Amazon</span>`;
-                    actionBtn = `<button onclick="toggleStatus(${item.id})" class="text-[10px] bg-gray-800 text-gray-300 border border-gray-700 font-bold py-1 px-2 rounded hover:bg-gray-700 transition"><i class="fa-solid fa-rotate-left mr-1"></i>Revert</button>`;
+                    badge = item.type === 'Negative' 
+                        ? `<span class="bg-rose-950 text-rose-400 border border-rose-900 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-triangle-exclamation mr-1 animate-pulse"></i> Critical Neg</span>`
+                        : `<span class="bg-blue-950 text-blue-400 border border-blue-900 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-star mr-1"></i> Positive Sec</span>`;
+                    
+                    actionBtn = `<button onclick="toggleResolve(${item.id})" class="text-[10px] bg-emerald-900 text-emerald-300 font-bold py-0.5 px-2 rounded hover:bg-emerald-800">Resolve</button>`;
                 }
 
                 const row = document.createElement('tr');
-                row.className = "hover:bg-gray-900/30 transition group";
+                row.className = "hover:bg-gray-900/30 transition";
                 row.innerHTML = `
-                    <td class="py-3 px-2">
-                        <span class="bg-gray-900 border border-gray-800 text-gray-300 font-mono font-bold text-[11px] px-1.5 py-0.5 rounded group-hover:border-amber-500/30 transition">${item.sku}</span>
-                    </td>
-                    <td class="py-3 px-2 font-mono text-gray-300 font-semibold">
-                        +${item.phone}
-                        <div class="text-[10px] text-gray-500 font-normal mt-0.5"><i class="fa-regular fa-calendar text-[9px]"></i> ${item.date}</div>
-                    </td>
-                    <td class="py-3 px-2 text-gray-300 max-w-xs truncate" title="${item.comment}">
-                        ${item.comment}
-                    </td>
-                    <td class="py-3 px-2 text-center">
-                        ${statusBadge}
-                    </td>
-                    <td class="py-3 px-2 text-right space-x-1.5 whitespace-nowrap">
+                    <td class="py-3 px-2 font-mono font-bold text-gray-300">${item.sku}</td>
+                    <td class="py-3 px-2 font-mono">${item.detail}<div class="text-[9px] text-gray-500 mt-0.5">${item.timestamp}</div></td>
+                    <td class="py-3 px-2 text-gray-300 max-w-xs truncate" title="${item.comment}">${item.comment}</td>
+                    <td class="py-3 px-2 text-center">${badge}</td>
+                    <td class="py-3 px-2 text-right space-x-1 whitespace-nowrap">
                         ${actionBtn}
-                        <button onclick="removeEntry(${item.id})" class="text-red-400 hover:text-red-300 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 p-1 px-2 rounded transition">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                        <button onclick="deleteEntry(${item.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
 
-            syncCounters(total, pending, live);
+            updateCounters(total, negative, resolved);
         }
 
-        // Update real executive layout stats counters
-        function syncCounters(t, p, l) {
+        function updateCounters(t, n, r) {
             document.getElementById('statTotal').innerText = t;
-            document.getElementById('statPending').innerText = p;
-            document.getElementById('statLive').innerText = l;
+            document.getElementById('statNegative').innerText = n;
+            document.getElementById('statResolved').innerText = r;
         }
 
-        // Initialize display stream
-        renderDashboard();
+        renderTable();
     </script>
 </body>
 </html>
