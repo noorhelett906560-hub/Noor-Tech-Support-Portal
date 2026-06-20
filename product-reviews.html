@@ -1,275 +1,784 @@
-<!DOCTYPE html>
+```html
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Helett - Amazon Intelligence & Review Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noor Tech Product Health Dashboard</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --soft: #eef3f8;
+      --text: #18212f;
+      --muted: #66758a;
+      --line: #dce4ee;
+      --primary: #1967d2;
+      --green: #168a4a;
+      --yellow: #b98500;
+      --red: #cf3434;
+    }
+
+    body.dark {
+      --bg: #10151d;
+      --surface: #17202b;
+      --soft: #202b38;
+      --text: #edf3fb;
+      --muted: #a9b7c8;
+      --line: #314051;
+      --primary: #7ab2ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    main {
+      padding: 20px;
+      display: grid;
+      gap: 20px;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      border-radius: 8px;
+    }
+
+    button {
+      border: 0;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      width: min(420px, 100%);
+    }
+
+    .cards, .sku-grid, .analytics, .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .analytics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card, .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+    }
+
+    .health-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--soft);
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .health-bar div {
+      height: 100%;
+    }
+
+    .green { color: var(--green); }
+    .yellow { color: var(--yellow); }
+    .red { color: var(--red); }
+    .bg-green { background: var(--green); }
+    .bg-yellow { background: var(--yellow); }
+    .bg-red { background: var(--red); }
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 0;
+    }
+
+    dt {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    dd {
+      margin: 2px 0 0;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .status-buttons button {
+      background: var(--soft);
+      color: var(--text);
+      padding: 7px 9px;
+    }
+
+    dialog {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--surface);
+      color: var(--text);
+      width: min(560px, calc(100vw - 24px));
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .trend {
+      display: grid;
+      gap: 10px;
+    }
+
+    .trend-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 40px;
+      gap: 10px;
+      align-items: center;
+      background: var(--soft);
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .trend-line {
+      height: 8px;
+      background: rgba(25, 103, 210, .25);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .trend-line div {
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 1000px) {
+      .cards, .sku-grid, .knowledge-grid { grid-template-columns: repeat(2, 1fr); }
+      .analytics { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      header { flex-direction: column; align-items: stretch; }
+      .cards, .sku-grid, .knowledge-grid { grid-template-columns: 1fr; }
+      .trend-row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-<body class="bg-[#060814] text-gray-200 font-sans antialiased min-h-screen">
+<body>
+  <header>
+    <div>
+      <h1>Noor Tech Product Health Dashboard</h1>
+      <p>HELETT review intelligence, support issues, and SKU health.</p>
+    </div>
+    <div class="top-actions">
+      <input id="searchInput" class="search" type="search" placeholder="Search review, SKU, issue, customer, ticket">
+      <button id="themeBtn">Dark Mode</button>
+    </div>
+  </header>
 
-    <header class="bg-[#0f1123]/90 border-b border-gray-800/80 sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="bg-amber-500 p-2 rounded-xl shadow-lg shadow-amber-500/20 text-gray-950">
-                    <i class="fa-brands fa-amazon text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-black tracking-tight text-white">HELETT <span class="text-amber-500 font-normal">AMAZON INTEL HUB</span></h1>
-                    <p class="text-[10px] text-gray-400 font-mono tracking-wider">LIVE ASIN MONITORING & FEEDBACK PIPELINE</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-3 bg-gray-900/80 px-4 py-2 rounded-xl border border-gray-800">
-                <i class="fa-regular fa-clock text-amber-500 text-sm animate-pulse"></i>
-                <div class="text-right">
-                    <div id="liveTime" class="text-xs font-mono font-bold text-white">00:00:00 PM</div>
-                    <div id="liveDate" class="text-[10px] text-gray-400 font-mono">19 June 2026</div>
-                </div>
-            </div>
+  <main>
+    <section id="searchResults" class="panel hidden"></section>
+
+    <section class="cards" id="managementCards"></section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div>
+          <h2>SKU Dashboard</h2>
+          <p>Product health score = 100 - negative review weight - open issue weight - unresolved complaint weight.</p>
         </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-            <div class="bg-[#0f1329] p-5 rounded-xl border border-blue-900/40 relative overflow-hidden">
-                <p class="text-[11px] font-bold uppercase text-blue-400/80 tracking-wider">Total Reviews Tracked</p>
-                <p class="text-3xl font-black text-white mt-1" id="statTotal">0</p>
-                <i class="fa-solid fa-calculator text-4xl text-blue-500/5 absolute right-4 bottom-3"></i>
-            </div>
-            <div class="bg-[#241318] p-5 rounded-xl border border-rose-900/40 relative overflow-hidden">
-                <p class="text-[11px] font-bold uppercase text-rose-400/80 tracking-wider font-mono">⚠️ Negative Feedbacks</p>
-                <p class="text-3xl font-black text-rose-400 mt-1" id="statNegative">0</p>
-                <i class="fa-solid fa-triangle-exclamation text-4xl text-rose-500/5 absolute right-4 bottom-3"></i>
-            </div>
-            <div class="bg-[#101c15] p-5 rounded-xl border border-emerald-900/40 relative overflow-hidden">
-                <p class="text-[11px] font-bold uppercase text-emerald-400/80 tracking-wider">Reflected & Resolved</p>
-                <p class="text-3xl font-black text-emerald-400 mt-1" id="statResolved">0</p>
-                <i class="fa-solid fa-square-check text-4xl text-emerald-500/5 absolute right-4 bottom-3"></i>
-            </div>
+        <div>
+          <button id="importBtn">Import CSV / Excel</button>
+          <button id="manualBtn">Manual Entry</button>
+          <input id="fileInput" type="file" accept=".csv,.tsv,.xlsx,.xls" hidden>
         </div>
+      </div>
+      <div id="skuGrid" class="sku-grid"></div>
+    </section>
 
-        <div class="mb-10">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4"><i class="fa-solid fa-layer-group text-amber-500 mr-1"></i> ASIN Separated Micro-Dashboards</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                
-                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
-                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: HT15</span><span class="text-amber-500 font-bold">★ 4.2</span></div>
-                    <div class="text-xs font-bold text-white mt-1 truncate">HT15 Desktop</div>
-                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0FGCT1MWB</div>
-                    <a href="https://www.amazon.in/HT15-Hands-Free-Exposure-Scanning-Warranty/dp/B0FGCT1MWB" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
-                </div>
+    <section class="analytics">
+      <div class="panel">
+        <h2>Daily Review Analytics</h2>
+        <canvas id="barChart" height="220"></canvas>
+      </div>
+      <div class="panel">
+        <h2>Review Trend</h2>
+        <canvas id="lineChart" height="220"></canvas>
+      </div>
+    </section>
 
-                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
-                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: HT20</span><span class="text-amber-500 font-bold">★ 4.0</span></div>
-                    <div class="text-xs font-bold text-white mt-1 truncate">HT20 Wireless</div>
-                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0CPDPTHVN</div>
-                    <a href="https://www.amazon.in/HT20-Wireless-Connectivity-Induction-Supermarket/dp/B0CPDPTHVN" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
-                </div>
+    <section class="panel">
+      <h2>Top Complaints Last 30 Days</h2>
+      <div id="trendList" class="trend"></div>
+    </section>
 
-                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
-                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: H30C</span><span class="text-amber-500 font-bold">★ 3.9</span></div>
-                    <div class="text-xs font-bold text-white mt-1 truncate">H30C Printer</div>
-                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0DW8DX2M9</div>
-                    <a href="https://www.amazon.in/H30C-Shipping-Adjustable-Resolution-Compatible/dp/B0DW8DX2M9" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
-                </div>
+    <section class="panel">
+      <h2>Negative Review Center</h2>
+      <div id="negativeTable" class="table-wrap"></div>
+    </section>
 
-                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
-                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: H80i</span><span class="text-amber-500 font-bold">★ 4.3</span></div>
-                    <div class="text-xs font-bold text-white mt-1 truncate">H80i POS</div>
-                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0CZ99K438</div>
-                    <a href="https://www.amazon.in/H80i-Compatible-Printing-Resolution-Warranty/dp/B0CZ99K438" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
-                </div>
+    <section class="panel">
+      <h2>Support Knowledge Center</h2>
+      <div id="knowledgeGrid" class="knowledge-grid"></div>
+    </section>
 
-                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
-                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: HE24</span><span class="text-amber-500 font-bold">★ 4.1</span></div>
-                    <div class="text-xs font-bold text-white mt-1 truncate">HE24 Scanner</div>
-                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0DDL3TR1L</div>
-                    <a href="https://www.amazon.in/HE24-Wireless-Bluetooth-Business-warranty/dp/B0DDL3TR1L" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
-                </div>
+    <section class="panel">
+      <h2>Customer Escalation Center</h2>
+      <form id="ticketForm">
+        <label>Customer<input name="customer" required></label>
+        <label>SKU<select name="sku" id="ticketSku" required></select></label>
+        <label>Priority<select name="priority" required><option>High</option><option>Medium</option><option>Low</option></select></label>
+        <label>Issue<textarea name="issue" rows="3" required></textarea></label>
+        <button type="submit">Create Ticket</button>
+      </form>
+      <div id="ticketList"></div>
+    </section>
+  </main>
 
-                <div class="bg-[#111322] border border-gray-800 p-3 rounded-xl hover:border-amber-500/40 transition">
-                    <div class="flex justify-between text-[10px] text-gray-500 font-mono"><span>SKU: TV-STK</span><span class="text-amber-500 font-bold">★ 4.5</span></div>
-                    <div class="text-xs font-bold text-white mt-1 truncate">infiniStick™</div>
-                    <div class="text-[9px] text-gray-400 font-mono mt-0.5">ASIN: B0GDKY6QHN</div>
-                    <a href="https://www.amazon.in/infiniStickTM-Android-Based-Bluetooth-Quad-Core-Processor/dp/B0GDKY6QHN" target="_blank" class="block text-center mt-2 bg-gray-950 text-[10px] py-1 rounded border border-gray-800 text-blue-400 hover:bg-gray-900">Open Listing</a>
-                </div>
+  <dialog id="reviewDialog">
+    <form id="reviewForm" method="dialog">
+      <h2>Add Review</h2>
+      <label>Date<input name="date" type="date" required></label>
+      <label>SKU<select name="sku" id="reviewSku" required></select></label>
+      <label>Rating<input name="rating" type="number" min="1" max="5" required></label>
+      <label>Review Title<input name="title" required></label>
+      <label>Review Description<textarea name="description" rows="4" required></textarea></label>
+      <button id="saveReview" type="button">Save Review</button>
+      <button type="submit">Cancel</button>
+    </form>
+  </dialog>
 
-            </div>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const PRODUCTS = [
+      "HT15", "HT20", "HT20 Pro", "HT410", "H30C Pro", "H65C", "HE24 Pro",
+      "RapidLabel BT", "H80i", "Face Attendance Device", "InfiniStick"
+    ];
+
+    const issueRules = [
+      { type: "Scanning Issue", terms: ["not scanning", "scan failed", "cannot scan", "scanner"] },
+      { type: "Bluetooth Issue", terms: ["bluetooth", "pairing", "wireless", "bt not"] },
+      { type: "Print Quality", terms: ["print faded", "faded", "light print", "poor print"] },
+      { type: "Driver / USB Issue", terms: ["usb", "driver", "not detected", "device not found"] },
+      { type: "Barcode Issue", terms: ["barcode", "qr", "not readable"] },
+      { type: "Paper / Label Feed", terms: ["paper jam", "label jam", "feed", "stuck"] },
+      { type: "Power Issue", terms: ["power", "not turning on", "dead", "charging"] },
+      { type: "App / Software Issue", terms: ["app", "software", "sync", "firmware"] }
+    ];
+
+    const today = new Date();
+    const daysAgo = days => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - days);
+      return d.toISOString().slice(0, 10);
+    };
+
+    function classifyIssue(text) {
+      const value = String(text).toLowerCase();
+      const match = issueRules.find(rule => rule.terms.some(term => value.includes(term)));
+      return match ? match.type : "General Feedback";
+    }
+
+    function makeReview(sku, rating, title, description, ago, status) {
+      return {
+        id: "R-" + Math.random().toString(16).slice(2),
+        date: daysAgo(ago),
+        sku,
+        rating,
+        title,
+        description,
+        issueType: classifyIssue(title + " " + description),
+        status: status || (rating <= 2 ? "Open" : rating === 3 ? "Investigating" : "Resolved"),
+        customer: "Customer"
+      };
+    }
+
+    let reviews = JSON.parse(localStorage.getItem("noorReviews") || "null") || [
+      makeReview("HT20", 5, "Fast scanner", "Working smoothly with invoices", 0),
+      makeReview("HT20", 2, "Bluetooth not working", "Bluetooth not working after two days", 1),
+      makeReview("HT20", 3, "Barcode not readable", "Barcode not readable on glossy packets", 4),
+      makeReview("HT20 Pro", 1, "USB not detected", "USB not detected on Windows laptop", 5),
+      makeReview("HT410", 2, "Not scanning", "Scanner is not scanning small labels", 8),
+      makeReview("H30C Pro", 2, "Print faded", "Print faded after changing roll", 9),
+      makeReview("HE24 Pro", 3, "Label feed issue", "Label feed gets stuck sometimes", 12),
+      makeReview("RapidLabel BT", 2, "Bluetooth connection lost", "Bluetooth connection lost while printing", 15),
+      makeReview("H80i", 1, "Paper jam", "Paper jam happens daily", 13),
+      makeReview("Face Attendance Device", 3, "Sync delay", "Attendance app sync delay in morning", 10),
+      makeReview("InfiniStick", 2, "Power issue", "Device not turning on after update", 19)
+    ];
+
+    let tickets = JSON.parse(localStorage.getItem("noorTickets") || "[]");
+
+    function saveData() {
+      localStorage.setItem("noorReviews", JSON.stringify(reviews));
+      localStorage.setItem("noorTickets", JSON.stringify(tickets));
+    }
+
+    async function fetchReviews() {
+      return reviews;
+    }
+
+    async function syncReviews(importedReviews) {
+      reviews = [...importedReviews, ...reviews];
+      saveData();
+      render();
+      return reviews;
+    }
+
+    function getProductHealth(sku) {
+      const list = reviews.filter(r => r.sku === sku);
+      const total = list.length;
+      const negative = list.filter(r => r.rating <= 3).length;
+      const open = list.filter(r => r.status === "Open").length;
+      const unresolved = list.filter(r => r.rating <= 2 && r.status !== "Resolved").length;
+      const resolved = list.filter(r => r.status === "Resolved").length;
+      const positive = list.filter(r => r.rating >= 4).length;
+      const avg = total ? list.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
+      const score = Math.max(0, Math.round(100 - negative * 4 - open * 6 - unresolved * 5));
+      const color = score >= 85 ? "green" : score >= 65 ? "yellow" : "red";
+      return { total, negative, open, unresolved, resolved, positive, avg, score, color };
+    }
+
+    window.NoorDataLayer = { fetchReviews, syncReviews, getProductHealth };
+
+    function render() {
+      renderManagement();
+      renderSkuGrid();
+      renderNegativeTable();
+      renderCharts();
+      renderTrends();
+      renderKnowledge();
+      renderTickets();
+      renderSkuOptions();
+      runSearch();
+    }
+
+    function renderManagement() {
+      const total = reviews.length;
+      const avg = total ? reviews.reduce((s, r) => s + Number(r.rating), 0) / total : 0;
+      const negative = reviews.filter(r => r.rating <= 3).length;
+      const open = reviews.filter(r => r.status === "Open").length;
+      const resolved = reviews.filter(r => r.status === "Resolved").length;
+
+      document.getElementById("managementCards").innerHTML = [
+        ["Total Reviews", total],
+        ["Average Rating", avg.toFixed(1)],
+        ["Negative Reviews", negative],
+        ["Open Issues", open],
+        ["Resolved Issues", resolved]
+      ].map(([label, value]) => `<div class="card"><span>${label}</span><strong>${value}</strong></div>`).join("");
+    }
+
+    function renderSkuGrid() {
+      document.getElementById("skuGrid").innerHTML = PRODUCTS.map(sku => {
+        const h = getProductHealth(sku);
+        return `
+          <div class="card">
+            <span>HELETT Product</span>
+            <h3>${sku}</h3>
+            <strong class="${h.color}">${h.score}%</strong>
+            <div class="health-bar"><div class="bg-${h.color}" style="width:${h.score}%"></div></div>
+            <dl>
+              <div><dt>Total Reviews</dt><dd>${h.total}</dd></div>
+              <div><dt>Average Rating</dt><dd>${h.avg.toFixed(1)}</dd></div>
+              <div><dt>Positive Reviews</dt><dd>${h.positive}</dd></div>
+              <div><dt>Negative Reviews</dt><dd>${h.negative}</dd></div>
+              <div><dt>Open Issues</dt><dd>${h.open}</dd></div>
+              <div><dt>Resolved Issues</dt><dd>${h.resolved}</dd></div>
+            </dl>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderNegativeTable() {
+      const negative = reviews.filter(r => r.rating <= 3);
+      document.getElementById("negativeTable").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>SKU</th><th>Rating</th><th>Issue Type</th><th>Status</th><th>Review</th><th>Buttons</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${negative.map(r => `
+              <tr>
+                <td>${r.date}</td>
+                <td>${r.sku}</td>
+                <td>${r.rating}</td>
+                <td>${r.issueType}</td>
+                <td><span class="pill">${r.status}</span></td>
+                <td><b>${r.title}</b><br>${r.description}</td>
+                <td>
+                  <div class="status-buttons">
+                    <button onclick="setReviewStatus('${r.id}','Open')">Open</button>
+                    <button onclick="setReviewStatus('${r.id}','Investigating')">Investigating</button>
+                    <button onclick="setReviewStatus('${r.id}','Resolved')">Resolved</button>
+                  </div>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function setReviewStatus(id, status) {
+      reviews = reviews.map(r => r.id === id ? { ...r, status } : r);
+      saveData();
+      render();
+    }
+
+    function renderTrends() {
+      const start = new Date(today);
+      start.setDate(start.getDate() - 30);
+
+      const counts = {};
+      reviews.filter(r => new Date(r.date) >= start && r.rating <= 3).forEach(r => {
+        counts[r.issueType] = (counts[r.issueType] || 0) + 1;
+      });
+
+      const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(1, ...rows.map(r => r[1]));
+
+      document.getElementById("trendList").innerHTML = rows.map(([name, count]) => `
+        <div class="trend-row">
+          <b>${name}</b>
+          <div class="trend-line"><div style="width:${count / max * 100}%"></div></div>
+          <span>${count}</span>
         </div>
+      `).join("") || "<p>No negative complaints in the last 30 days.</p>";
+    }
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="bg-[#101222] p-6 rounded-xl border border-gray-800 shadow-2xl h-fit">
-                <h2 class="text-sm font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-bug text-rose-500"></i> Log Amazon Review File</h2>
-                <form id="auditForm" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Target Product SKU</label>
-                        <select id="skuSelect" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none">
-                            <option value="HT15">HT15 (Desktop Scanner)</option>
-                            <option value="HT20">HT20 (Wireless Scanner)</option>
-                            <option value="H30C">H30C (Adjustable Lite)</option>
-                            <option value="H80i">H80i (POS Printer)</option>
-                            <option value="HE24">HE24 (Business Tech)</option>
-                            <option value="Infinistick">infiniStick™ TV</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Customer Details / Order ID</label>
-                        <input type="text" id="custDetail" placeholder="e.g. Order #403-1234567" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Review Type / Classification</label>
-                        <select id="reviewType" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none">
-                            <option value="Negative">🔴 Critical / Negative Feedback (1-3 Star)</option>
-                            <option value="Positive">🟢 Positive Feedback Secured (4-5 Star)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Issue / Feedback Log Comment</label>
-                        <textarea id="issueComment" placeholder="e.g. Sensor pairing issue, customer left 1-star comment..." class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-xs text-gray-200 focus:border-blue-500 outline-none h-20 resize-none" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-950 font-extrabold py-2 px-4 rounded-lg text-xs uppercase tracking-wider transition">
-                        Add Review to Monitor Queue
-                    </button>
-                </form>
-            </div>
-
-            <div class="lg:col-span-2 bg-[#101222] p-6 rounded-xl border border-gray-800 shadow-2xl">
-                <h2 class="text-sm font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-purple-500"></i> Amazon Escalation Matrix Matrix</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-gray-800 text-gray-500 text-[10px] uppercase font-bold tracking-wider">
-                                <th class="py-2.5 px-2">Product SKU</th>
-                                <th class="py-2.5 px-2">Order/Client Identity</th>
-                                <th class="py-2.5 px-2">Review Content Log</th>
-                                <th class="py-2.5 px-2 text-center">Status Badge</th>
-                                <th class="py-2.5 px-2 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="matrixTableBody" class="divide-y divide-gray-800/40 text-xs">
-                            </tbody>
-                    </table>
-                    <div id="emptyMsg" class="text-center text-gray-600 py-12 hidden">
-                        <i class="fa-solid fa-fingerprint text-2xl mb-2 block"></i> No Amazon audit files logged yet.
-                    </div>
-                </div>
-            </div>
-
+    function renderKnowledge() {
+      document.getElementById("knowledgeGrid").innerHTML = PRODUCTS.map(sku => `
+        <div class="card">
+          <h3>${sku}</h3>
+          <p><b>Installation:</b> Setup checklist and pairing guide</p>
+          <p><b>Common Errors:</b> ${sku.includes("HT") ? "Scanning, barcode, USB" : "Print, sync, power, app"}</p>
+          <p><b>Solutions:</b> Driver reset, calibration, firmware check</p>
+          <p><b>FAQ:</b> Warranty, compatibility, maintenance</p>
+          <p><b>Videos:</b> Setup and troubleshooting</p>
+          <p><b>Drivers:</b> Windows, Android, utility tools</p>
         </div>
-    </main>
+      `).join("");
+    }
 
-    <script>
-        // Setup state persistence inside LocalStorage
-        let intelligenceLogs = JSON.parse(localStorage.getItem('helett_intel_data')) || [];
+    function renderTickets() {
+      document.getElementById("ticketList").innerHTML = tickets.map(t => `
+        <div class="card">
+          <h3>${t.id} - ${t.customer}</h3>
+          <p><b>${t.priority}</b> priority · ${t.sku}</p>
+          <p>${t.issue}</p>
+          <span class="pill">${t.status}</span>
+        </div>
+      `).join("");
+    }
 
-        const form = document.getElementById('auditForm');
-        const tableBody = document.getElementById('matrixTableBody');
-        const emptyMsg = document.getElementById('emptyMsg');
+    function renderSkuOptions() {
+      const options = PRODUCTS.map(sku => `<option>${sku}</option>`).join("");
+      document.getElementById("reviewSku").innerHTML = options;
+      document.getElementById("ticketSku").innerHTML = options;
+    }
 
-        // Clock Logic
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('liveDate').innerText = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+    function renderCharts() {
+      drawBarChart();
+      drawLineChart();
+    }
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const entry = {
-                id: Date.now(),
-                sku: document.getElementById('skuSelect').value,
-                detail: document.getElementById('custDetail').value,
-                type: document.getElementById('reviewType').value,
-                comment: document.getElementById('issueComment').value,
-                resolved: false,
-                timestamp: new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'})
-            };
-            intelligenceLogs.unshift(entry);
-            saveAndRender();
-            form.reset();
-        });
+    function setupCanvas(id) {
+      const canvas = document.getElementById(id);
+      const ctx = canvas.getContext("2d");
+      const ratio = devicePixelRatio || 1;
+      const width = canvas.parentElement.clientWidth - 32;
+      const height = Number(canvas.getAttribute("height"));
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { ctx, width, height };
+    }
 
-        function toggleResolve(id) {
-            intelligenceLogs = intelligenceLogs.map(item => {
-                if(item.id === id) item.resolved = !item.resolved;
-                return item;
-            });
-            saveAndRender();
-        }
+    function drawBarChart() {
+      const { ctx, width, height } = setupCanvas("barChart");
+      const data = [
+        ["Today", reviews.filter(r => r.date === daysAgo(0)).length],
+        ["Yesterday", reviews.filter(r => r.date === daysAgo(1)).length],
+        ["Weekly", reviews.filter(r => new Date(r.date) >= new Date(Date.now() - 7 * 86400000)).length],
+        ["Monthly", reviews.filter(r => new Date(r.date) >= new Date(Date.now() - 30 * 86400000)).length]
+      ];
+      const max = Math.max(1, ...data.map(x => x[1]));
+      ctx.clearRect(0, 0, width, height);
+      data.forEach(([label, count], i) => {
+        const w = width / data.length - 28;
+        const x = i * (width / data.length) + 16;
+        const h = (height - 50) * count / max;
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--primary");
+        ctx.fillRect(x, height - 30 - h, w, h);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--text");
+        ctx.fillText(count, x + 4, height - 38 - h);
+        ctx.fillText(label, x, height - 10);
+      });
+    }
 
-        function deleteEntry(id) {
-            if(confirm('Securely purge this audit file?')) {
-                intelligenceLogs = intelligenceLogs.filter(item => item.id !== id);
-                saveAndRender();
-            }
-        }
+    function drawLineChart() {
+      const { ctx, width, height } = setupCanvas("lineChart");
+      const data = Array.from({ length: 14 }, (_, i) => {
+        const date = daysAgo(13 - i);
+        return { label: date.slice(5), count: reviews.filter(r => r.date === date).length };
+      });
+      const max = Math.max(1, ...data.map(x => x.count));
+      const points = data.map((d, i) => ({
+        x: 16 + i * ((width - 32) / (data.length - 1)),
+        y: height - 30 - ((height - 55) * d.count / max),
+        label: d.label
+      }));
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue("--primary");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+      ctx.stroke();
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--primary");
+      points.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
 
-        function saveAndRender() {
-            localStorage.setItem('helett_intel_data', JSON.stringify(intelligenceLogs));
-            renderTable();
-        }
+    function runSearch() {
+      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      const box = document.getElementById("searchResults");
+      if (!q) {
+        box.classList.add("hidden");
+        return;
+      }
 
-        function renderTable() {
-            tableBody.innerHTML = '';
-            if(intelligenceLogs.length === 0) {
-                emptyMsg.classList.remove('hidden');
-                updateCounters(0, 0, 0);
-                return;
-            }
-            emptyMsg.classList.add('hidden');
+      const reviewMatches = reviews.filter(r => Object.values(r).join(" ").toLowerCase().includes(q));
+      const ticketMatches = tickets.filter(t => Object.values(t).join(" ").toLowerCase().includes(q));
 
-            let total = intelligenceLogs.length;
-            let negative = 0;
-            let resolved = 0;
+      box.classList.remove("hidden");
+      box.innerHTML = `
+        <h2>Search Results</h2>
+        ${reviewMatches.map(r => `<p><b>Review:</b> ${r.sku} · ${r.issueType} · ${r.title}</p>`).join("")}
+        ${ticketMatches.map(t => `<p><b>Ticket:</b> ${t.id} · ${t.customer} · ${t.issue}</p>`).join("")}
+        ${!reviewMatches.length && !ticketMatches.length ? "<p>No results found.</p>" : ""}
+      `;
+    }
 
-            intelligenceLogs.forEach(item => {
-                if(item.type === 'Negative' && !item.resolved) negative++;
-                if(item.resolved) resolved++;
+    function normalizeImported(row) {
+      const lower = Object.fromEntries(Object.entries(row).map(([k, v]) => [k.toLowerCase().trim(), v]));
+      const title = lower["review title"] || lower.title || "Imported review";
+      const description = lower["review description"] || lower.description || lower.review || "";
+      const rating = Number(lower.rating || 0);
 
-                let badge = '';
-                let actionBtn = '';
+      return {
+        id: "R-" + Math.random().toString(16).slice(2),
+        date: lower.date ? new Date(lower.date).toISOString().slice(0, 10) : daysAgo(0),
+        sku: lower.sku || lower.product || lower["product name"],
+        rating,
+        title,
+        description,
+        issueType: classifyIssue(title + " " + description),
+        status: rating <= 2 ? "Open" : rating === 3 ? "Investigating" : "Resolved",
+        customer: lower.customer || "Imported Review"
+      };
+    }
 
-                if(item.resolved) {
-                    badge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Resolved / Fixed</span>`;
-                    actionBtn = `<button onclick="toggleResolve(${item.id})" class="text-[10px] bg-gray-800 text-gray-400 py-0.5 px-2 rounded hover:bg-gray-700">Reopen</button>`;
-                } else {
-                    badge = item.type === 'Negative' 
-                        ? `<span class="bg-rose-950 text-rose-400 border border-rose-900 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-triangle-exclamation mr-1 animate-pulse"></i> Critical Neg</span>`
-                        : `<span class="bg-blue-950 text-blue-400 border border-blue-900 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-star mr-1"></i> Positive Sec</span>`;
-                    
-                    actionBtn = `<button onclick="toggleResolve(${item.id})" class="text-[10px] bg-emerald-900 text-emerald-300 font-bold py-0.5 px-2 rounded hover:bg-emerald-800">Resolve</button>`;
-                }
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = lines.shift().split(",").map(h => h.trim());
+      return lines.map(line => {
+        const values = line.split(",").map(v => v.trim());
+        return headers.reduce((row, h, i) => {
+          row[h] = values[i] || "";
+          return row;
+        }, {});
+      });
+    }
 
-                const row = document.createElement('tr');
-                row.className = "hover:bg-gray-900/30 transition";
-                row.innerHTML = `
-                    <td class="py-3 px-2 font-mono font-bold text-gray-300">${item.sku}</td>
-                    <td class="py-3 px-2 font-mono">${item.detail}<div class="text-[9px] text-gray-500 mt-0.5">${item.timestamp}</div></td>
-                    <td class="py-3 px-2 text-gray-300 max-w-xs truncate" title="${item.comment}">${item.comment}</td>
-                    <td class="py-3 px-2 text-center">${badge}</td>
-                    <td class="py-3 px-2 text-right space-x-1 whitespace-nowrap">
-                        ${actionBtn}
-                        <button onclick="deleteEntry(${item.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+    document.getElementById("themeBtn").onclick = () => {
+      document.body.classList.toggle("dark");
+      renderCharts();
+    };
 
-            updateCounters(total, negative, resolved);
-        }
+    document.getElementById("manualBtn").onclick = () => {
+      document.getElementById("reviewDialog").showModal();
+    };
 
-        function updateCounters(t, n, r) {
-            document.getElementById('statTotal').innerText = t;
-            document.getElementById('statNegative').innerText = n;
-            document.getElementById('statResolved').innerText = r;
-        }
+    document.getElementById("saveReview").onclick = () => {
+      const form = document.getElementById("reviewForm");
+      if (!form.reportValidity()) return;
+      const data = Object.fromEntries(new FormData(form));
+      const rating = Number(data.rating);
+      reviews.unshift({
+        id: "R-" + Math.random().toString(16).slice(2),
+        date: data.date,
+        sku: data.sku,
+        rating,
+        title: data.title,
+        description: data.description,
+        issueType: classifyIssue(data.title + " " + data.description),
+        status: rating <= 2 ? "Open" : rating === 3 ? "Investigating" : "Resolved",
+        customer: "Manual Entry"
+      });
+      saveData();
+      form.reset();
+      document.getElementById("reviewDialog").close();
+      render();
+    };
 
-        renderTable();
-    </script>
+    document.getElementById("importBtn").onclick = () => {
+      document.getElementById("fileInput").click();
+    };
+
+    document.getElementById("fileInput").onchange = async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      let rows = [];
+      if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer);
+        rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+      } else {
+        rows = parseCsv(await file.text());
+      }
+
+      const imported = rows.map(normalizeImported).filter(r => r.sku && r.rating);
+      syncReviews(imported);
+      alert(imported.length + " reviews imported.");
+      e.target.value = "";
+    };
+
+    document.getElementById("ticketForm").onsubmit = e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      tickets.unshift({
+        id: "T-" + Date.now().toString().slice(-6),
+        date: daysAgo(0),
+        status: "Open",
+        ...data
+      });
+      saveData();
+      e.target.reset();
+      render();
+    };
+
+    document.getElementById("searchInput").oninput = runSearch;
+    window.onresize = renderCharts;
+
+    render();
+  </script>
 </body>
 </html>
+```
