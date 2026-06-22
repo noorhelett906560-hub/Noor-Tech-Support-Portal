@@ -1,0 +1,1496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HELETT Amazon Review Intelligence</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-2: #eef3f8;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #d9e2ef;
+      --primary: #1266d6;
+      --primary-2: #0d4fa8;
+      --green: #168a4a;
+      --yellow: #b98500;
+      --red: #cf3434;
+      --shadow: 0 14px 34px rgba(18, 35, 58, .08);
+    }
+
+    body.dark {
+      --bg: #10151d;
+      --panel: #17202b;
+      --panel-2: #202b38;
+      --text: #eef4fb;
+      --muted: #a8b6c7;
+      --line: #314052;
+      --primary: #72adff;
+      --primary-2: #b8d6ff;
+      --shadow: 0 14px 34px rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    button.danger {
+      background: var(--red);
+      color: white;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 4px; font-size: 28px; }
+    h2 { margin-bottom: 0; font-size: 18px; }
+    h3 { margin-bottom: 8px; font-size: 16px; }
+    p { color: var(--muted); }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 22px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      font-weight: 900;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav {
+      text-align: left;
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .nav.active, .nav:hover {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    .main {
+      min-width: 0;
+      padding: 26px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      min-width: min(460px, 46vw);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .panel, .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel { padding: 18px; }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .sku-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .chart-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .settings-grid {
+      grid-template-columns: 380px 1fr;
+    }
+
+    .card {
+      padding: 16px;
+    }
+
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+    }
+
+    .sku-card header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .sku-card dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0;
+    }
+
+    dt {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    dd {
+      margin: 3px 0 0;
+      font-weight: 900;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .good { color: var(--green); }
+    .warn { color: var(--yellow); }
+    .bad { color: var(--red); }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hidden { display: none !important; }
+
+    .issue-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .issue {
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    dialog {
+      width: min(720px, calc(100vw - 24px));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 18px;
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, .45);
+    }
+
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--panel-2);
+      border-radius: 8px;
+    }
+
+    @media (max-width: 1160px) {
+      .metric-grid, .sku-grid, .chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .main { padding: 18px; }
+      .topbar { flex-direction: column; align-items: stretch; }
+      .search { min-width: 0; }
+      .metric-grid, .sku-grid, .chart-grid, .filters { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">H</div>
+        <div>
+          <strong>HELETT</strong>
+          <small>Amazon Review Intelligence</small>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav active" data-view="dashboard">Dashboard</button>
+        <button class="nav" data-view="sku">SKU Dashboard</button>
+        <button class="nav" data-view="reviews">Review Center</button>
+        <button class="nav" data-view="negative">Negative Reviews</button>
+        <button class="nav" data-view="charts">Charts</button>
+        <button class="nav" data-view="settings">Settings</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p>Separate review intelligence module. CRM remains untouched.</p>
+        </div>
+
+        <div class="actions">
+          <input id="globalSearch" class="search" type="search" placeholder="Search SKU, ASIN, product, review text">
+          <button id="syncBtn">Sync Reviews</button>
+          <button id="themeBtn" class="secondary">Dark Mode</button>
+        </div>
+      </header>
+
+      <section id="searchPanel" class="panel hidden"></section>
+
+      <section id="dashboard" class="view active">
+        <div id="metricCards" class="grid metric-grid"></div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Critical Products</h2>
+            <span class="pill">Rating below 3.5 or high negative volume</span>
+          </div>
+          <div id="criticalProducts" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="sku" class="view">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>SKU Dashboard</h2>
+            <span class="pill">Amazon product health by SKU</span>
+          </div>
+          <div id="skuGrid" class="grid sku-grid"></div>
+        </div>
+      </section>
+
+      <section id="reviews" class="view">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Review Center</h2>
+            <div class="button-row">
+              <button id="importReviewsBtn">Import Reviews</button>
+              <button id="exportProductReviewsBtn" class="secondary">Export Product Reviews</button>
+              <input id="reviewImportFile" type="file" accept=".csv,.tsv,.xlsx,.xls" hidden>
+            </div>
+          </div>
+
+          <div class="filters">
+            <select id="reviewProductFilter"></select>
+            <select id="reviewRatingFilter">
+              <option value="">All ratings</option>
+              <option value="5">5 star</option>
+              <option value="4">4 star</option>
+              <option value="3">3 star</option>
+              <option value="2">2 star</option>
+              <option value="1">1 star</option>
+            </select>
+            <input id="reviewTextFilter" type="search" placeholder="Filter review text">
+            <button id="addReviewBtn">Add Review</button>
+          </div>
+
+          <div id="reviewTable" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="negative" class="view">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Negative Review Center</h2>
+            <div class="button-row">
+              <button id="exportNegativeBtn" class="secondary">Export Negative Reviews</button>
+              <button id="exportAllBtn" class="secondary">Export All Reviews</button>
+            </div>
+          </div>
+          <div id="negativeTable" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="charts" class="view">
+        <div class="grid chart-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Daily Reviews</h2>
+              <span class="pill">Last 14 days</span>
+            </div>
+            <canvas id="dailyChart" height="230"></canvas>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Weekly Reviews</h2>
+              <span class="pill">Last 8 weeks</span>
+            </div>
+            <canvas id="weeklyChart" height="230"></canvas>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Monthly Reviews</h2>
+              <span class="pill">Last 6 months</span>
+            </div>
+            <canvas id="monthlyChart" height="230"></canvas>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-head">
+            <h2>AI Review Intelligence</h2>
+            <span class="pill">Detected issue categories</span>
+          </div>
+          <div id="issueTable" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="grid settings-grid">
+          <form id="productForm" class="panel form">
+            <div class="panel-head">
+              <h2 id="productFormTitle">Add Product</h2>
+              <button id="resetProductFormBtn" type="button" class="secondary">Clear</button>
+            </div>
+
+            <input type="hidden" name="id">
+
+            <label>
+              Product Name
+              <input name="name" required placeholder="Example: HELETT HT20 Barcode Scanner">
+            </label>
+
+            <label>
+              SKU
+              <input name="sku" required placeholder="Example: HT20">
+            </label>
+
+            <label>
+              ASIN
+              <input name="asin" required placeholder="Example: B0XXXXXXXX">
+            </label>
+
+            <label>
+              Amazon URL
+              <input name="url" type="url" required placeholder="https://www.amazon.in/dp/...">
+            </label>
+
+            <label>
+              Category
+              <input name="category" required placeholder="Scanner, Label Printer, Receipt Printer">
+            </label>
+
+            <label>
+              Future API Endpoint
+              <input id="apiEndpoint" placeholder="Optional: https://your-api.com/reviews">
+            </label>
+
+            <div class="button-row">
+              <button type="submit">Save Product</button>
+              <button id="importProductsBtn" type="button" class="secondary">Import Product List</button>
+              <input id="productImportFile" type="file" accept=".csv,.tsv,.xlsx,.xls" hidden>
+            </div>
+          </form>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Product Master</h2>
+              <span id="productCount" class="pill">0 products</span>
+            </div>
+            <div id="productTable" class="table-wrap"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="reviewDialog">
+    <form id="reviewForm" class="form" method="dialog">
+      <div class="panel-head">
+        <h2>Add Amazon Review</h2>
+        <button type="submit" class="secondary">Close</button>
+      </div>
+
+      <label>
+        Product
+        <select name="productId" id="reviewProductInput" required></select>
+      </label>
+
+      <label>
+        Date
+        <input name="date" type="date" required>
+      </label>
+
+      <label>
+        Rating
+        <input name="rating" type="number" min="1" max="5" step="1" required>
+      </label>
+
+      <label>
+        Review Title
+        <input name="title" required>
+      </label>
+
+      <label>
+        Review Text
+        <textarea name="text" rows="5" required></textarea>
+      </label>
+
+      <label>
+        Amazon Review ID
+        <input name="amazonReviewId" placeholder="Optional">
+      </label>
+
+      <div class="button-row">
+        <button id="saveReviewBtn" type="button">Save Review</button>
+        <button type="submit" class="secondary">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const STORAGE = {
+      products: "helettAmazonProductsV1",
+      reviews: "helettAmazonReviewsV1",
+      settings: "helettAmazonSettingsV1",
+      theme: "helettAmazonThemeV1"
+    };
+
+    const issueRules = [
+      { name: "Bluetooth Issues", terms: ["bluetooth", "bt", "pairing", "wireless", "connection lost", "not connecting"] },
+      { name: "USB Issues", terms: ["usb", "not detected", "cable", "port", "device not found"] },
+      { name: "Driver Issues", terms: ["driver", "install", "installation", "windows driver", "software not working"] },
+      { name: "QR Issues", terms: ["qr", "qr code", "quick response"] },
+      { name: "Barcode Issues", terms: ["barcode", "bar code", "not readable", "scan failed", "not scanning"] },
+      { name: "Print Quality Issues", terms: ["print faded", "faded", "light print", "blurred", "poor print", "not clear"] }
+    ];
+
+    let products = readStore(STORAGE.products, []);
+    let reviews = readStore(STORAGE.reviews, []);
+    let settings = readStore(STORAGE.settings, { apiEndpoint: "" });
+
+    function readStore(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function writeStore() {
+      localStorage.setItem(STORAGE.products, JSON.stringify(products));
+      localStorage.setItem(STORAGE.reviews, JSON.stringify(reviews));
+      localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
+    }
+
+    function uid(prefix) {
+      return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(16).slice(2, 7);
+    }
+
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function findProduct(productId) {
+      return products.find(product => product.id === productId);
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim();
+    }
+
+    function identifyIssues(title, text) {
+      const content = `${title || ""} ${text || ""}`.toLowerCase();
+      return issueRules
+        .filter(rule => rule.terms.some(term => content.includes(term)))
+        .map(rule => rule.name);
+    }
+
+    function buildReview(input) {
+      const product = findProduct(input.productId);
+      const rating = Number(input.rating);
+
+      return {
+        id: input.id || uid("review"),
+        productId: input.productId,
+        productName: product ? product.name : normalizeText(input.productName),
+        sku: product ? product.sku : normalizeText(input.sku),
+        asin: product ? product.asin : normalizeText(input.asin),
+        date: input.date || todayISO(),
+        rating,
+        title: normalizeText(input.title),
+        text: normalizeText(input.text),
+        amazonReviewId: normalizeText(input.amazonReviewId),
+        issues: identifyIssues(input.title, input.text),
+        source: input.source || "LocalStorage",
+        syncedAt: input.syncedAt || new Date().toISOString()
+      };
+    }
+
+    async function fetchProductReviews(product) {
+      if (!settings.apiEndpoint) {
+        return reviews.filter(review => review.productId === product.id);
+      }
+
+      const url = new URL(settings.apiEndpoint);
+      url.searchParams.set("asin", product.asin);
+      url.searchParams.set("sku", product.sku);
+
+      const response = await fetch(url.toString(), { method: "GET" });
+      if (!response.ok) throw new Error("Review API request failed");
+
+      const payload = await response.json();
+      const list = Array.isArray(payload) ? payload : payload.reviews || [];
+
+      return list.map(item => buildReview({
+        productId: product.id,
+        date: item.date,
+        rating: item.rating,
+        title: item.title,
+        text: item.text || item.reviewText || item.description,
+        amazonReviewId: item.amazonReviewId || item.id,
+        source: "API",
+        syncedAt: new Date().toISOString()
+      }));
+    }
+
+    async function fetchProductRating(product) {
+      const list = await fetchProductReviews(product);
+      const count = list.length;
+      const rating = count ? list.reduce((sum, review) => sum + Number(review.rating), 0) / count : 0;
+      return { asin: product.asin, sku: product.sku, rating, reviewCount: count };
+    }
+
+    async function syncReviews() {
+      if (!products.length) {
+        alert("Add products in Settings before syncing reviews.");
+        return [];
+      }
+
+      if (!settings.apiEndpoint) {
+        products = products.map(product => ({ ...product, lastSync: new Date().toISOString() }));
+        writeStore();
+        render();
+        alert("Local review data synced. Add an API endpoint in Settings when your Amazon review service is ready.");
+        return reviews;
+      }
+
+      const synced = [];
+
+      for (const product of products) {
+        const productReviews = await fetchProductReviews(product);
+        synced.push(...productReviews);
+      }
+
+      const existingKeys = new Set(reviews.map(review => review.amazonReviewId || review.id));
+      const newReviews = synced.filter(review => !existingKeys.has(review.amazonReviewId || review.id));
+
+      reviews = [...newReviews, ...reviews];
+      products = products.map(product => ({ ...product, lastSync: new Date().toISOString() }));
+
+      writeStore();
+      render();
+      alert(newReviews.length + " new reviews synced.");
+      return newReviews;
+    }
+
+    window.AmazonReviewDataLayer = {
+      syncReviews,
+      fetchProductReviews,
+      fetchProductRating,
+      getProducts: () => products,
+      getReviews: () => reviews
+    };
+
+    function getProductStats(product) {
+      const list = reviews.filter(review => review.productId === product.id);
+      const reviewCount = list.length;
+      const rating = reviewCount ? list.reduce((sum, review) => sum + Number(review.rating), 0) / reviewCount : 0;
+      const negativeCount = list.filter(review => Number(review.rating) <= 3).length;
+      const critical = reviewCount > 0 && (rating < 3.5 || negativeCount / reviewCount >= .35);
+
+      return {
+        reviewCount,
+        rating,
+        negativeCount,
+        critical,
+        lastSync: product.lastSync ? new Date(product.lastSync).toLocaleString() : "Never"
+      };
+    }
+
+    function getAllStats() {
+      const totalProducts = products.length;
+      const totalReviews = reviews.length;
+      const averageRating = totalReviews ? reviews.reduce((sum, review) => sum + Number(review.rating), 0) / totalReviews : 0;
+      const negativeReviews = reviews.filter(review => Number(review.rating) <= 3).length;
+      const criticalProducts = products.filter(product => getProductStats(product).critical).length;
+
+      return { totalProducts, totalReviews, averageRating, negativeReviews, criticalProducts };
+    }
+
+    function render() {
+      renderFilters();
+      renderDashboard();
+      renderSkuDashboard();
+      renderReviews();
+      renderNegativeReviews();
+      renderCharts();
+      renderIssues();
+      renderSettings();
+      runSearch();
+    }
+
+    function renderDashboard() {
+      const stats = getAllStats();
+
+      document.getElementById("metricCards").innerHTML = [
+        ["Total Products", stats.totalProducts],
+        ["Total Reviews", stats.totalReviews],
+        ["Average Rating", stats.averageRating.toFixed(2)],
+        ["Negative Reviews", stats.negativeReviews],
+        ["Critical Products", stats.criticalProducts]
+      ].map(([label, value]) => `
+        <article class="card metric">
+          <span>${label}</span>
+          <strong>${value}</strong>
+        </article>
+      `).join("");
+
+      const critical = products.filter(product => getProductStats(product).critical);
+
+      document.getElementById("criticalProducts").innerHTML = critical.length ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>ASIN</th>
+              <th>Rating</th>
+              <th>Reviews</th>
+              <th>Negative</th>
+              <th>Amazon</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${critical.map(product => {
+              const stats = getProductStats(product);
+              return `
+                <tr>
+                  <td>${product.name}</td>
+                  <td>${product.sku}</td>
+                  <td>${product.asin}</td>
+                  <td class="bad">${stats.rating.toFixed(2)}</td>
+                  <td>${stats.reviewCount}</td>
+                  <td>${stats.negativeCount}</td>
+                  <td><a href="${product.url}" target="_blank" rel="noopener">Open</a></td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      ` : `<div class="empty">No critical products detected.</div>`;
+    }
+
+    function renderSkuDashboard() {
+      document.getElementById("skuGrid").innerHTML = products.length ? products.map(product => {
+        const stats = getProductStats(product);
+        const ratingClass = stats.rating >= 4 ? "good" : stats.rating >= 3.5 ? "warn" : "bad";
+
+        return `
+          <article class="card sku-card">
+            <header>
+              <div>
+                <span>${product.category}</span>
+                <h3>${product.name}</h3>
+              </div>
+              <strong class="${ratingClass}">${stats.rating.toFixed(2)}</strong>
+            </header>
+
+            <dl>
+              <div><dt>SKU</dt><dd>${product.sku}</dd></div>
+              <div><dt>ASIN</dt><dd>${product.asin}</dd></div>
+              <div><dt>Review Count</dt><dd>${stats.reviewCount}</dd></div>
+              <div><dt>Negative Count</dt><dd>${stats.negativeCount}</dd></div>
+              <div><dt>Last Sync</dt><dd>${stats.lastSync}</dd></div>
+              <div><dt>Status</dt><dd>${stats.critical ? "Critical" : "Normal"}</dd></div>
+            </dl>
+          </article>
+        `;
+      }).join("") : `<div class="empty">Add products from Settings to build the SKU dashboard.</div>`;
+    }
+
+    function getFilteredReviews(negativeOnly = false) {
+      const productId = document.getElementById("reviewProductFilter").value;
+      const rating = document.getElementById("reviewRatingFilter").value;
+      const text = document.getElementById("reviewTextFilter").value.toLowerCase().trim();
+
+      return reviews.filter(review => {
+        const matchesNegative = !negativeOnly || Number(review.rating) <= 3;
+        const matchesProduct = !productId || review.productId === productId;
+        const matchesRating = !rating || Number(review.rating) === Number(rating);
+        const matchesText = !text || `${review.title} ${review.text} ${review.sku} ${review.asin} ${review.productName}`.toLowerCase().includes(text);
+        return matchesNegative && matchesProduct && matchesRating && matchesText;
+      });
+    }
+
+    function renderReviews() {
+      const rows = getFilteredReviews(false);
+      document.getElementById("reviewTable").innerHTML = buildReviewTable(rows);
+    }
+
+    function renderNegativeReviews() {
+      const rows = reviews.filter(review => Number(review.rating) <= 3);
+      document.getElementById("negativeTable").innerHTML = buildReviewTable(rows);
+    }
+
+    function buildReviewTable(rows) {
+      if (!rows.length) return `<div class="empty">No reviews found.</div>`;
+
+      return `
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>ASIN</th>
+              <th>Rating</th>
+              <th>Review Title</th>
+              <th>Review Text</th>
+              <th>AI Issues</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(review => `
+              <tr>
+                <td>${review.date}</td>
+                <td>${review.productName}</td>
+                <td>${review.sku}</td>
+                <td>${review.asin}</td>
+                <td>${review.rating}</td>
+                <td><strong>${review.title}</strong></td>
+                <td>${review.text}</td>
+                <td>
+                  <div class="issue-list">
+                    ${(review.issues.length ? review.issues : ["No issue detected"]).map(issue => `<span class="issue">${issue}</span>`).join("")}
+                  </div>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderIssues() {
+      const counts = {};
+
+      reviews.forEach(review => {
+        review.issues.forEach(issue => {
+          counts[issue] = (counts[issue] || 0) + 1;
+        });
+      });
+
+      const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+      document.getElementById("issueTable").innerHTML = rows.length ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Issue Type</th>
+              <th>Count</th>
+              <th>Related Reviews</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(([issue, count]) => `
+              <tr>
+                <td>${issue}</td>
+                <td>${count}</td>
+                <td>${reviews.filter(review => review.issues.includes(issue)).slice(0, 5).map(review => `${review.sku}: ${review.title}`).join("<br>")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      ` : `<div class="empty">No AI issue categories detected yet.</div>`;
+    }
+
+    function renderSettings() {
+      document.getElementById("productCount").textContent = products.length + " products";
+      document.getElementById("apiEndpoint").value = settings.apiEndpoint || "";
+
+      document.getElementById("productTable").innerHTML = products.length ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>SKU</th>
+              <th>ASIN</th>
+              <th>Category</th>
+              <th>Amazon URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${products.map(product => `
+              <tr>
+                <td>${product.name}</td>
+                <td>${product.sku}</td>
+                <td>${product.asin}</td>
+                <td>${product.category}</td>
+                <td><a href="${product.url}" target="_blank" rel="noopener">Open</a></td>
+                <td>
+                  <div class="button-row">
+                    <button type="button" onclick="editProduct('${product.id}')">Edit</button>
+                    <button type="button" class="danger" onclick="deleteProduct('${product.id}')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      ` : `<div class="empty">No products added. Use the form or import a product list.</div>`;
+    }
+
+    function renderFilters() {
+      const productOptions = `<option value="">All products</option>` + products.map(product => `<option value="${product.id}">${product.sku} - ${product.name}</option>`).join("");
+      document.getElementById("reviewProductFilter").innerHTML = productOptions;
+      document.getElementById("reviewProductInput").innerHTML = products.map(product => `<option value="${product.id}">${product.sku} - ${product.name}</option>`).join("");
+    }
+
+    function setupCanvas(id) {
+      const canvas = document.getElementById(id);
+      const ctx = canvas.getContext("2d");
+      const ratio = window.devicePixelRatio || 1;
+      const width = Math.max(260, canvas.parentElement.clientWidth - 36);
+      const height = Number(canvas.getAttribute("height"));
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { ctx, width, height };
+    }
+
+    function renderCharts() {
+      drawChart("dailyChart", buildDailyData(), "bar");
+      drawChart("weeklyChart", buildWeeklyData(), "line");
+      drawChart("monthlyChart", buildMonthlyData(), "bar");
+    }
+
+    function drawChart(id, data, type) {
+      const { ctx, width, height } = setupCanvas(id);
+      const max = Math.max(1, ...data.map(item => item.count));
+      const text = getComputedStyle(document.body).getPropertyValue("--text").trim();
+      const muted = getComputedStyle(document.body).getPropertyValue("--muted").trim();
+      const primary = getComputedStyle(document.body).getPropertyValue("--primary").trim();
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.font = "12px Arial";
+      ctx.fillStyle = muted;
+
+      if (type === "bar") {
+        data.forEach((item, index) => {
+          const slot = width / data.length;
+          const barWidth = Math.max(16, slot - 18);
+          const barHeight = (height - 54) * item.count / max;
+          const x = index * slot + 8;
+          const y = height - 30 - barHeight;
+
+          ctx.fillStyle = primary;
+          ctx.fillRect(x, y, barWidth, barHeight);
+
+          ctx.fillStyle = text;
+          ctx.fillText(String(item.count), x + 2, y - 6);
+
+          ctx.fillStyle = muted;
+          ctx.fillText(item.label, x, height - 10);
+        });
+        return;
+      }
+
+      const points = data.map((item, index) => ({
+        x: 16 + index * ((width - 32) / Math.max(1, data.length - 1)),
+        y: height - 32 - ((height - 58) * item.count / max),
+        label: item.label,
+        count: item.count
+      }));
+
+      ctx.strokeStyle = primary;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      points.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y));
+      ctx.stroke();
+
+      ctx.fillStyle = primary;
+      points.forEach(point => {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = muted;
+      points.forEach((point, index) => {
+        if (index % 2 === 0) ctx.fillText(point.label, point.x - 12, height - 10);
+      });
+    }
+
+    function buildDailyData() {
+      return Array.from({ length: 14 }, (_, index) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (13 - index));
+        const key = date.toISOString().slice(0, 10);
+        return {
+          label: key.slice(5),
+          count: reviews.filter(review => review.date === key).length
+        };
+      });
+    }
+
+    function buildWeeklyData() {
+      return Array.from({ length: 8 }, (_, index) => {
+        const start = new Date();
+        start.setDate(start.getDate() - ((7 - index) * 7));
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+
+        return {
+          label: "W" + (index + 1),
+          count: reviews.filter(review => {
+            const date = new Date(review.date);
+            return date >= start && date <= end;
+          }).length
+        };
+      });
+    }
+
+    function buildMonthlyData() {
+      return Array.from({ length: 6 }, (_, index) => {
+        const date = new Date();
+        date.setMonth(date.getMonth() - (5 - index));
+        const year = date.getFullYear();
+        const month = date.getMonth();
+
+        return {
+          label: date.toLocaleString(undefined, { month: "short" }),
+          count: reviews.filter(review => {
+            const reviewDate = new Date(review.date);
+            return reviewDate.getFullYear() === year && reviewDate.getMonth() === month;
+          }).length
+        };
+      });
+    }
+
+    function runSearch() {
+      const q = document.getElementById("globalSearch").value.toLowerCase().trim();
+      const panel = document.getElementById("searchPanel");
+
+      if (!q) {
+        panel.classList.add("hidden");
+        return;
+      }
+
+      const productMatches = products.filter(product =>
+        `${product.name} ${product.sku} ${product.asin} ${product.category}`.toLowerCase().includes(q)
+      );
+
+      const reviewMatches = reviews.filter(review =>
+        `${review.productName} ${review.sku} ${review.asin} ${review.title} ${review.text}`.toLowerCase().includes(q)
+      );
+
+      panel.classList.remove("hidden");
+      panel.innerHTML = `
+        <div class="panel-head">
+          <h2>Search Results</h2>
+          <span class="pill">${productMatches.length + reviewMatches.length} matches</span>
+        </div>
+        ${productMatches.map(product => `
+          <p><strong>Product:</strong> ${product.sku} · ${product.asin} · ${product.name}</p>
+        `).join("")}
+        ${reviewMatches.slice(0, 30).map(review => `
+          <p><strong>Review:</strong> ${review.sku} · ${review.rating} star · ${review.title}<br>${review.text}</p>
+        `).join("")}
+        ${!productMatches.length && !reviewMatches.length ? `<div class="empty">No matching product or review found.</div>` : ""}
+      `;
+    }
+
+    function editProduct(id) {
+      const product = products.find(item => item.id === id);
+      if (!product) return;
+
+      const form = document.getElementById("productForm");
+      form.elements.id.value = product.id;
+      form.elements.name.value = product.name;
+      form.elements.sku.value = product.sku;
+      form.elements.asin.value = product.asin;
+      form.elements.url.value = product.url;
+      form.elements.category.value = product.category;
+      document.getElementById("productFormTitle").textContent = "Edit Product";
+    }
+
+    function deleteProduct(id) {
+      if (!confirm("Delete this product and its linked reviews?")) return;
+      products = products.filter(product => product.id !== id);
+      reviews = reviews.filter(review => review.productId !== id);
+      writeStore();
+      render();
+    }
+
+    function clearProductForm() {
+      document.getElementById("productForm").reset();
+      document.getElementById("productForm").elements.id.value = "";
+      document.getElementById("productFormTitle").textContent = "Add Product";
+    }
+
+    function productFromRow(row) {
+      const lower = normalizeRow(row);
+      return {
+        id: uid("product"),
+        name: lower["product name"] || lower.name || lower.product || "",
+        sku: lower.sku || "",
+        asin: lower.asin || "",
+        url: lower["amazon url"] || lower.url || lower.link || "",
+        category: lower.category || ""
+      };
+    }
+
+    function reviewFromRow(row) {
+      const lower = normalizeRow(row);
+      const sku = lower.sku || "";
+      const asin = lower.asin || "";
+      const product = products.find(item => item.sku === sku || item.asin === asin);
+
+      if (!product) return null;
+
+      return buildReview({
+        productId: product.id,
+        date: parseDate(lower.date),
+        rating: lower.rating,
+        title: lower["review title"] || lower.title || "",
+        text: lower["review text"] || lower.text || lower.review || lower.description || "",
+        amazonReviewId: lower["amazon review id"] || lower.reviewid || lower.id || "",
+        source: "Import"
+      });
+    }
+
+    function normalizeRow(row) {
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [String(key).toLowerCase().trim(), value])
+      );
+    }
+
+    function parseDate(value) {
+      if (!value) return todayISO();
+
+      if (typeof value === "number" && window.XLSX) {
+        const parsed = XLSX.SSF.parse_date_code(value);
+        return new Date(parsed.y, parsed.m - 1, parsed.d).toISOString().slice(0, 10);
+      }
+
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? todayISO() : date.toISOString().slice(0, 10);
+    }
+
+    async function parseFile(file) {
+      const name = file.name.toLowerCase();
+
+      if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer);
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        return XLSX.utils.sheet_to_json(sheet);
+      }
+
+      const delimiter = name.endsWith(".tsv") ? "\t" : ",";
+      return parseDelimited(await file.text(), delimiter);
+    }
+
+    function parseDelimited(text, delimiter) {
+      const lines = text.trim().split(/\r?\n/).filter(Boolean);
+      if (!lines.length) return [];
+
+      const headers = splitLine(lines.shift(), delimiter);
+      return lines.map(line => {
+        const values = splitLine(line, delimiter);
+        return headers.reduce((row, header, index) => {
+          row[header] = values[index] || "";
+          return row;
+        }, {});
+      });
+    }
+
+    function splitLine(line, delimiter) {
+      const values = [];
+      let current = "";
+      let quoted = false;
+
+      for (const char of line) {
+        if (char === '"') quoted = !quoted;
+        else if (char === delimiter && !quoted) {
+          values.push(current.trim());
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+
+      values.push(current.trim());
+      return values;
+    }
+
+    function exportRows(filename, rows) {
+      if (!rows.length) {
+        alert("No data to export.");
+        return;
+      }
+
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(","),
+        ...rows.map(row => headers.map(header => csvCell(row[header])).join(","))
+      ].join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value) {
+      const text = Array.isArray(value) ? value.join("; ") : String(value ?? "");
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    function reviewExportRows(list) {
+      return list.map(review => ({
+        Date: review.date,
+        ProductName: review.productName,
+        SKU: review.sku,
+        ASIN: review.asin,
+        Rating: review.rating,
+        ReviewTitle: review.title,
+        ReviewText: review.text,
+        Issues: review.issues.join("; "),
+        AmazonReviewID: review.amazonReviewId,
+        Source: review.source,
+        SyncedAt: review.syncedAt
+      }));
+    }
+
+    document.addEventListener("click", event => {
+      const nav = event.target.closest(".nav");
+      if (!nav) return;
+
+      document.querySelectorAll(".nav").forEach(item => item.classList.toggle("active", item === nav));
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === nav.dataset.view));
+      document.getElementById("pageTitle").textContent = nav.textContent;
+      if (nav.dataset.view === "charts") requestAnimationFrame(renderCharts);
+    });
+
+    document.getElementById("syncBtn").addEventListener("click", syncReviews);
+
+    document.getElementById("themeBtn").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem(STORAGE.theme, document.body.classList.contains("dark") ? "dark" : "light");
+      renderCharts();
+    });
+
+    document.getElementById("globalSearch").addEventListener("input", runSearch);
+    document.getElementById("reviewProductFilter").addEventListener("change", renderReviews);
+    document.getElementById("reviewRatingFilter").addEventListener("change", renderReviews);
+    document.getElementById("reviewTextFilter").addEventListener("input", renderReviews);
+
+    document.getElementById("productForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const data = Object.fromEntries(new FormData(form));
+
+      settings.apiEndpoint = document.getElementById("apiEndpoint").value.trim();
+
+      if (data.id) {
+        products = products.map(product => product.id === data.id ? { ...product, ...data } : product);
+        reviews = reviews.map(review => {
+          if (review.productId !== data.id) return review;
+          return { ...review, productName: data.name, sku: data.sku, asin: data.asin };
+        });
+      } else {
+        products.push({
+          id: uid("product"),
+          name: data.name.trim(),
+          sku: data.sku.trim(),
+          asin: data.asin.trim(),
+          url: data.url.trim(),
+          category: data.category.trim(),
+          lastSync: ""
+        });
+      }
+
+      writeStore();
+      clearProductForm();
+      render();
+    });
+
+    document.getElementById("apiEndpoint").addEventListener("change", event => {
+      settings.apiEndpoint = event.target.value.trim();
+      writeStore();
+    });
+
+    document.getElementById("resetProductFormBtn").addEventListener("click", clearProductForm);
+
+    document.getElementById("importProductsBtn").addEventListener("click", () => {
+      document.getElementById("productImportFile").click();
+    });
+
+    document.getElementById("productImportFile").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const rows = await parseFile(file);
+      const imported = rows.map(productFromRow).filter(product => product.name && product.sku && product.asin && product.url && product.category);
+      const existing = new Set(products.map(product => product.sku + "|" + product.asin));
+
+      products = [
+        ...products,
+        ...imported.filter(product => !existing.has(product.sku + "|" + product.asin))
+      ];
+
+      writeStore();
+      render();
+      alert(imported.length + " products imported.");
+      event.target.value = "";
+    });
+
+    document.getElementById("addReviewBtn").addEventListener("click", () => {
+      if (!products.length) {
+        alert("Add products in Settings before adding reviews.");
+        return;
+      }
+
+      const form = document.getElementById("reviewForm");
+      form.reset();
+      form.elements.date.value = todayISO();
+      document.getElementById("reviewDialog").showModal();
+    });
+
+    document.getElementById("saveReviewBtn").addEventListener("click", () => {
+      const form = document.getElementById("reviewForm");
+      if (!form.reportValidity()) return;
+
+      const data = Object.fromEntries(new FormData(form));
+      reviews.unshift(buildReview(data));
+
+      writeStore();
+      document.getElementById("reviewDialog").close();
+      render();
+    });
+
+    document.getElementById("importReviewsBtn").addEventListener("click", () => {
+      document.getElementById("reviewImportFile").click();
+    });
+
+    document.getElementById("reviewImportFile").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const rows = await parseFile(file);
+      const imported = rows.map(reviewFromRow).filter(Boolean);
+
+      reviews = [...imported, ...reviews];
+
+      writeStore();
+      render();
+      alert(imported.length + " reviews imported.");
+      event.target.value = "";
+    });
+
+    document.getElementById("exportProductReviewsBtn").addEventListener("click", () => {
+      exportRows("product-reviews.csv", reviewExportRows(getFilteredReviews(false)));
+    });
+
+    document.getElementById("exportNegativeBtn").addEventListener("click", () => {
+      exportRows("negative-reviews.csv", reviewExportRows(reviews.filter(review => Number(review.rating) <= 3)));
+    });
+
+    document.getElementById("exportAllBtn").addEventListener("click", () => {
+      exportRows("all-reviews.csv", reviewExportRows(reviews));
+    });
+
+    window.addEventListener("resize", renderCharts);
+
+    if (localStorage.getItem(STORAGE.theme) === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    render();
+  </script>
+</body>
+</html>
