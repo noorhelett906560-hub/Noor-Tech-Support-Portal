@@ -375,9 +375,10 @@
 
         <div class="stats-grid">
             <div class="stat-card" style="border-top-color: var(--secondary)"><h4>Total Return Requests</h4><div id="countTotal" style="font-size:1.8rem; font-weight:800;">0</div></div>
-            <div class="stat-card" style="border-top-color: var(--warning)"><h4>In Transit (Raaste me)</h4><div id="countTransit" style="font-size:1.8rem; font-weight:800; color: var(--warning)">0</div></div>
+            <div class="stat-card" style="border-top-color: var(--warning)"><h4>In Transit</h4><div id="countTransit" style="font-size:1.8rem; font-weight:800; color: var(--warning)">0</div></div>
             <div class="stat-card" style="border-top-color: #a855f7"><h4>Warehouse Received</h4><div id="countWH" style="font-size:1.8rem; font-weight:800; color: #a855f7">0</div></div>
-            <div class="stat-card" style="border-top-color: var(--success)"><h4>Repaired & Delivered</h4><div id="countDelivered" style="font-size:1.8rem; font-weight:800; color: var(--success)">0</div></div>
+            <div class="stat-card" style="border-top-color: var(--success)"><h4>Repaired</h4><div id="countDelivered" style="font-size:1.8rem; font-weight:800; color: var(--success)">0</div></div>
+            <div class="stat-card" style="border-top-color: var(--success)"><h4>Delivered</h4><div id="countDelivered" style="font-size:1.8rem; font-weight:800; color: var(--success)">0</div></div>
         </div>
 
         <div class="charts-grid">
@@ -419,10 +420,12 @@
                         <option value="Indian Post">Courier: Indian Post</option>
                     </select>
                     <select id="status">
-                        <option value="ClientSent">1. Client Sent / We Picked</option>
-                        <option value="In Transit">2. In Transit (On the way)</option>
-                        <option value="WHReceived">3. WH Received (Service Centre Inward)</option>
-                        <option value="Delivered">4. Repaired & Delivered</option>
+                        <option value="ClientSent">1. Client Sent</option>
+                        <option value="ClientSent">2.We Picked</option>
+                        <option value="In Transit">3. In Transit (On the way)</option>
+                        <option value="WHReceived">4. WH Received (Service Centre Inward)</option>
+                        <option value="Delivered">5. Repaired</option>
+                         <option value="Delivered">6.Delivered</option>
                     </select>
 
                     <div class="section-tag"><i class="fas fa-wrench"></i> Fault / Technical Note</div>
