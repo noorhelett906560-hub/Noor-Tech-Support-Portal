@@ -79,6 +79,281 @@
         .pipe-step.active-done { background: #10b981; color: white; }
 
         .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+
+        .enterprise-shell {
+            background: #060814;
+            min-height: calc(100vh - 70px);
+            border-radius: 18px;
+            padding: 26px;
+            color: #e5e7eb;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 50px rgba(2,6,23,0.24);
+        }
+
+        .enterprise-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .enterprise-eyebrow {
+            margin: 0 0 6px 0;
+            color: #60a5fa;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .enterprise-header h2 {
+            margin: 0;
+            color: #f8fafc;
+            font-size: 1.5rem;
+            letter-spacing: 0;
+        }
+
+        .enterprise-live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.32);
+            color: #86efac;
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .enterprise-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .enterprise-metric-card {
+            background: rgba(15,23,42,0.72);
+            border: 1px solid rgba(148,163,184,0.16);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+            backdrop-filter: blur(14px);
+            min-height: 112px;
+        }
+
+        .enterprise-metric-card strong {
+            display: block;
+            margin: 8px 0 6px 0;
+            color: #f8fafc;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .enterprise-metric-card small {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            line-height: 1.35;
+        }
+
+        .enterprise-card-label {
+            color: #cbd5e1;
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .enterprise-metric-card.warning {
+            border-color: rgba(245,158,11,0.34);
+        }
+
+        .enterprise-metric-card.warning strong {
+            color: #fbbf24;
+        }
+
+        .enterprise-metric-card.success {
+            border-color: rgba(16,185,129,0.34);
+        }
+
+        .enterprise-metric-card.success strong {
+            color: #34d399;
+        }
+
+        .enterprise-metric-card.danger {
+            border-color: rgba(239,68,68,0.34);
+        }
+
+        .enterprise-metric-card.danger strong {
+            color: #f87171;
+        }
+
+        .enterprise-panel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .enterprise-panel {
+            background: rgba(15,23,42,0.78);
+            border: 1px solid rgba(148,163,184,0.16);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 16px 38px rgba(0,0,0,0.22);
+            backdrop-filter: blur(14px);
+        }
+
+        .enterprise-wide-panel {
+            margin-top: 16px;
+        }
+
+        .enterprise-panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .enterprise-panel-title h3 {
+            margin: 0;
+            color: #f8fafc;
+            font-size: 0.98rem;
+        }
+
+        .enterprise-panel-title span {
+            color: #94a3b8;
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .enterprise-signal-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .enterprise-signal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: rgba(30,41,59,0.72);
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 10px;
+            padding: 11px 12px;
+        }
+
+        .enterprise-signal-row span {
+            color: #e2e8f0;
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .enterprise-signal-row strong {
+            color: #93c5fd;
+            font-size: 0.9rem;
+        }
+
+        .enterprise-stream-table-wrap {
+            overflow-x: auto;
+        }
+
+        .enterprise-stream-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .enterprise-stream-table th {
+            background: rgba(30,41,59,0.8);
+            color: #93c5fd;
+            border-bottom: 1px solid rgba(148,163,184,0.16);
+        }
+
+        .enterprise-stream-table td {
+            color: #dbeafe;
+            border-top: 1px solid rgba(148,163,184,0.12);
+        }
+
+        .enterprise-stream-table tr:hover {
+            background: rgba(37,99,235,0.12);
+        }
+
+        .enterprise-status-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            border: 1px solid rgba(148,163,184,0.18);
+            color: #e5e7eb;
+            background: rgba(71,85,105,0.48);
+        }
+
+        .enterprise-status-pill.delivered {
+            color: #86efac;
+            background: rgba(16,185,129,0.12);
+            border-color: rgba(16,185,129,0.28);
+        }
+
+        .enterprise-status-pill.transit {
+            color: #fde68a;
+            background: rgba(245,158,11,0.12);
+            border-color: rgba(245,158,11,0.28);
+        }
+
+        .enterprise-status-pill.warehouse {
+            color: #d8b4fe;
+            background: rgba(168,85,247,0.12);
+            border-color: rgba(168,85,247,0.28);
+        }
+
+        .enterprise-risk-high {
+            color: #fecaca;
+            font-weight: 800;
+        }
+
+        .enterprise-risk-normal {
+            color: #bfdbfe;
+            font-weight: 800;
+        }
+
+        @media (max-width: 1180px) {
+            .enterprise-metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .enterprise-panel-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .enterprise-shell {
+                padding: 18px;
+                border-radius: 14px;
+            }
+
+            .enterprise-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .enterprise-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .enterprise-panel-title {
+                flex-direction: column;
+            }
+
+            .enterprise-panel-title span {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body>
@@ -86,6 +361,7 @@
 <div class="sidebar">
     <h2><i class="fas fa-boxes-packing"></i> Noor-Tech CRM</h2>
     <div class="nav-item active" onclick="showPage('dashboard', this)"><i class="fas fa-chart-pie"></i> Control Centre</div>
+    <div class="nav-item" onclick="showPage('enterpriseDashboard', this)"><i class="fas fa-chart-line"></i> Enterprise Live Analysis</div>
     <div class="nav-item" onclick="showPage('tickets', this)"><i class="fas fa-truck-ramp-box"></i> Return Pipeline</div>
     <div class="nav-item" onclick="exportExcel()"><i class="fas fa-file-csv"></i> Download Excel</div>
 </div>
@@ -159,9 +435,123 @@
         </div>
     </div>
 
+    <div id="enterpriseDashboard" class="page-content">
+        <div class="enterprise-shell">
+            <div class="enterprise-header">
+                <div>
+                    <p class="enterprise-eyebrow">Realtime Operations Intelligence</p>
+                    <h2>Enterprise Dashboard & Live Stream Analysis</h2>
+                </div>
+                <div class="enterprise-live-pill">
+                    <i class="fas fa-signal"></i>
+                    <span id="enterpriseLastSync">Waiting for live sync...</span>
+                </div>
+            </div>
+
+            <div class="enterprise-metrics-grid">
+                <div class="enterprise-metric-card">
+                    <span class="enterprise-card-label">Total Cases</span>
+                    <strong id="enterpriseTotalCases">0</strong>
+                    <small>Legacy live records from noor_cloud_tickets</small>
+                </div>
+                <div class="enterprise-metric-card warning">
+                    <span class="enterprise-card-label">Open Cases</span>
+                    <strong id="enterpriseOpenCases">0</strong>
+                    <small>All non-delivered operational cases</small>
+                </div>
+                <div class="enterprise-metric-card success">
+                    <span class="enterprise-card-label">Closed Cases</span>
+                    <strong id="enterpriseClosedCases">0</strong>
+                    <small>Delivered / repaired and shipped</small>
+                </div>
+                <div class="enterprise-metric-card danger">
+                    <span class="enterprise-card-label">Critical Attention</span>
+                    <strong id="enterpriseCriticalCases">0</strong>
+                    <small>Aged or high-friction service records</small>
+                </div>
+                <div class="enterprise-metric-card">
+                    <span class="enterprise-card-label">Today's Logs</span>
+                    <strong id="enterpriseTodayLogs">0</strong>
+                    <small>Cases created today</small>
+                </div>
+                <div class="enterprise-metric-card">
+                    <span class="enterprise-card-label">Monthly Volume</span>
+                    <strong id="enterpriseMonthlyVolume">0</strong>
+                    <small>Cases created this month</small>
+                </div>
+                <div class="enterprise-metric-card">
+                    <span class="enterprise-card-label">Pending Movement</span>
+                    <strong id="enterprisePendingCases">0</strong>
+                    <small>Sent, transit, or warehouse stages</small>
+                </div>
+                <div class="enterprise-metric-card">
+                    <span class="enterprise-card-label">Avg Closure Days</span>
+                    <strong id="enterpriseAvgClosure">0</strong>
+                    <small>Based on inward/outward timestamps</small>
+                </div>
+            </div>
+
+            <div class="enterprise-panel-grid">
+                <section class="enterprise-panel">
+                    <div class="enterprise-panel-title">
+                        <h3>Pipeline Distribution</h3>
+                        <span>Realtime Chart.js stream</span>
+                    </div>
+                    <canvas id="enterprisePipelineChart" height="150"></canvas>
+                </section>
+
+                <section class="enterprise-panel">
+                    <div class="enterprise-panel-title">
+                        <h3>Top Performing SKUs</h3>
+                        <span>Highest service volume</span>
+                    </div>
+                    <canvas id="enterpriseSkuChart" height="150"></canvas>
+                </section>
+
+                <section class="enterprise-panel">
+                    <div class="enterprise-panel-title">
+                        <h3>Courier Partner Load</h3>
+                        <span>Active dispatch split</span>
+                    </div>
+                    <canvas id="enterpriseCourierChart" height="150"></canvas>
+                </section>
+
+                <section class="enterprise-panel">
+                    <div class="enterprise-panel-title">
+                        <h3>Recurring Problem Signals</h3>
+                        <span>Keyword intelligence from notes</span>
+                    </div>
+                    <div id="enterpriseProblemSignals" class="enterprise-signal-list"></div>
+                </section>
+            </div>
+
+            <div class="enterprise-panel enterprise-wide-panel">
+                <div class="enterprise-panel-title">
+                    <h3>Live Operational Stream</h3>
+                    <span>Latest customer, SKU, courier, and service status records</span>
+                </div>
+                <div class="enterprise-stream-table-wrap">
+                    <table class="enterprise-stream-table">
+                        <thead>
+                            <tr>
+                                <th>Case</th>
+                                <th>Customer</th>
+                                <th>SKU</th>
+                                <th>Courier</th>
+                                <th>Status</th>
+                                <th>Signal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enterpriseLiveStreamBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="tickets" class="page-content">
         <h3 style="color:var(--primary); margin-bottom:20px;"><i class="fas fa-folder-open"></i> Complete Return & Repair Queue</h3>
-        <input type="text" id="search" style="padding:14px; margin-bottom:25px; border-radius:12px; border:2px solid #e2e8f0; width:100%; background:white;" placeholder="🔍 Search via Name, AWB Tracking, Invoice or Phone...">
+        <input type="text" id="search" style="padding:14px; margin-bottom:25px; border-radius:12px; border:2px solid #e2e8f0; width:100%; background:white;" placeholder="ðŸ” Search via Name, AWB Tracking, Invoice or Phone...">
         <div class="table-container">
             <table>
                 <thead>
@@ -424,8 +814,357 @@
             row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
         });
     });
+
+    let enterprisePipelineChart = null;
+    let enterpriseSkuChart = null;
+    let enterpriseCourierChart = null;
+
+    const enterpriseOriginalUpdateUI = updateUI;
+    updateUI = function() {
+        enterpriseOriginalUpdateUI();
+        refreshEnterpriseDashboard();
+    };
+
+    function enterpriseSafeText(value) {
+        return String(value === undefined || value === null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function enterpriseParseDate(value) {
+        if (!value) return null;
+
+        if (typeof value === 'number') {
+            const numericDate = new Date(value);
+            return isNaN(numericDate.getTime()) ? null : numericDate;
+        }
+
+        const raw = String(value).trim();
+        if (!raw || raw === 'N/A') return null;
+
+        const direct = new Date(raw);
+        if (!isNaN(direct.getTime())) return direct;
+
+        const monthMap = {
+            jan: 0, january: 0,
+            feb: 1, february: 1,
+            mar: 2, march: 2,
+            apr: 3, april: 3,
+            may: 4,
+            jun: 5, june: 5,
+            jul: 6, july: 6,
+            aug: 7, august: 7,
+            sep: 8, sept: 8, september: 8,
+            oct: 9, october: 9,
+            nov: 10, november: 10,
+            dec: 11, december: 11
+        };
+
+        const cleaned = raw.replace(',', '').replace(/\s+/g, ' ');
+        const match = cleaned.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})(?:\s+(\d{1,2}):(\d{2})\s*(am|pm)?)?/i);
+
+        if (!match) return null;
+
+        const day = Number(match[1]);
+        const month = monthMap[match[2].toLowerCase()];
+        const year = Number(match[3]);
+        let hour = match[4] ? Number(match[4]) : 0;
+        const minute = match[5] ? Number(match[5]) : 0;
+        const meridian = match[6] ? match[6].toLowerCase() : '';
+
+        if (month === undefined) return null;
+        if (meridian === 'pm' && hour < 12) hour += 12;
+        if (meridian === 'am' && hour === 12) hour = 0;
+
+        const parsed = new Date(year, month, day, hour, minute);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function enterpriseStartOfDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function enterpriseDaysBetween(startValue, endValue) {
+        const start = enterpriseParseDate(startValue);
+        const end = enterpriseParseDate(endValue);
+        if (!start || !end) return null;
+        return Math.max(0, Math.round((end.getTime() - start.getTime()) / 86400000));
+    }
+
+    function enterpriseNormalizeStatus(status) {
+        if (status === 'ClientSent') return 'Client Sent';
+        if (status === 'In Transit') return 'In Transit';
+        if (status === 'WHReceived') return 'Warehouse Received';
+        if (status === 'Delivered') return 'Delivered';
+        return status || 'Unknown';
+    }
+
+    function enterpriseStatusClass(status) {
+        if (status === 'Delivered') return 'delivered';
+        if (status === 'In Transit') return 'transit';
+        if (status === 'WHReceived') return 'warehouse';
+        return '';
+    }
+
+    function enterpriseIsCritical(ticket) {
+        const text = `${ticket.note || ''} ${ticket.status || ''}`.toLowerCase();
+        const urgentWords = ['critical', 'urgent', 'dead', 'burn', 'broken', 'damage', 'replacement', 'escalation', 'not working'];
+        const hasUrgentWord = urgentWords.some(word => text.includes(word));
+
+        const created = enterpriseParseDate(ticket.date) || enterpriseParseDate(ticket.inwardDate);
+        const ageDays = created ? Math.floor((Date.now() - created.getTime()) / 86400000) : 0;
+        const isAgedOpen = ticket.status !== 'Delivered' && ageDays >= 7;
+
+        return hasUrgentWord || isAgedOpen;
+    }
+
+    function enterpriseCountByField(records, fieldName, fallbackLabel) {
+        const output = {};
+
+        records.forEach(item => {
+            const raw = item[fieldName];
+            const key = raw && String(raw).trim() ? String(raw).trim() : fallbackLabel;
+            output[key] = (output[key] || 0) + 1;
+        });
+
+        return output;
+    }
+
+    function enterpriseTopEntries(countMap, limit) {
+        return Object.keys(countMap)
+            .map(key => ({ label: key, value: countMap[key] }))
+            .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+            .slice(0, limit);
+    }
+
+    function enterpriseDetectProblemSignals(records) {
+        const dictionary = [
+            { key: 'Battery / Power', words: ['battery', 'charge', 'charging', 'power', 'dead', 'backup'] },
+            { key: 'Print / Output Quality', words: ['print', 'quality', 'head', 'paper', 'ink', 'blank'] },
+            { key: 'Display / Indicator', words: ['display', 'screen', 'light', 'indicator', 'led'] },
+            { key: 'Connectivity', words: ['bluetooth', 'wifi', 'connect', 'pair', 'network'] },
+            { key: 'Physical Damage', words: ['damage', 'broken', 'crack', 'body', 'button'] },
+            { key: 'Replacement Request', words: ['replacement', 'replace', 'exchange'] }
+        ];
+
+        const signalMap = {};
+
+        dictionary.forEach(group => {
+            signalMap[group.key] = 0;
+        });
+
+        records.forEach(ticket => {
+            const note = String(ticket.note || '').toLowerCase();
+
+            dictionary.forEach(group => {
+                if (group.words.some(word => note.includes(word))) {
+                    signalMap[group.key] += 1;
+                }
+            });
+        });
+
+        return enterpriseTopEntries(signalMap, 6);
+    }
+
+    function enterpriseSetText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = value;
+    }
+
+    function refreshEnterpriseDashboard() {
+        if (!document.getElementById('enterpriseDashboard')) return;
+
+        const now = new Date();
+        const todayStart = enterpriseStartOfDay(now);
+
+        const total = allTickets.length;
+        const closed = allTickets.filter(t => t.status === 'Delivered').length;
+        const open = total - closed;
+        const pending = allTickets.filter(t => ['ClientSent', 'In Transit', 'WHReceived'].includes(t.status)).length;
+        const critical = allTickets.filter(enterpriseIsCritical).length;
+
+        const todayLogs = allTickets.filter(t => {
+            const created = enterpriseParseDate(t.date);
+            return created && created >= todayStart;
+        }).length;
+
+        const monthlyVolume = allTickets.filter(t => {
+            const created = enterpriseParseDate(t.date);
+            return created && created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+        }).length;
+
+        const closureDays = allTickets
+            .map(t => enterpriseDaysBetween(t.inwardDate || t.date, t.outwardDate))
+            .filter(days => typeof days === 'number');
+
+        const avgClosure = closureDays.length
+            ? Math.round(closureDays.reduce((sum, days) => sum + days, 0) / closureDays.length)
+            : 0;
+
+        enterpriseSetText('enterpriseTotalCases', total);
+        enterpriseSetText('enterpriseOpenCases', open);
+        enterpriseSetText('enterpriseClosedCases', closed);
+        enterpriseSetText('enterpriseCriticalCases', critical);
+        enterpriseSetText('enterpriseTodayLogs', todayLogs);
+        enterpriseSetText('enterpriseMonthlyVolume', monthlyVolume);
+        enterpriseSetText('enterprisePendingCases', pending);
+        enterpriseSetText('enterpriseAvgClosure', avgClosure);
+        enterpriseSetText('enterpriseLastSync', 'Live synced: ' + now.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'medium' }));
+
+        renderEnterpriseCharts();
+        renderEnterpriseProblemSignals();
+        renderEnterpriseLiveStream();
+    }
+
+    function renderEnterpriseCharts() {
+        const pipelineCanvas = document.getElementById('enterprisePipelineChart');
+        const skuCanvas = document.getElementById('enterpriseSkuChart');
+        const courierCanvas = document.getElementById('enterpriseCourierChart');
+
+        if (!pipelineCanvas || !skuCanvas || !courierCanvas) return;
+
+        const statusCounts = {
+            'Client Sent': allTickets.filter(t => t.status === 'ClientSent').length,
+            'In Transit': allTickets.filter(t => t.status === 'In Transit').length,
+            'Warehouse': allTickets.filter(t => t.status === 'WHReceived').length,
+            'Delivered': allTickets.filter(t => t.status === 'Delivered').length
+        };
+
+        const topSkus = enterpriseTopEntries(enterpriseCountByField(allTickets, 'sku', 'Unmapped SKU'), 6);
+        const topCouriers = enterpriseTopEntries(enterpriseCountByField(allTickets, 'courier', 'Unassigned Courier'), 6);
+
+        if (enterprisePipelineChart) enterprisePipelineChart.destroy();
+        if (enterpriseSkuChart) enterpriseSkuChart.destroy();
+        if (enterpriseCourierChart) enterpriseCourierChart.destroy();
+
+        enterprisePipelineChart = new Chart(pipelineCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(statusCounts),
+                datasets: [{
+                    data: Object.values(statusCounts),
+                    backgroundColor: ['#3b82f6', '#f59e0b', '#a855f7', '#10b981'],
+                    borderColor: '#060814',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: { color: '#cbd5e1' }
+                    }
+                }
+            }
+        });
+
+        enterpriseSkuChart = new Chart(skuCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: topSkus.map(item => item.label),
+                datasets: [{
+                    data: topSkus.map(item => item.value),
+                    backgroundColor: '#60a5fa',
+                    borderRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(148,163,184,0.08)' } },
+                    y: { ticks: { color: '#cbd5e1', precision: 0 }, grid: { color: 'rgba(148,163,184,0.08)' } }
+                }
+            }
+        });
+
+        enterpriseCourierChart = new Chart(courierCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: topCouriers.map(item => item.label),
+                datasets: [{
+                    data: topCouriers.map(item => item.value),
+                    backgroundColor: '#34d399',
+                    borderRadius: 7
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { ticks: { color: '#cbd5e1', precision: 0 }, grid: { color: 'rgba(148,163,184,0.08)' } },
+                    y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(148,163,184,0.08)' } }
+                }
+            }
+        });
+    }
+
+    function renderEnterpriseProblemSignals() {
+        const target = document.getElementById('enterpriseProblemSignals');
+        if (!target) return;
+
+        const signals = enterpriseDetectProblemSignals(allTickets);
+        const activeSignals = signals.filter(item => item.value > 0);
+
+        if (activeSignals.length === 0) {
+            target.innerHTML = '<div class="enterprise-signal-row"><span>No recurring issue signals detected yet</span><strong>0</strong></div>';
+            return;
+        }
+
+        target.innerHTML = activeSignals.map(item => `
+            <div class="enterprise-signal-row">
+                <span>${enterpriseSafeText(item.label)}</span>
+                <strong>${item.value}</strong>
+            </div>
+        `).join('');
+    }
+
+    function renderEnterpriseLiveStream() {
+        const target = document.getElementById('enterpriseLiveStreamBody');
+        if (!target) return;
+
+        const sortedTickets = allTickets.slice().sort((a, b) => {
+            const dateA = enterpriseParseDate(a.date);
+            const dateB = enterpriseParseDate(b.date);
+            const timeA = dateA ? dateA.getTime() : Number(a.id || 0);
+            const timeB = dateB ? dateB.getTime() : Number(b.id || 0);
+            return timeB - timeA;
+        }).slice(0, 12);
+
+        if (sortedTickets.length === 0) {
+            target.innerHTML = '<tr><td colspan="6">No live records found.</td></tr>';
+            return;
+        }
+
+        target.innerHTML = sortedTickets.map(ticket => {
+            const critical = enterpriseIsCritical(ticket);
+            const statusClass = enterpriseStatusClass(ticket.status);
+            const caseId = ticket.id ? '#' + ticket.id : 'N/A';
+
+            return `
+                <tr onclick="openModal('${enterpriseSafeText(ticket.id)}')">
+                    <td>${enterpriseSafeText(caseId)}<br><small>${enterpriseSafeText(ticket.inv || 'No invoice')}</small></td>
+                    <td>${enterpriseSafeText(ticket.name || 'Unknown')}<br><small>${enterpriseSafeText(ticket.phone || 'No phone')}</small></td>
+                    <td>${enterpriseSafeText(ticket.sku || 'N/A')}</td>
+                    <td>${enterpriseSafeText(ticket.courier || 'N/A')}<br><small>${enterpriseSafeText(ticket.awbNo || 'No AWB')}</small></td>
+                    <td><span class="enterprise-status-pill ${statusClass}">${enterpriseSafeText(enterpriseNormalizeStatus(ticket.status))}</span></td>
+                    <td class="${critical ? 'enterprise-risk-high' : 'enterprise-risk-normal'}">${critical ? 'Needs Review' : 'Normal'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    refreshEnterpriseDashboard();
 </script>
 </body>
 </html>
 
-
+ye codex ne diya haibhai 
