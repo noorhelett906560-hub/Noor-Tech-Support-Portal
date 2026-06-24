@@ -1,868 +1,80 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noor Tech Support Portal</title>
-
+<title>HELETT CRM Enterprise Portal</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-:root {
-    --primary: #0f172a;
-    --secondary: #2563eb;
-    --success: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --bg: #f8fafc;
-    --text: #334155;
-    --muted: #64748b;
-    --line: #e2e8f0;
-    --soft: #f1f5f9;
-}
-* { box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg);
-    margin: 0;
-    display: flex;
-    color: var(--text);
-    overflow: hidden;
-}
-.sidebar {
-    width: 260px;
-    background: var(--primary);
-    height: 100vh;
-    color: white;
-    padding: 20px;
-    position: fixed;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-    z-index: 1000;
-    overflow-y: auto;
-}
-.sidebar h2 {
-    font-size: 1.25rem;
-    margin: 0 0 24px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 15px;
-    text-align: center;
-    color: #f1f5f9;
-    letter-spacing: 1px;
-}
-.brand-mark sup {
-    font-size: 0.48em;
-    line-height: 0;
-    position: relative;
-    top: -0.62em;
-}
-.nav-item {
-    padding: 13px 16px;
-    margin: 7px 0;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 500;
-    color: #94a3b8;
-}
-.nav-item:hover, .nav-item.active {
-    background: var(--secondary);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37,99,235,0.2);
-}
-.main {
-    margin-left: 280px;
-    padding: 35px;
-    width: calc(100% - 280px);
-    height: 100vh;
-    overflow-y: auto;
-}
-.page-content { display: none; }
-.page-content.active { display: block; }
-.workspace-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-.workspace-header h3 {
-    color: var(--primary);
-    margin: 0;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.live-pill {
-    background: #e0f2fe;
-    color: #0369a1;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid #bae6fd;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-}
-.tab-summary {
-    color: var(--muted);
-    margin: -8px 0 24px 0;
-    font-size: 0.92rem;
-    line-height: 1.5;
-}
-.stats-grid, .analytics-grid, .module-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-.stat-card, .analytics-card, .flow-card, .form-section, .table-container, .panel-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(15,23,42,0.02), 0 10px 15px rgba(15,23,42,0.04);
-}
-.stat-card, .analytics-card {
-    padding: 22px;
-    border-top: 4px solid var(--secondary);
-    transition: 0.2s;
-}
-.stat-card:hover, .analytics-card:hover { transform: translateY(-3px); }
-.stat-card h4, .analytics-card h4, .flow-card h4 {
-    margin: 0 0 10px 0;
-    color: var(--muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.metric, .analytics-card strong, .flow-card strong {
-    display: block;
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--primary);
-    line-height: 1.1;
-}
-.stat-card small, .analytics-card small, .flow-card small {
-    display: block;
-    margin-top: 6px;
-    color: var(--muted);
-    font-size: 0.75rem;
-}
-.form-section, .panel-card {
-    padding: 30px;
-    margin-bottom: 30px;
-}
-.grid-layout {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-}
-.section-tag {
-    grid-column: 1 / -1;
-    background: var(--soft);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-left: 4px solid var(--secondary);
-}
-input, select, textarea {
-    padding: 12px 16px;
-    border: 1.5px solid var(--line);
-    border-radius: 10px;
-    width: 100%;
-    outline: none;
-    font-size: 0.9rem;
-    color: var(--primary);
-    background: #f8fafc;
-    transition: 0.2s;
-    min-width: 0;
-}
-input:focus, select:focus, textarea:focus {
-    border-color: var(--secondary);
-    background: white;
-    box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
-}
-textarea {
-    grid-column: 1 / -1;
-    height: 90px;
-    resize: vertical;
-}
-.hidden-field { display: none; }
-.btn-group {
-    margin-top: 25px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-.btn {
-    padding: 13px 24px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    transition: 0.2s;
-    font-size: 0.95rem;
-    text-decoration: none;
-    justify-content: center;
-}
-.btn-save { background: var(--success); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
-.btn-save:hover { background: #0d9488; }
-.btn-secondary { background: var(--secondary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-.btn-secondary:hover { background: #1d4ed8; }
-.btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(239,68,68,0.2); }
-.table-container {
-    overflow-x: auto;
-    margin-bottom: 30px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 860px;
-}
-th {
-    background: #f8fafc;
-    padding: 16px 20px;
-    text-align: left;
-    color: var(--muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    font-weight: 600;
-    border-bottom: 2px solid #edf2f7;
-    white-space: nowrap;
-}
-td {
-    padding: 18px 20px;
-    border-top: 1px solid #f1f5f9;
-    font-size: 0.9rem;
-    color: #334155;
-    vertical-align: top;
-}
-tr:hover { background: #f8fafc; cursor: pointer; }
-.pipeline-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-.status-ClientSent { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-.status-CompanyPickup { background: #ecfeff; color: #155e75; border: 1px solid #a5f3fc; }
-.status-WHReceived { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
-.status-ReadyToShip { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-.status-Dispatched { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.status-Delivered { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-.status-RTO { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-.status-InTransit { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(15,23,42,0.6);
-    backdrop-filter: blur(6px);
-    overflow-y: auto;
-}
-.modal-content {
-    background: white;
-    margin: 3% auto;
-    padding: 35px;
-    width: 85%;
-    max-width: 900px;
-    border-radius: 20px;
-    position: relative;
-    box-shadow: 0 25px 50px -12 rgba(0,0,0,0.25);
-}
-.close {
-    position: absolute;
-    right: 25px;
-    top: 25px;
-    font-size: 26px;
-    cursor: pointer;
-    color: var(--danger);
-    transition: 0.2s;
-}
-.close:hover { transform: scale(1.1); }
-.modal-header { border-bottom: 2px solid var(--line); margin-bottom: 25px; padding-bottom: 15px; }
-.visual-pipeline {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px 0 30px 0;
-    background: var(--soft);
-    padding: 15px 20px;
-    border-radius: 12px;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.pipe-step {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: #94a3b8;
-    padding: 6px 10px;
-    border-radius: 8px;
-}
-.pipe-step.active-sent { background: #3b82f6; color: white; }
-.pipe-step.active-pickup { background: #06b6d4; color: white; }
-.pipe-step.active-wh { background: #a855f7; color: white; }
-.pipe-step.active-ready { background: #10b981; color: white; }
-.pipe-step.active-dispatched { background: #f59e0b; color: white; }
-.pipe-step.active-done { background: #059669; color: white; }
-.pipe-step.active-rto { background: #ef4444; color: white; }
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-    background: white;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-}
-.status-flow-grid {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-}
-.flow-card {
-    padding: 18px;
-    border-left: 4px solid var(--secondary);
-}
-.filter-bar {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 24px;
-}
-.module-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 22px;
-}
-.module-tab {
-    border: 1px solid rgba(148,163,184,0.25);
-    background: white;
-    color: var(--primary);
-    padding: 10px 14px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 800;
-    box-shadow: 0 4px 10px rgba(15,23,42,0.04);
-}
-.module-tab.active {
-    background: var(--secondary);
-    color: white;
-}
-.module-panel { display: none; }
-.module-panel.active { display: block; }
-.track-link, .media-link-row a {
-    color: var(--secondary);
-    font-weight: 800;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    word-break: break-word;
-}
-.track-link:hover, .media-link-row a:hover { text-decoration: underline; }
-.priority-row { border-left: 4px solid var(--danger); }
-.priority-tag {
-    color: #991b1b;
-    background: #fee2e2;
-    border: 1px solid #fecaca;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    font-weight: 800;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.muted-small { color: var(--muted); font-size: 0.78rem; }
-.empty-state { padding: 28px; text-align: center; color: var(--muted); font-weight: 600; }
-.media-preview-list { display: grid; gap: 10px; margin-top: 15px; }
-.media-link-row {
-    background: #f8fafc;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 12px;
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: center;
-}
-.glass-suite {
-    background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,41,59,0.94));
-    color: #e5e7eb;
-    border-radius: 18px;
-    padding: 24px;
-    min-height: calc(100vh - 70px);
-}
-.glass-suite .panel-card, .glass-suite .table-container, .glass-suite .form-section {
-    color: var(--text);
-}
-.kpi-dark {
-    background: rgba(255,255,255,0.96);
-    border-radius: 16px;
-    padding: 20px;
-    border-top: 4px solid var(--secondary);
-}
-.kpi-dark span {
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-.kpi-dark strong {
-    display: block;
-    color: var(--primary);
-    font-size: 1.7rem;
-    margin-top: 8px;
-}
-.template-grid, .two-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-.three-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-}
-.template-box, .kb-result {
-    background: #f8fafc;
-    border: 1.5px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
-    min-height: 120px;
-    line-height: 1.55;
-}
-.soft-delete-btn {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    cursor: pointer;
-}
-@media (max-width: 1280px) {
-    .stats-grid, .analytics-grid, .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .status-flow-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .three-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 900px) {
-    body { display: block; overflow: auto; }
-    .sidebar { position: relative; width: 100%; height: auto; padding: 16px; }
-    .sidebar h2 { margin-bottom: 16px; }
-    .nav-item { margin: 6px 0; padding: 12px 14px; }
-    .main { margin-left: 0; width: 100%; height: auto; padding: 18px; overflow: visible; }
-    .grid-layout, .filter-bar, .charts-grid, .template-grid, .two-grid {
-        grid-template-columns: 1fr;
-    }
-    .section-tag, textarea { grid-column: 1; }
-    .stats-grid, .analytics-grid, .status-flow-grid, .module-grid {
-        grid-template-columns: 1fr;
-    }
-    .workspace-header { align-items: flex-start; flex-direction: column; }
-    .btn { width: 100%; }
-    .modal-content { width: calc(100% - 24px); margin: 12px auto; padding: 24px 18px; }
-    .visual-pipeline { display: grid; grid-template-columns: 1fr; }
-    .module-tabs { display: grid; grid-template-columns: 1fr; }
-    .module-tab { border-radius: 10px; width: 100%; text-align: left; }
-}
-@media (max-width: 520px) {
-    .main { padding: 12px; }
-    .form-section, .stat-card, .analytics-card, .panel-card { padding: 16px; border-radius: 12px; }
-    th, td { padding: 12px; }
-    .metric, .analytics-card strong, .flow-card strong { font-size: 1.45rem; }
-}
+:root{--primary:#0f172a;--secondary:#2563eb;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--purple:#a855f7;--cyan:#06b6d4;--bg:#f8fafc;--text:#334155;--muted:#64748b;--line:#e2e8f0;--soft:#f1f5f9}
+*{box-sizing:border-box}body{margin:0;display:flex;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}.sidebar{position:fixed;z-index:1000;width:260px;height:100vh;padding:20px;overflow-y:auto;background:var(--primary);color:#fff;box-shadow:4px 0 10px rgba(0,0,0,.1)}.sidebar h2{margin:0 0 28px;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,.1);text-align:center;color:#f1f5f9;letter-spacing:1px}.sidebar sup{position:relative;top:-.62em;font-size:.48em}.nav-item{display:flex;align-items:center;gap:14px;margin:8px 0;padding:14px 18px;border-radius:10px;color:#94a3b8;cursor:pointer;font-weight:600;transition:.2s}.nav-item:hover,.nav-item.active{background:var(--secondary);color:#fff}.main{width:calc(100% - 280px);height:100vh;margin-left:280px;padding:35px;overflow-y:auto}.page{display:none}.page.active{display:block}.header{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:20px}.header h2{display:flex;align-items:center;gap:10px;margin:0;color:var(--primary);font-size:1.25rem}.live-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid #bae6fd;border-radius:20px;background:#e0f2fe;color:#0369a1;font-size:.75rem;font-weight:800}.summary{margin:-7px 0 24px;color:var(--muted);line-height:1.5}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:28px}.card,.panel,.table-card{border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(15,23,42,.06)}.card{padding:21px;border-top:4px solid var(--secondary)}.card h4{margin:0 0 9px;color:var(--muted);font-size:.78rem;text-transform:uppercase}.metric{font-size:1.8rem;font-weight:800;color:var(--primary)}.card small{color:var(--muted)}.panel{padding:28px;margin-bottom:28px}.panel h3{margin:0 0 20px;color:var(--primary)}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.section{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:10px 15px;border-left:4px solid var(--secondary);border-radius:8px;background:var(--soft);font-weight:800;color:var(--primary)}input,select,textarea{width:100%;min-width:0;padding:12px 15px;border:1.5px solid var(--line);border-radius:10px;background:#f8fafc;color:var(--primary);outline:none;font-size:.9rem}input:focus,select:focus,textarea:focus{border-color:var(--secondary);background:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.1)}textarea{grid-column:1/-1;min-height:90px;resize:vertical}.attach{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:1.5px dashed #93c5fd;border-radius:10px;background:#eff6ff;color:#1e40af;font-weight:800;cursor:pointer}.attach input{width:auto}.pipeline{display:none}.pipeline.show{display:contents}.hidden{display:none!important}.buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border:0;border-radius:9px;cursor:pointer;font-weight:800}.btn:disabled{cursor:not-allowed;opacity:.65}.green{background:var(--success);color:#fff}.blue{background:var(--secondary);color:#fff}.red{background:var(--danger);color:#fff}.light{background:#e2e8f0;color:#0f172a}.toolbar{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;margin-bottom:22px}.table-card{overflow-x:auto;margin-bottom:28px}table{width:100%;min-width:940px;border-collapse:collapse}th{padding:15px 18px;border-bottom:2px solid #edf2f7;background:#f8fafc;color:var(--muted);text-align:left;text-transform:uppercase;font-size:.75rem}td{padding:16px 18px;border-top:1px solid #f1f5f9;vertical-align:top;font-size:.9rem}tr:hover{background:#f8fafc}.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;font-size:.75rem;font-weight:800;white-space:nowrap}.b-blue{background:#dbeafe;color:#1e40af}.b-cyan{background:#cffafe;color:#155e75}.b-purple{background:#f3e8ff;color:#6b21a8}.b-green{background:#d1fae5;color:#065f46}.b-yellow{background:#fef3c7;color:#92400e}.b-red{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:7px;flex-wrap:wrap}.small{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:0;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:800}.edit{background:#dbeafe;color:#1e40af}.delete{background:#fee2e2;color:#991b1b}.empty{padding:28px!important;text-align:center;color:var(--muted);font-weight:700}.modal{display:none;position:fixed;inset:0;z-index:2000;overflow-y:auto;background:rgba(15,23,42,.65)}.modal-content{position:relative;width:85%;max-width:900px;margin:3% auto;padding:32px;border-radius:18px;background:#fff}.close{position:absolute;right:22px;top:18px;color:var(--danger);font-size:28px;cursor:pointer}.pipeline-view{display:flex;gap:8px;flex-wrap:wrap;padding:14px;margin:20px 0;background:var(--soft);border-radius:10px}.step{padding:7px 10px;border-radius:8px;color:#94a3b8;font-size:.75rem;font-weight:800}.on1{background:#3b82f6;color:#fff}.on2{background:#06b6d4;color:#fff}.on3{background:#a855f7;color:#fff}.on4{background:#10b981;color:#fff}.on5{background:#f59e0b;color:#fff}.on6{background:#059669;color:#fff}.on7{background:#ef4444;color:#fff}.toast{display:none;position:fixed;right:20px;bottom:20px;z-index:5000;max-width:430px;padding:13px 18px;border-radius:10px;color:#fff;font-weight:800;box-shadow:0 12px 30px rgba(15,23,42,.25)}.toast.show{display:block}.toast.success{background:#059669}.toast.error{background:#dc2626}.toast.info{background:#2563eb}
+.track-link{display:inline-flex;align-items:center;gap:6px;color:var(--secondary);font-weight:800;text-decoration:none;white-space:nowrap}.track-link:hover{text-decoration:underline}.pager{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--line);background:#fff}.pager button{min-width:38px;padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--primary);cursor:pointer;font-weight:800}.pager button:hover:not(:disabled),.pager button.active{background:var(--secondary);color:#fff;border-color:var(--secondary)}.pager button:disabled{cursor:not-allowed;opacity:.45}.pager-info{color:var(--muted);font-size:.8rem;font-weight:700;margin:0 6px}.sync-state{font-size:.76rem;font-weight:800;color:var(--muted)}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){body{display:block;overflow:auto}.sidebar{position:relative;width:100%;height:auto}.main{width:100%;height:auto;margin:0;padding:18px;overflow:visible}.stats,.grid,.toolbar{grid-template-columns:1fr}.btn{width:100%}.modal-content{width:calc(100% - 20px);margin:10px auto}.header{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
-
 <div class="sidebar">
-    <h2 class="brand-mark">HELETT<sup>&reg;</sup> CRM</h2>
-    <div class="nav-item active" onclick="showPage('dashboard', this)"><i class="fas fa-chart-pie"></i> Legacy Dashboard</div>
-    <div class="nav-item" onclick="showPage('tickets', this)"><i class="fas fa-truck-ramp-box"></i> Legacy Pipeline</div>
-    <div class="nav-item" onclick="showPage('enterpriseSuite', this)"><i class="fas fa-layer-group"></i> Enterprise Suite</div>
-    <div class="nav-item" onclick="exportExcel()"><i class="fas fa-file-csv"></i> Download Excel</div>
+<h2>HELETT<sup>&reg;</sup> CRM</h2>
+<div class="nav-item active" onclick="showPage('warrantyPage',this)"><i class="fas fa-shield-halved"></i> Warranty Hub</div>
+<div class="nav-item" onclick="showPage('servicePage',this)"><i class="fas fa-route"></i> Replacement Engine</div>
+<div class="nav-item" onclick="showPage('criticalPage',this)"><i class="fas fa-triangle-exclamation"></i> Critical Complaint Queue</div>
 </div>
-
 <div class="main">
-    <div id="dashboard" class="page-content active">
-        <div class="workspace-header">
-            <h3><i class="fas fa-chart-pie" style="color:var(--secondary);"></i> Control Centre</h3>
-            <div>
-                <span id="liveClock" style="font-weight: 600; color: #64748b; font-size: 0.9rem;"></span>
-                <span class="live-pill"><i class="fas fa-circle-check"></i> LIVE ENGINE ONLINE</span>
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card"><h4>Total Return Requests</h4><div id="countTotal" class="metric">0</div></div>
-            <div class="stat-card" style="border-top-color:#06b6d4;"><h4>We Pickup Live Cases</h4><div id="countCompanyPickup" class="metric" style="color:#0891b2;">0</div></div>
-            <div class="stat-card" style="border-top-color:#a855f7;"><h4>Warehouse Received</h4><div id="countWH" class="metric" style="color:#a855f7;">0</div></div>
-            <div class="stat-card" style="border-top-color:var(--danger);"><h4>RTO Active Logs</h4><div id="countRTO" class="metric" style="color:var(--danger);">0</div></div>
-        </div>
-
-        <div class="charts-grid">
-            <div>
-                <p style="font-size:0.8rem;font-weight:bold;color:#64748b;text-align:center;margin-bottom:12px;">COURIER DISPATCH SPLIT</p>
-                <canvas id="courierChart" height="120"></canvas>
-            </div>
-            <div>
-                <p style="font-size:0.8rem;font-weight:bold;color:#64748b;text-align:center;margin-bottom:12px;">PIPELINE RATIO</p>
-                <canvas id="pipelineChart" height="120"></canvas>
-            </div>
-        </div>
-
-        <div class="form-section">
-            <h3 style="margin-top:0;margin-bottom:20px;color:var(--primary);font-size:1.15rem;"><i class="fas fa-square-plus" style="color:var(--secondary);"></i> Log New Inbound Repair Case</h3>
-            <form id="crmForm">
-                <div class="grid-layout">
-                    <div class="section-tag"><i class="fas fa-user"></i> Customer & Order Basics</div>
-                    <input type="text" id="custName" placeholder="Customer Name" required>
-                    <input type="text" id="custPhone" placeholder="Phone Number" required>
-                    <input type="text" id="invNo" placeholder="Invoice / Order ID" required>
-
-                    <div class="section-tag"><i class="fas fa-cube"></i> Product Specifications</div>
-                    <input type="text" id="sku" placeholder="Model / SKU (e.g. HT20, H30C)" required>
-                    <input type="text" id="serial" placeholder="Product Serial Number (S/N)">
-                    <select id="source">
-                        <option value="Amazon">Platform: Amazon</option>
-                        <option value="Flipkart">Platform: Flipkart</option>
-                        <option value="Direct Website">Platform: Direct Website</option>
-                    </select>
-
-                    <div class="section-tag"><i class="fas fa-calendar-check"></i> Warranty & Media</div>
-                    <input type="date" id="warrantyExpiry" title="Warranty Expiry Date">
-                    <input type="text" id="invoiceImageLink" placeholder="Invoice/Product Image Link">
-                    <input type="text" id="mediaUrl" placeholder="Photo/Video URL">
-
-                    <div class="section-tag"><i class="fas fa-truck"></i> Logistics & Courier Journey</div>
-                    <input type="text" id="awbNo" placeholder="AWB / Tracking Number" required>
-                    <select id="courier" onchange="toggleCourierOverride('courier','manualCourier')">
-                        <option value="Shiprocket">Courier: Shiprocket</option>
-                        <option value="Delhivery">Courier: Delhivery</option>
-                        <option value="BlueDart">Courier: BlueDart</option>
-                        <option value="Amazon Shipping">Courier: Amazon Shipping</option>
-                        <option value="DTDC">Courier: DTDC</option>
-                        <option value="Indian Post">Courier: Indian Post</option>
-                        <option value="Other / Manual Input">Other / Manual Input</option>
-                    </select>
-                    <input type="text" id="manualCourier" class="hidden-field" placeholder="Type courier partner manually">
-
-                    <div class="section-tag"><i class="fas fa-route"></i> Pipeline Stage</div>
-                    <select id="status">
-                        <option value="ClientSent">1. Client Sent</option>
-                        <option value="CompanyPickup">2. We Pickup / Company Route</option>
-                        <option value="WHReceived">3. WH Received</option>
-                        <option value="ReadyToShip">4. Repaired / Ready to Ship</option>
-                        <option value="Dispatched">5. Dispatched via Courier</option>
-                        <option value="Delivered">6. Delivered / Closed</option>
-                        <option value="RTO">7. RTO (Return to Origin)</option>
-                    </select>
-                    <textarea id="issueNote" placeholder="Write the problem here..."></textarea>
-                </div>
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-save"><i class="fas fa-cloud-arrow-up"></i> Save To Live Pipeline</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="tickets" class="page-content">
-        <div class="workspace-header">
-            <h3><i class="fas fa-folder-open" style="color:var(--secondary);"></i> Complete Return & Repair Queue</h3>
-        </div>
-        <input type="text" id="search" style="margin-bottom:25px;" placeholder="Search via Name, AWB Tracking, Invoice or Phone...">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer / Order ID</th>
-                        <th>Model/SKU</th>
-                        <th>AWB / Partner</th>
-                        <th>Current Repair Stage</th>
-                        <th>Problem Statement</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="crmTableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="enterpriseSuite" class="page-content">
-        <div class="glass-suite">
-            <div class="workspace-header">
-                <h3 style="color:#f8fafc;"><i class="fas fa-layer-group"></i> Enterprise Service Management Suite</h3>
-                <span class="live-pill"><i class="fas fa-shield-halved"></i> Append-Only Paths Active</span>
-            </div>
-            <p class="tab-summary" style="color:#cbd5e1;">12 enterprise modules with isolated Firebase paths and audit-safe operations.</p>
-
-            <div class="module-tabs">
-                <button class="module-tab active" onclick="showEnterpriseModule('mDashboard', this)">Enterprise Dashboard</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mCustomer', this)">Customer CRM</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mWarranty', this)">Warranty</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mService', this)">Service Center</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mWarehouse', this)">Warehouse</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mShipment', this)">Shipment</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mReviews', this)">Reviews</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mKB', this)">Knowledge Base</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mProduct', this)">Product Master</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mReports', this)">Reports</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mSettings', this)">Settings</button>
-                <button class="module-tab" onclick="showEnterpriseModule('mAudit', this)">Audit Logs</button>
-            </div>
-
-            <div id="mDashboard" class="module-panel active">
-                <div class="module-grid">
-                    <div class="kpi-dark"><span>Today Cases</span><strong id="dashToday">0</strong></div>
-                    <div class="kpi-dark"><span>Monthly Cases</span><strong id="dashMonth">0</strong></div>
-                    <div class="kpi-dark"><span>Critical/Urgent</span><strong id="dashCritical">0</strong></div>
-                    <div class="kpi-dark"><span>Avg Repair Days</span><strong id="dashAvgRepair">0</strong></div>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Customer</th><th>Invoice</th><th>SKU</th><th>Status</th><th>Risk</th></tr></thead>
-                        <tbody id="enterpriseDashboardBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="mCustomer" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-users"></i> Customer CRM</h3>
-                    <input id="customerSearch" placeholder="Search by phone, name, invoice, SKU">
-                    <div class="table-container" style="margin-top:18px;">
-                        <table><thead><tr><th>Customer</th><th>Phone</th><th>Invoices</th><th>Last SKU</th><th>History</th></tr></thead><tbody id="customerCrmBody"></tbody></table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mWarranty" class="module-panel">
-                <div class="form-section">
-                    <h3><i class="fas fa-shield-halved"></i> Warranty Registration</h3>
-                    <div class="grid-layout">
-                        <input id="wName" placeholder="Customer Name">
-                        <input id="wPhone" placeholder="Phone">
-                        <input id="wInvoice" placeholder="Invoice">
-                        <input id="wSku" placeholder="SKU">
-                        <input id="wSerial" placeholder="Serial Number">
-                        <input id="wAmazon" placeholder="Amazon Order ID">
-                        <input id="wMarketplace" placeholder="Marketplace">
-                        <input id="wExpiry" type="date">
-                        <button class="btn btn-save" type="button" onclick="saveWarrantyRecord()"><i class="fas fa-cloud-arrow-up"></i> Save Warranty</button>
-                    </div>
-                </div>
-                <div class="table-container"><table><thead><tr><th>Customer</th><th>Invoice</th><th>SKU</th><th>Expiry</th></tr></thead><tbody id="warrantyBody"></tbody></table></div>
-            </div>
-
-            <div id="mService" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-screwdriver-wrench"></i> Service Center</h3>
-                    <div class="grid-layout">
-                        <select id="serviceTicket"></select>
-                        <input id="serviceEngineer" placeholder="Engineer Assigned">
-                        <select id="serviceStage">
-                            <option>Engineer Assigned</option><option>QC Pending</option><option>Repair Under Process</option><option>Waiting Parts</option><option>Ready To Ship</option>
-                        </select>
-                        <textarea id="serviceNote" placeholder="Repair notes"></textarea>
-                        <button class="btn btn-save" type="button" onclick="saveServiceUpdate()">Save Service Update</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mWarehouse" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-warehouse"></i> Warehouse</h3>
-                    <div class="grid-layout">
-                        <input id="stockSku" placeholder="SKU">
-                        <input id="stockQty" type="number" placeholder="Received Qty">
-                        <input id="stockLocation" placeholder="Rack / Bin Location">
-                        <button class="btn btn-save" type="button" onclick="saveWarehouseStock()">Save Stock Allocation</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mShipment" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-truck-fast"></i> Shipment Tracking</h3>
-                    <div class="grid-layout">
-                        <select id="shipTicket"></select>
-                        <select id="shipCourier">
-                            <option>BlueDart</option><option>DTDC</option><option>Amazon Shipping</option><option>Delhivery</option><option>XpressBees</option><option>India Post</option><option>Ekart</option><option>Shadowfax</option><option>Shiprocket</option>
-                        </select>
-                        <input id="shipAwb" placeholder="AWB Number">
-                        <button class="btn btn-save" type="button" onclick="saveShipmentUpdate()">Save Shipment</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mReviews" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-star-half-stroke"></i> Review Management</h3>
-                    <div class="grid-layout">
-                        <input id="reviewName" placeholder="Customer Name">
-                        <input id="reviewPhone" placeholder="Number">
-                        <input id="reviewInvoice" placeholder="Invoice">
-                        <input id="reviewSku" placeholder="SKU">
-                        <select id="reviewRating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-                        <select id="reviewStatus"><option>Pending Bad Review</option><option>Upgraded Live Positive Feedback</option></select>
-                        <textarea id="reviewNote" placeholder="Review note"></textarea>
-                        <button class="btn btn-save" type="button" onclick="saveReviewRecord()">Save Review</button>
-                    </div>
-                </div>
-                <div class="module-grid">
-                    <div class="kpi-dark"><span>Pending Bad Reviews</span><strong id="pendingBadReviews">0</strong></div>
-                    <div class="kpi-dark"><span>Positive Upgrades</span><strong id="upgradedPositiveReviews">0</strong></div>
-                </div>
-            </div>
-
-            <div id="mKB" class="module-panel">
-                <div class="two-grid">
-                    <div class="panel-card">
-                        <h3><i class="fas fa-brain"></i> AI Knowledge Base</h3>
-                        <input id="kbIssue" placeholder="Technical issue">
-                        <textarea id="kbSolution" placeholder="Solution"></textarea>
-                        <input id="kbSku" placeholder="Linked SKU">
-                        <div class="btn-group">
-                            <button class="btn btn-save" onclick="saveKnowledgeEntry()">Save Knowledge</button>
-                            <button class="btn btn-secondary" onclick="searchKnowledgeBase()">Search</button>
-                        </div>
-                    </div>
-                    <div class="panel-card">
-                        <h3>Templates</h3>
-                        <div id="kbResult" class="kb-result">Save or search knowledge.</div>
-                    </div>
-                </div>
-                <div class="three-grid">
-                    <div class="panel-card"><h3>English</h3><div id="tplEnglish" class="template-box"></div><button class="btn btn-secondary" onclick="copyTemplate('tplEnglish')">Copy</button></div>
-                    <div class="panel-card"><h3>Hindi</h3><div id="tplHindi" class="template-box"></div><button class="btn btn-secondary" onclick="copyTemplate('tplHindi')">Copy</button></div>
-                    <div class="panel-card"><h3>Tamil</h3><div id="tplTamil" class="template-box"></div><button class="btn btn-secondary" onclick="copyTemplate('tplTamil')">Copy</button></div>
-                </div>
-            </div>
-
-            <div id="mProduct" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-boxes-stacked"></i> Product Master</h3>
-                    <div class="grid-layout">
-                        <input id="pmSku" placeholder="SKU">
-                        <input id="pmName" placeholder="Product Name">
-                        <input id="pmManual" placeholder="Manual PDF Link">
-                        <input id="pmFirmware" placeholder="Firmware Link">
-                        <textarea id="pmIssues" placeholder="Common Issues"></textarea>
-                        <button class="btn btn-save" onclick="saveProductMaster()">Save Product</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mReports" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-file-lines"></i> Reports</h3>
-                    <div class="grid-layout">
-                        <input id="reportFrom" type="date">
-                        <input id="reportTo" type="date">
-                        <select id="reportType"><option>Warranty</option><option>Shipment</option><option>Reviews</option><option>Engineer Performance</option></select>
-                        <button class="btn btn-save" onclick="saveReportConfig()">Save Report Config</button>
-                        <button class="btn btn-secondary" onclick="exportEnterpriseReport()">Export Filtered CSV</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mSettings" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-gear"></i> Settings</h3>
-                    <div class="grid-layout">
-                        <input id="setCompany" placeholder="Company Name">
-                        <input id="setSupport" placeholder="Support Phone">
-                        <input id="setEmail" placeholder="Support Email">
-                        <button class="btn btn-save" onclick="saveSettings()">Save Settings</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mAudit" class="module-panel">
-                <div class="panel-card">
-                    <h3><i class="fas fa-clipboard-list"></i> Audit Logs</h3>
-                    <div class="table-container"><table><thead><tr><th>Action</th><th>Path</th><th>Record</th><th>Time</th></tr></thead><tbody id="auditBody"></tbody></table></div>
-                </div>
-            </div>
-        </div>
-    </div>
+<section id="warrantyPage" class="page active">
+<div class="header"><h2><i class="fas fa-shield-halved" style="color:var(--secondary)"></i> Warranty Hub</h2><div><span id="clock" style="font-weight:600;color:#64748b"></span> <span class="live-pill"><i class="fas fa-circle-check"></i> LIVE WARRANTY ENGINE ONLINE</span></div></div>
+<p class="summary">All old records remain visible. New warranty data enters Operational Pipeline Matrix only when you manually attach it.</p>
+<div class="stats">
+<div class="card"><h4>Total Logged</h4><div id="totalLogged" class="metric">0</div><small>Old + new records</small></div>
+<div class="card" style="border-color:var(--success)"><h4>Active Warranty</h4><div id="activeWarranty" class="metric" style="color:var(--success)">0</div><small>Warranty still active</small></div>
+<div class="card" style="border-color:var(--warning)"><h4>Expiring in 30 Days</h4><div id="expiringWarranty" class="metric" style="color:var(--warning)">0</div><small>Expiry alert</small></div>
+<div class="card"><h4>Client Sent</h4><div id="clientCount" class="metric">0</div><small>Pipeline only</small></div>
+<div class="card" style="border-color:var(--cyan)"><h4>We Pickup</h4><div id="pickupCount" class="metric">0</div><small>Pipeline only</small></div>
+<div class="card" style="border-color:var(--purple)"><h4>WH Received</h4><div id="whCount" class="metric">0</div><small>Pipeline only</small></div>
+<div class="card" style="border-color:var(--warning)"><h4>Dispatched</h4><div id="dispatchCount" class="metric">0</div><small>Pipeline only</small></div>
+<div class="card" style="border-color:var(--danger)"><h4>RTO</h4><div id="rtoCount" class="metric">0</div><small>Pipeline only</small></div>
 </div>
-
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <div class="modal-header">
-            <h3 style="margin:0;color:var(--primary);"><i class="fas fa-sliders" style="color:var(--secondary);"></i> Update Return Step Pipeline</h3>
-            <p id="modalTicketID" style="font-weight:bold;color:var(--secondary);margin:5px 0 0 0;font-size:0.9rem;"></p>
-        </div>
-        <div class="visual-pipeline" id="modalVisualPipeline">
-            <div class="pipe-step" id="pipeStep1"><i class="fas fa-box"></i> 1. Client Sent</div>
-            <div class="pipe-step" id="pipeStep2"><i class="fas fa-route"></i> 2. We Pickup</div>
-            <div class="pipe-step" id="pipeStep3"><i class="fas fa-warehouse"></i> 3. WH Received</div>
-            <div class="pipe-step" id="pipeStep4"><i class="fas fa-screwdriver-wrench"></i> 4. Ready</div>
-            <div class="pipe-step" id="pipeStep5"><i class="fas fa-truck-fast"></i> 5. Dispatched</div>
-            <div class="pipe-step" id="pipeStep6"><i class="fas fa-circle-check"></i> 6. Closed</div>
-            <div class="pipe-step" id="pipeStep7"><i class="fas fa-rotate-left"></i> 7. RTO</div>
-        </div>
-        <form id="editForm">
-            <div class="grid-layout">
-                <div class="section-tag">Quick Action Stage Modifier</div>
-                <div>
-                    <label style="font-size:0.75rem;font-weight:700;color:#64748b;">Change Operations Status</label>
-                    <select id="editStatus" onchange="syncModalPipeline(this.value)" style="margin-top:5px;">
-                        <option value="ClientSent">1. Client Sent</option>
-                        <option value="CompanyPickup">2. We Pickup / Company Route</option>
-                        <option value="WHReceived">3. WH Received</option>
-                        <option value="ReadyToShip">4. Repaired / Ready to Ship</option>
-                        <option value="Dispatched">5. Dispatched via Courier</option>
-                        <option value="Delivered">6. Delivered / Closed</option>
-                        <option value="RTO">7. RTO</option>
-                    </select>
-                </div>
-                <div><label style="font-size:0.75rem;font-weight:700;color:#64748b;">Inward/Received Date</label><input type="date" id="editInDate" style="margin-top:5px;"></div>
-                <div><label style="font-size:0.75rem;font-weight:700;color:#64748b;">Outward/Delivered Date</label><input type="date" id="editOutDate" style="margin-top:5px;"></div>
-                <div class="section-tag">Modify Core Details</div>
-                <div><label style="font-size:0.75rem;font-weight:700;color:#64748b;">Customer Name</label><input type="text" id="editName" style="margin-top:5px;"></div>
-                <div><label style="font-size:0.75rem;font-weight:700;color:#64748b;">Phone No</label><input type="text" id="editPhone" style="margin-top:5px;"></div>
-                <div><label style="font-size:0.75rem;font-weight:700;color:#64748b;">AWB tracking Number</label><input type="text" id="editAwb" style="margin-top:5px;"></div>
-                <div style="grid-column:1 / -1"><label style="font-size:0.75rem;font-weight:700;color:#64748b;">Service Center Notes</label><textarea id="editNote" style="margin-top:5px;"></textarea></div>
-            </div>
-            <button type="button" class="btn btn-save" onclick="saveFullUpdate()" style="width:100%;margin-top:25px;background:var(--secondary);"><i class="fas fa-rotate"></i> Save & Sync Operations Pipeline</button>
-        </form>
-    </div>
+<div class="panel"><h3><i class="fas fa-square-plus" style="color:var(--secondary)"></i> Log Warranty Detail</h3>
+<form id="warrantyForm"><div class="grid">
+<div class="section"><i class="fas fa-user"></i> Customer & Warranty Basics</div>
+<input id="wName" required placeholder="Customer Name"><input id="wPhone" required placeholder="Phone Number"><input id="wInvoice" required placeholder="Invoice Number / Order ID">
+<div class="section"><i class="fas fa-cube"></i> Product Warranty Identity</div>
+<input id="wSku" required placeholder="Model / SKU"><input id="wSerial" placeholder="Product Serial Number"><select id="wSource"><option>Amazon</option><option>Flipkart</option><option>Direct Website</option><option>Call</option><option>WhatsApp</option></select>
+<div class="section"><i class="fas fa-calendar-check"></i> Warranty Reference</div>
+<input id="wPurchase" type="date" title="Purchase Date"><input id="wExpiry" type="date" title="Warranty Expiry"><textarea id="wNote" placeholder="Warranty note only..."></textarea>
+<div class="section"><i class="fas fa-link"></i> Optional Repair / Replacement Link</div>
+<label class="attach"><input id="attachPipeline" type="checkbox" onchange="togglePipeline()"> Attach this warranty record to Operational Pipeline Matrix</label>
+<div id="pipelineBox" class="pipeline">
+<div class="section"><i class="fas fa-truck"></i> Courier Tracking Registry</div>
+<input id="wAwb" placeholder="AWB / Tracking Number"><select id="wCourier" onchange="toggleManualCourier()"><option>Shiprocket</option><option>Delhivery</option><option>BlueDart</option><option>Amazon Shipping</option><option>DTDC</option><option>Indian Post</option><option value="Other">Other / Manual Input</option></select><input id="manualCourier" class="hidden" placeholder="Type courier name">
+<div class="section"><i class="fas fa-route"></i> Operational Pipeline Matrix</div>
+<select id="wStatus"><option value="ClientSent">1. Client Sent</option><option value="CompanyPickup">2. We Pickup / Company Route</option><option value="WHReceived">3. WH Received</option><option value="ReadyToShip">4. Repaired / Ready to Ship</option><option value="Dispatched">5. Dispatched via Courier</option><option value="Delivered">6. Delivered / Closed</option><option value="RTO">7. RTO</option></select><textarea id="wIssue" placeholder="Repair / replacement issue note..."></textarea>
+</div></div>
+<div class="buttons"><button id="wSave" class="btn green" type="submit"><i class="fas fa-cloud-arrow-up"></i> Save Warranty Detail</button><button class="btn blue" type="button" onclick="exportWarranty()"><i class="fas fa-file-csv"></i> Download Excel</button></div>
+</form></div>
+<div class="toolbar"><input id="wSearch" placeholder="Search all warranty and old records..."><select id="wFilter"><option value="">All Records</option><option value="Warranty Only">Warranty Only</option><option value="Pipeline">Pipeline / Old Records</option></select><button class="btn light" onclick="exportWarranty()"><i class="fas fa-download"></i> Export</button></div>
+<div class="table-card"><table><thead><tr><th>Customer / Invoice</th><th>SKU / Serial</th><th>Warranty</th><th>Courier / AWB</th><th>Status</th><th>Note</th><th>Action</th></tr></thead><tbody id="wBody"></tbody></table><div id="wPager" class="pager"></div></div>
+</section>
+<section id="servicePage" class="page">
+<div class="header"><h2><i class="fas fa-route" style="color:var(--secondary)"></i> Replacement Engine</h2><span class="live-pill"><i class="fas fa-database"></i> EXISTING LIVE DATA CONNECTED</span></div>
+<p class="summary">Only service, repair and replacement entries appear here. Warranty-only entries remain separate.</p>
+<div class="stats"><div class="card"><h4>Total Service Cases</h4><div id="serviceTotal" class="metric">0</div></div><div class="card"><h4>Client Sent</h4><div id="sClient" class="metric">0</div></div><div class="card" style="border-color:var(--cyan)"><h4>We Pickup</h4><div id="sPickup" class="metric">0</div></div><div class="card" style="border-color:var(--purple)"><h4>WH Received</h4><div id="sWh" class="metric">0</div></div><div class="card" style="border-color:var(--success)"><h4>Ready To Ship</h4><div id="sReady" class="metric">0</div></div><div class="card" style="border-color:var(--warning)"><h4>Dispatched</h4><div id="sDispatch" class="metric">0</div></div><div class="card" style="border-color:#059669"><h4>Delivered</h4><div id="sDelivered" class="metric">0</div></div><div class="card" style="border-color:var(--danger)"><h4>RTO</h4><div id="sRto" class="metric">0</div></div></div>
+<div class="toolbar"><input id="sSearch" placeholder="Search by customer, invoice, SKU, AWB, courier or phone..."><select id="sFilter"><option value="">All Statuses</option><option value="ClientSent">Client Sent</option><option value="CompanyPickup">We Pickup</option><option value="WHReceived">WH Received</option><option value="ReadyToShip">Ready To Ship</option><option value="Dispatched">Dispatched</option><option value="Delivered">Delivered</option><option value="RTO">RTO</option><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Resolved">Resolved</option></select><button class="btn blue" onclick="exportService()"><i class="fas fa-file-csv"></i> Export</button></div>
+<div class="table-card"><table><thead><tr><th>Customer / Order ID</th><th>Model / SKU</th><th>AWB / Partner</th><th>Track</th><th>Current Stage</th><th>Inward</th><th>Outward</th><th>Action</th></tr></thead><tbody id="sBody"></tbody></table><div id="sPager" class="pager"></div></div>
+</section>
+<section id="criticalPage" class="page">
+<div class="header"><h2><i class="fas fa-triangle-exclamation" style="color:var(--danger)"></i> Critical Complaint Queue</h2><span class="live-pill" style="background:#fee2e2;color:#991b1b;border-color:#fecaca"><i class="fas fa-bell"></i> IMPORTANT ISSUE REGISTER</span></div>
+<p class="summary">Save important or escalated complaints here. AI, photo, video and media repository options are removed.</p>
+<div class="stats"><div class="card" style="border-color:var(--danger)"><h4>Total Critical</h4><div id="cTotal" class="metric">0</div></div><div class="card" style="border-color:var(--warning)"><h4>Open</h4><div id="cOpen" class="metric">0</div></div><div class="card" style="border-color:var(--purple)"><h4>Critical / Emergency</h4><div id="cUrgent" class="metric">0</div></div><div class="card" style="border-color:var(--success)"><h4>Resolved / Closed</h4><div id="cSolved" class="metric">0</div></div></div>
+<div class="panel"><h3><i class="fas fa-square-plus" style="color:var(--danger)"></i> Save Critical Complaint</h3><form id="criticalForm"><div class="grid"><div class="section"><i class="fas fa-user"></i> Customer & Product Details</div><input id="cName" required placeholder="Customer Name"><input id="cPhone" placeholder="Phone Number"><input id="cInvoice" placeholder="Invoice / Order ID"><input id="cSku" placeholder="SKU / Model"><select id="cCategory"><option>Technical Complex</option><option>Repeated Failure</option><option>Product Safety</option><option>Marketplace Escalation</option><option>Negative Review</option><option>Logistics Loss / Damage</option><option>VIP Customer</option><option>Other</option></select><select id="cPriority"><option>High</option><option>Critical</option><option>Emergency</option></select><div class="section"><i class="fas fa-clipboard-list"></i> Complaint Management</div><input id="cTitle" required placeholder="Short Complaint Title"><select id="cStatus"><option>Open</option><option>Investigating</option><option>Waiting Customer</option><option>Waiting Management</option><option>Resolved</option><option>Closed</option></select><input id="cOwner" placeholder="Assigned Staff / Owner"><input id="cFollowup" type="date" title="Next Follow-up Date"><textarea id="cDetails" required placeholder="Complete critical complaint details..."></textarea><textarea id="cAction" placeholder="Action taken / final resolution..."></textarea></div><div class="buttons"><button id="cSave" class="btn green" type="submit"><i class="fas fa-cloud-arrow-up"></i> Save Critical Complaint</button><button class="btn blue" type="button" onclick="exportCritical()"><i class="fas fa-file-csv"></i> Download Excel</button></div></form></div>
+<div class="toolbar"><input id="cSearch" placeholder="Search critical complaints..."><select id="cFilter"><option value="">All Statuses</option><option>Open</option><option>Investigating</option><option>Waiting Customer</option><option>Waiting Management</option><option>Resolved</option><option>Closed</option></select><button class="btn light" onclick="exportCritical()"><i class="fas fa-download"></i> Export</button></div>
+<div class="table-card"><table><thead><tr><th>Priority</th><th>Customer / Invoice</th><th>SKU / Category</th><th>Complaint</th><th>Status / Owner</th><th>Follow-up</th><th>Action</th></tr></thead><tbody id="cBody"></tbody></table><div id="cPager" class="pager"></div></div>
+</section>
 </div>
-
+<div id="editModal" class="modal"><div class="modal-content"><span class="close" onclick="closeModal()">&times;</span><h3><i class="fas fa-sliders" style="color:var(--secondary)"></i> Update Return Step Pipeline</h3><p id="modalId" style="font-weight:800;color:var(--secondary)"></p><div class="pipeline-view"><span id="st1" class="step">Client Sent</span><span id="st2" class="step">We Pickup</span><span id="st3" class="step">WH Received</span><span id="st4" class="step">Ready</span><span id="st5" class="step">Dispatched</span><span id="st6" class="step">Closed</span><span id="st7" class="step">RTO</span></div><div class="grid"><select id="eStatus" onchange="paintPipeline(this.value)"><option value="ClientSent">Client Sent</option><option value="CompanyPickup">We Pickup</option><option value="WHReceived">WH Received</option><option value="ReadyToShip">Ready To Ship</option><option value="Dispatched">Dispatched</option><option value="Delivered">Delivered / Closed</option><option value="RTO">RTO</option><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Resolved">Resolved</option></select><input id="eIn" type="date" title="Inward Date"><input id="eOut" type="date" title="Outward Date"><input id="eName" placeholder="Customer Name"><input id="ePhone" placeholder="Phone"><input id="eAwb" placeholder="AWB"><textarea id="eNote" placeholder="Service note"></textarea></div><div class="buttons"><button id="eSave" class="btn blue" onclick="saveServiceEdit()"><i class="fas fa-save"></i> Save Changes</button></div></div></div>
+<div id="toast" class="toast"></div>
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyCVXygnMOKaPVbadqlX9AgWiuUdKW6mTOc",
@@ -875,559 +87,757 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database().ref('noor_cloud_tickets');
-const refs = {
-    productMaster: firebase.database().ref('noor_product_master'),
-    reviews: firebase.database().ref('noor_reviews'),
-    warranty: firebase.database().ref('noor_warranty'),
-    ai: firebase.database().ref('noor_ai'),
-    reports: firebase.database().ref('noor_reports'),
-    settings: firebase.database().ref('noor_settings'),
-    audit: firebase.database().ref('noor_audit_logs')
+
+const root = firebase.database().ref("noor_cloud_tickets");
+const warrantyRef = root.child("_warranty_records");
+const criticalRef = root.child("_critical_complaints");
+const legacyCriticalRef = root.child("_critical_issues");
+
+const $ = id => document.getElementById(id);
+const PAGE_SIZE = 40;
+const pages = { warranty: 1, service: 1, critical: 1 };
+
+const serviceMap = new Map();
+const directWarrantyMap = new Map();
+const directCriticalMap = new Map();
+let nestedWarranties = [];
+let nestedCriticals = [];
+let legacyCriticals = [];
+let services = [];
+let warranties = [];
+let criticals = [];
+let editKey = null;
+let activePage = "warrantyPage";
+let renderTimer = null;
+
+function updateClock() {
+$("clock").textContent = "System Live Time: " + new Date().toLocaleString("en-IN", {
+dateStyle: "medium",
+timeStyle: "medium"
+});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function showPage(id, element) {
+document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+$(id).classList.add("active");
+element.classList.add("active");
+activePage = id;
+renderCurrentPage();
+}
+
+function esc(value) {
+return String(value ?? "")
+.replace(/&/g, "&")
+.replace(/</g, "<")
+.replace(/>/g, ">")
+.replace(/"/g, """)
+.replace(/'/g, "'");
+}
+
+function norm(status) {
+if (status === "Client Sent") return "ClientSent";
+if (status === "In Transit") return "Dispatched";
+return status || "";
+}
+
+function statusText(status) {
+const map = {
+ClientSent: "Client Sent",
+CompanyPickup: "We Pickup / Company Route",
+WHReceived: "WH Received",
+ReadyToShip: "Repaired / Ready to Ship",
+Dispatched: "Dispatched via Courier",
+Delivered: "Delivered / Closed",
+RTO: "RTO",
+Pending: "Pending",
+"In Progress": "In Progress",
+Resolved: "Resolved"
+};
+return map[norm(status)] || status || "Unknown";
+}
+
+function statusClass(status) {
+const map = {
+ClientSent: "b-blue",
+CompanyPickup: "b-cyan",
+WHReceived: "b-purple",
+ReadyToShip: "b-green",
+Dispatched: "b-yellow",
+Delivered: "b-green",
+RTO: "b-red",
+Pending: "b-yellow",
+"In Progress": "b-blue",
+Resolved: "b-green"
+};
+return map[norm(status)] || "b-blue";
+}
+
+function toast(message, type = "success") {
+const box = $("toast");
+box.textContent = message;
+box.className = "toast show " + type;
+clearTimeout(toast.timer);
+toast.timer = setTimeout(() => { box.className = "toast"; }, 4000);
+}
+
+function loading(button, isLoading, normalHTML) {
+button.disabled = isLoading;
+button.innerHTML = isLoading
+? '<i class="fas fa-spinner fa-spin"></i> Saving...'
+: normalHTML;
+}
+
+function debounce(fn, wait = 250) {
+let timer;
+return (...args) => {
+clearTimeout(timer);
+timer = setTimeout(() => fn(...args), wait);
+};
+}
+
+function togglePipeline() {
+$("pipelineBox").classList.toggle("show", $("attachPipeline").checked);
+}
+
+function toggleManualCourier() {
+const isOther = $("wCourier").value === "Other";
+$("manualCourier").classList.toggle("hidden", !isOther);
+if (!isOther) $("manualCourier").value = "";
+}
+
+function courierValue() {
+return $("wCourier").value === "Other"
+? ($("manualCourier").value.trim() || "Other")
+: $("wCourier").value;
+}
+
+function warrantyState(record) {
+const expiry = record.warrantyExpiry ? new Date(record.warrantyExpiry) : null;
+if (!expiry || Number.isNaN(expiry.getTime())) return "Not Set";
+const today = new Date();
+const next30 = new Date();
+next30.setDate(today.getDate() + 30);
+if (expiry < today) return "Expired";
+if (expiry <= next30) return "Expiring";
+return "Active";
+}
+
+function shiprocketTrackUrl(awb) {
+const value = String(awb || "").trim();
+if (!value || value === "N/A" || value === "undefined") return "";
+return "https://www.shiprocket.in/shipment-tracking/?tracking_id=" + encodeURIComponent(value);
+}
+
+function mergeCollections() {
+services = Array.from(serviceMap.values());
+warranties = [...nestedWarranties, ...Array.from(directWarrantyMap.values())];
+
+```
+const criticalByPath = new Map();
+[...nestedCriticals, ...legacyCriticals, ...Array.from(directCriticalMap.values())]
+    .forEach(item => criticalByPath.set(item._path, item));
+criticals = Array.from(criticalByPath.values());
+```
+
+}
+
+function scheduleRender() {
+clearTimeout(renderTimer);
+renderTimer = setTimeout(() => {
+mergeCollections();
+renderCurrentPage();
+}, 90);
+}
+
+function renderCurrentPage() {
+if (activePage === "warrantyPage") renderWarranty();
+if (activePage === "servicePage") renderService();
+if (activePage === "criticalPage") renderCritical();
+}
+
+function routeRootRecord(snapshot) {
+const key = snapshot.key;
+const value = snapshot.val();
+if (!key || key.startsWith("_") || !value || typeof value !== "object") return;
+
+```
+serviceMap.delete(key);
+directWarrantyMap.delete(key);
+directCriticalMap.delete(key);
+
+const record = { ...value, _key: key, _path: key };
+if (value.recordType === "warranty") directWarrantyMap.set(key, record);
+else if (value.recordType === "critical") directCriticalMap.set(key, record);
+else serviceMap.set(key, record);
+scheduleRender();
+```
+
+}
+
+root.on("child_added", routeRootRecord, error => toast("Firebase read error: " + error.message, "error"));
+root.on("child_changed", routeRootRecord, error => toast("Firebase update error: " + error.message, "error"));
+root.on("child_removed", snapshot => {
+const key = snapshot.key;
+serviceMap.delete(key);
+directWarrantyMap.delete(key);
+directCriticalMap.delete(key);
+scheduleRender();
+});
+
+warrantyRef.on("value", snapshot => {
+nestedWarranties = [];
+snapshot.forEach(child => {
+const value = child.val();
+if (value && typeof value === "object") {
+nestedWarranties.push({ ...value, _key: child.key, _path: "_warranty_records/" + child.key });
+}
+});
+scheduleRender();
+}, error => toast("Warranty read error: " + error.message, "error"));
+
+criticalRef.on("value", snapshot => {
+nestedCriticals = [];
+snapshot.forEach(child => {
+const value = child.val();
+if (value && typeof value === "object") {
+nestedCriticals.push({ ...value, _key: child.key, _path: "_critical_complaints/" + child.key });
+}
+});
+scheduleRender();
+}, error => toast("Critical read error: " + error.message, "error"));
+
+legacyCriticalRef.on("value", snapshot => {
+legacyCriticals = [];
+snapshot.forEach(child => {
+const value = child.val();
+if (value && typeof value === "object") {
+legacyCriticals.push({ ...value, _key: child.key, _path: "_critical_issues/" + child.key });
+}
+});
+scheduleRender();
+});
+
+function combinedWarrantyRows() {
+const linked = new Set(
+warranties
+.map(item => String(item.linkedServiceKey || item.pipelineTicketId || ""))
+.filter(Boolean)
+);
+
+```
+return [
+    ...warranties.map(item => ({ ...item, _displayType: "Warranty Only" })),
+    ...services
+        .filter(item => !linked.has(String(item._key)))
+        .map(item => ({ ...item, _displayType: "Pipeline" }))
+];
+```
+
+}
+
+function countStatus(status) {
+return services.filter(item => norm(item.status) === status).length;
+}
+
+function paginate(items, type) {
+const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+pages[type] = Math.min(Math.max(1, pages[type]), totalPages);
+const start = (pages[type] - 1) * PAGE_SIZE;
+return {
+items: items.slice(start, start + PAGE_SIZE),
+totalPages,
+start,
+end: Math.min(start + PAGE_SIZE, items.length),
+total: items.length
+};
+}
+
+function renderPager(elementId, type, pageData) {
+const box = $(elementId);
+if (!box) return;
+if (pageData.total <= PAGE_SIZE) {
+box.innerHTML = '<span class="pager-info">' + pageData.total + ' record(s)</span>';
+return;
+}
+
+```
+const current = pages[type];
+const buttons = [];
+const first = Math.max(1, current - 2);
+const last = Math.min(pageData.totalPages, current + 2);
+
+buttons.push(`<button ${current === 1 ? "disabled" : ""} onclick="changePage('${type}',${current - 1})"><i class="fas fa-chevron-left"></i></button>`);
+for (let page = first; page <= last; page += 1) {
+    buttons.push(`<button class="${page === current ? "active" : ""}" onclick="changePage('${type}',${page})">${page}</button>`);
+}
+buttons.push(`<button ${current === pageData.totalPages ? "disabled" : ""} onclick="changePage('${type}',${current + 1})"><i class="fas fa-chevron-right"></i></button>`);
+buttons.push(`<span class="pager-info">${pageData.start + 1}-${pageData.end} of ${pageData.total}</span>`);
+box.innerHTML = buttons.join("");
+```
+
+}
+
+function changePage(type, page) {
+pages[type] = page;
+renderCurrentPage();
+window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderWarranty() {
+const rows = combinedWarrantyRows();
+const today = new Date();
+const next30 = new Date();
+next30.setDate(today.getDate() + 30);
+
+```
+$("totalLogged").textContent = rows.length;
+$("activeWarranty").textContent = rows.filter(item => {
+    const expiry = item.warrantyExpiry ? new Date(item.warrantyExpiry) : null;
+    return expiry && !Number.isNaN(expiry.getTime()) && expiry >= today;
+}).length;
+$("expiringWarranty").textContent = rows.filter(item => {
+    const expiry = item.warrantyExpiry ? new Date(item.warrantyExpiry) : null;
+    return expiry && !Number.isNaN(expiry.getTime()) && expiry >= today && expiry <= next30;
+}).length;
+$("clientCount").textContent = countStatus("ClientSent");
+$("pickupCount").textContent = countStatus("CompanyPickup");
+$("whCount").textContent = countStatus("WHReceived");
+$("dispatchCount").textContent = countStatus("Dispatched");
+$("rtoCount").textContent = countStatus("RTO");
+
+const query = $("wSearch").value.toLowerCase().trim();
+const filter = $("wFilter").value;
+const filtered = rows.filter(item => {
+    const text = `${item.name || ""} ${item.phone || ""} ${item.inv || item.invoice || ""} ${item.sku || ""} ${item.serial || item.sn || ""} ${item.awbNo || ""} ${item.courier || ""} ${item.note || item.warrantyNote || ""}`.toLowerCase();
+    return (!query || text.includes(query)) && (!filter || item._displayType === filter);
+});
+
+const pageData = paginate(filtered, "warranty");
+renderPager("wPager", "warranty", pageData);
+
+if (!pageData.items.length) {
+    $("wBody").innerHTML = '<tr><td class="empty" colspan="7">No records found.</td></tr>';
+    return;
+}
+
+$("wBody").innerHTML = pageData.items.map(item => {
+    const isWarranty = item._displayType === "Warranty Only";
+    const displayedStatus = isWarranty
+        ? (item.attachedToPipeline ? "Attached: " + statusText(item.pipelineStatus) : "Warranty Only")
+        : statusText(item.status);
+    const displayedClass = isWarranty
+        ? (item.attachedToPipeline ? "b-blue" : "b-green")
+        : statusClass(item.status);
+    const deleteAction = isWarranty
+        ? `deleteWarranty('${esc(item._path)}','${esc(item.linkedServiceKey || item.pipelineTicketId || "")}')`
+        : `deleteService('${esc(item._path)}')`;
+    const editButton = !isWarranty
+        ? `<button class="small edit" onclick="openService('${esc(item._path)}')"><i class="fas fa-pen"></i> Edit</button>`
+        : "";
+    const state = warrantyState(item);
+    const stateClass = state === "Active" ? "b-green" : state === "Expired" ? "b-red" : "b-yellow";
+    const awb = item.awbNo || item.pipelineAwb || "";
+    const trackUrl = shiprocketTrackUrl(awb);
+
+    return `<tr>
+        <td><strong>${esc(item.name)}</strong><br><small>${esc(item.phone || "")}</small><br><small>Invoice: ${esc(item.inv || item.invoice || "")}</small></td>
+        <td><strong>${esc(item.sku || "")}</strong><br><small>S/N: ${esc(item.serial || item.sn || "N/A")}</small></td>
+        <td><span class="badge ${stateClass}">${esc(state)}</span><br><small>${esc(item.warrantyExpiry || "Not set")}</small></td>
+        <td><strong>${esc(item.courier || item.pipelineCourier || "N/A")}</strong><br><small>${esc(awb || "No AWB")}</small>${trackUrl ? `<br><a class="track-link" href="${esc(trackUrl)}" target="_blank"><i class="fas fa-location-dot"></i> Track</a>` : ""}</td>
+        <td><span class="badge ${displayedClass}">${esc(displayedStatus)}</span></td>
+        <td>${esc(item.warrantyNote || item.note || "")}</td>
+        <td><div class="actions">${editButton}<button class="small delete" onclick="${deleteAction}"><i class="fas fa-trash"></i> Delete</button></div></td>
+    </tr>`;
+}).join("");
+```
+
+}
+
+function renderService() {
+$("serviceTotal").textContent = services.length;
+$("sClient").textContent = countStatus("ClientSent");
+$("sPickup").textContent = countStatus("CompanyPickup");
+$("sWh").textContent = countStatus("WHReceived");
+$("sReady").textContent = countStatus("ReadyToShip");
+$("sDispatch").textContent = countStatus("Dispatched");
+$("sDelivered").textContent = countStatus("Delivered");
+$("sRto").textContent = countStatus("RTO");
+
+```
+const query = $("sSearch").value.toLowerCase().trim();
+const filter = $("sFilter").value;
+const filtered = services.filter(item => {
+    const text = `${item.name || ""} ${item.phone || ""} ${item.inv || ""} ${item.sku || ""} ${item.awbNo || ""} ${item.courier || ""}`.toLowerCase();
+    return (!query || text.includes(query)) && (!filter || norm(item.status) === filter);
+});
+
+const pageData = paginate(filtered, "service");
+renderPager("sPager", "service", pageData);
+
+if (!pageData.items.length) {
+    $("sBody").innerHTML = '<tr><td class="empty" colspan="8">No service records found.</td></tr>';
+    return;
+}
+
+$("sBody").innerHTML = pageData.items.map(item => {
+    const trackUrl = shiprocketTrackUrl(item.awbNo);
+    return `<tr>
+        <td><strong>${esc(item.name)}</strong><br><small>${esc(item.phone || "")}</small><br><small>ID: ${esc(item.inv || "")}</small></td>
+        <td><strong>${esc(item.sku || "")}</strong></td>
+        <td><strong>${esc(item.awbNo || "No AWB")}</strong><br><small>${esc(item.courier || "N/A")}</small></td>
+        <td>${trackUrl ? `<a class="track-link" href="${esc(trackUrl)}" target="_blank"><i class="fas fa-location-dot"></i> Track</a>` : '<span style="color:var(--muted)">No AWB</span>'}</td>
+        <td><span class="badge ${statusClass(item.status)}">${esc(statusText(item.status))}</span></td>
+        <td>${esc(item.inwardDate || "Pending")}</td>
+        <td>${esc(item.outwardDate || "Pending")}</td>
+        <td><div class="actions"><button class="small edit" onclick="openService('${esc(item._path)}')"><i class="fas fa-pen"></i> Edit</button><button class="small delete" onclick="deleteService('${esc(item._path)}')"><i class="fas fa-trash"></i> Delete</button></div></td>
+    </tr>`;
+}).join("");
+```
+
+}
+
+function renderCritical() {
+$("cTotal").textContent = criticals.length;
+$("cOpen").textContent = criticals.filter(item => !["Resolved", "Closed"].includes(item.criticalStatus || item.status)).length;
+$("cUrgent").textContent = criticals.filter(item => ["Critical", "Emergency"].includes(item.priority)).length;
+$("cSolved").textContent = criticals.filter(item => ["Resolved", "Closed"].includes(item.criticalStatus || item.status)).length;
+
+```
+const query = $("cSearch").value.toLowerCase().trim();
+const filter = $("cFilter").value;
+const filtered = criticals.filter(item => {
+    const status = item.criticalStatus || item.status || "Open";
+    const text = `${item.name || ""} ${item.phone || ""} ${item.inv || item.invoice || ""} ${item.sku || ""} ${item.title || ""} ${item.category || ""} ${item.owner || ""}`.toLowerCase();
+    return (!query || text.includes(query)) && (!filter || status === filter);
+});
+
+const pageData = paginate(filtered, "critical");
+renderPager("cPager", "critical", pageData);
+
+if (!pageData.items.length) {
+    $("cBody").innerHTML = '<tr><td class="empty" colspan="7">No critical complaints saved.</td></tr>';
+    return;
+}
+
+$("cBody").innerHTML = pageData.items.map(item => {
+    const status = item.criticalStatus || item.status || "Open";
+    return `<tr>
+        <td><span class="badge ${["Critical", "Emergency"].includes(item.priority) ? "b-red" : "b-yellow"}">${esc(item.priority || "High")}</span></td>
+        <td><strong>${esc(item.name)}</strong><br><small>${esc(item.phone || "")}</small><br><small>${esc(item.inv || item.invoice || "")}</small></td>
+        <td>${esc(item.sku || "")}<br><small>${esc(item.category || "")}</small></td>
+        <td><strong>${esc(item.title || "")}</strong><br><small>${esc(item.details || item.note || "")}</small></td>
+        <td><span class="badge ${["Resolved", "Closed"].includes(status) ? "b-green" : "b-blue"}">${esc(status)}</span><br><small>${esc(item.owner || "Unassigned")}</small></td>
+        <td>${esc(item.followupDate || item.followup || "Not set")}</td>
+        <td><button class="small delete" onclick="deleteCritical('${esc(item._path)}')"><i class="fas fa-trash"></i> Delete</button></td>
+    </tr>`;
+}).join("");
+```
+
+}
+
+$("warrantyForm").addEventListener("submit", async event => {
+event.preventDefault();
+const button = $("wSave");
+loading(button, true, "");
+
+```
+const warrantyKey = warrantyRef.push().key;
+const attach = $("attachPipeline").checked;
+const serviceKey = attach ? root.push().key : "";
+const now = new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+const warranty = {
+    id: warrantyKey,
+    recordType: "warranty",
+    name: $("wName").value.trim(),
+    phone: $("wPhone").value.trim(),
+    inv: $("wInvoice").value.trim(),
+    sku: $("wSku").value.trim(),
+    serial: $("wSerial").value.trim() || "N/A",
+    source: $("wSource").value,
+    purchaseDate: $("wPurchase").value,
+    warrantyExpiry: $("wExpiry").value,
+    warrantyNote: $("wNote").value.trim(),
+    attachedToPipeline: attach,
+    linkedServiceKey: serviceKey,
+    pipelineTicketId: serviceKey,
+    pipelineStatus: attach ? $("wStatus").value : "",
+    pipelineAwb: attach ? $("wAwb").value.trim() : "",
+    pipelineCourier: attach ? courierValue() : "",
+    date: now,
+    createdAt: firebase.database.ServerValue.TIMESTAMP
 };
 
-let allTickets = [];
-let currentEditingID = null;
-let courierChart, pipelineChart;
-let warrantyRecords = [];
-let reviewRecords = [];
-let knowledgeMemory = [];
-
-function updateLiveClock() {
-    const now = new Date();
-    document.getElementById('liveClock').innerText = "System Live Time: " + now.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'medium' });
-}
-setInterval(updateLiveClock, 1000);
-updateLiveClock();
-
-function showPage(pageId, element) {
-    document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    element.classList.add('active');
-    if (pageId === 'enterpriseSuite' || pageId === 'dashboard') setTimeout(renderGraphs, 100);
-    renderAllEnterprise();
-}
-
-function showEnterpriseModule(id, el) {
-    document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.module-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    el.classList.add('active');
-    if (id === 'mAudit') renderAuditLogs();
-}
-
-function debounce(fn, ms) {
-    let timer;
-    return function() {
-        clearTimeout(timer);
-        const args = arguments;
-        timer = setTimeout(() => fn.apply(this, args), ms || 500);
+const updates = {};
+updates["_warranty_records/" + warrantyKey] = warranty;
+if (attach) {
+    updates[serviceKey] = {
+        id: serviceKey,
+        recordType: "service",
+        sourceWarrantyPath: "_warranty_records/" + warrantyKey,
+        name: warranty.name,
+        phone: warranty.phone,
+        inv: warranty.inv,
+        sku: warranty.sku,
+        serial: warranty.serial,
+        sn: warranty.serial,
+        source: warranty.source,
+        warrantyExpiry: warranty.warrantyExpiry,
+        awbNo: $("wAwb").value.trim(),
+        courier: courierValue(),
+        status: $("wStatus").value,
+        note: $("wIssue").value.trim() || warranty.warrantyNote,
+        inwardDate: "",
+        outwardDate: "",
+        date: now,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
     };
 }
 
-function escapeHTML(value) {
-    return String(value === undefined || value === null ? '' : value)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+try {
+    toast("Saving to cloud...", "info");
+    await root.update(updates);
+    event.target.reset();
+    togglePipeline();
+    toggleManualCourier();
+    toast(attach ? "Warranty saved and attached to pipeline." : "Warranty saved separately.");
+} catch (error) {
+    toast("Save failed: " + error.message, "error");
+} finally {
+    loading(button, false, '<i class="fas fa-cloud-arrow-up"></i> Save Warranty Detail');
 }
+```
 
-function activeTickets() {
-    return allTickets.filter(t => t && t.isDeleted !== true);
-}
-
-function normalizeLegacyStatus(status) {
-    if (status === 'Client Sent') return 'ClientSent';
-    if (status === 'In Transit') return 'Dispatched';
-    return status || '';
-}
-
-function getReadableStatus(status) {
-    const s = normalizeLegacyStatus(status);
-    if (s === 'ClientSent') return 'Client Sent';
-    if (s === 'CompanyPickup') return 'We Pickup / Company Route';
-    if (s === 'WHReceived') return 'WH Received';
-    if (s === 'ReadyToShip') return 'Repaired / Ready to Ship';
-    if (s === 'Dispatched') return 'Dispatched via Courier';
-    if (s === 'Delivered') return 'Delivered / Closed';
-    if (s === 'RTO') return 'RTO';
-    return status || 'Unknown';
-}
-
-function parseRecordDate(value) {
-    if (!value) return null;
-    const d = new Date(value);
-    return isNaN(d.getTime()) ? null : d;
-}
-
-function getRecordAgeDays(ticket) {
-    const d = parseRecordDate(ticket.date) || parseRecordDate(ticket.inwardDate);
-    if (!d) return 0;
-    return Math.floor((Date.now() - d.getTime()) / 86400000);
-}
-
-function isCriticalTicket(t) {
-    const note = String(t.note || '').toLowerCase();
-    return ['dead','urgent','broken','not working','critical','escalation'].some(w => note.includes(w)) || (normalizeLegacyStatus(t.status) !== 'Delivered' && getRecordAgeDays(t) > 7);
-}
-
-function getCriticalReason(t) {
-    const note = String(t.note || '').toLowerCase();
-    const words = ['dead','urgent','broken','not working','critical','escalation'].filter(w => note.includes(w));
-    const reasons = [];
-    if (words.length) reasons.push('Keyword: ' + words.join(', '));
-    if (normalizeLegacyStatus(t.status) !== 'Delivered' && getRecordAgeDays(t) > 7) reasons.push('Older than 7 days');
-    return reasons.join(' | ');
-}
-
-function normalizeMediaItems(t) {
-    if (Array.isArray(t.mediaFiles)) return t.mediaFiles.filter(m => m && m.url);
-    const arr = [];
-    if (t.invoiceImageLink) arr.push({ type: 'invoice', url: t.invoiceImageLink });
-    if (t.mediaUrl) arr.push({ type: 'media', url: t.mediaUrl });
-    if (t.mediaPhotoUrl) arr.push({ type: 'photo', url: t.mediaPhotoUrl });
-    if (t.mediaVideoUrl) arr.push({ type: 'video', url: t.mediaVideoUrl });
-    return arr;
-}
-
-function writeAudit(actionType, payload) {
-    return refs.audit.push({
-        actionType,
-        payload: payload || {},
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
-        source: 'Noor Tech Support Portal'
-    });
-}
-
-function softDeleteRecord(id) {
-    if (!confirm('Soft delete this record? Data will be preserved and hidden from active views.')) return;
-    db.child(id).update({
-        isDeleted: true,
-        deletedAt: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => writeAudit('SOFT_DELETE', { path: 'noor_cloud_tickets', recordId: id }))
-      .then(() => alert('Record soft-deleted safely.'));
-}
-
-function applyWorkflowTriggers(id, patch) {
-    const up = Object.assign({}, patch || {});
-    if (up.awbNo && String(up.awbNo).trim().length >= 5 && !up.status) up.status = 'Dispatched';
-    if (up.engineerAssigned && !up.serviceStage) up.serviceStage = 'Engineer Assigned';
-    up.workflowUpdatedAt = firebase.database.ServerValue.TIMESTAMP;
-    return db.child(id).update(up).then(() => writeAudit('WORKFLOW_TRIGGER_UPDATE', { path: 'noor_cloud_tickets', recordId: id, keys: Object.keys(up) }));
-}
-
-function toggleCourierOverride(selectId, inputId) {
-    const select = document.getElementById(selectId);
-    const input = document.getElementById(inputId);
-    input.style.display = select.value === 'Other / Manual Input' ? 'block' : 'none';
-    if (select.value !== 'Other / Manual Input') input.value = '';
-}
-
-function getSelectedCourierValue() {
-    const selected = document.getElementById('courier').value;
-    const manual = document.getElementById('manualCourier').value.trim();
-    return selected === 'Other / Manual Input' ? (manual || 'Other / Manual Input') : selected;
-}
-
-function getShiprocketTrackLink(awb) {
-    const x = String(awb || '').trim();
-    return x ? 'https://www.shiprocket.in/shipment-tracking/?tracking_id=' + encodeURIComponent(x) : '';
-}
-
-db.on('value', snapshot => {
-    allTickets = [];
-    snapshot.forEach(child => allTickets.push(child.val()));
-    updateUI();
-    renderGraphs();
-    renderAllEnterprise();
 });
 
-refs.warranty.on('value', s => {
-    warrantyRecords = [];
-    s.forEach(c => { const v = c.val(); if (v && v.isDeleted !== true) warrantyRecords.push(v); });
-    renderWarrantyBody();
+$("criticalForm").addEventListener("submit", async event => {
+event.preventDefault();
+const button = $("cSave");
+loading(button, true, "");
+const key = criticalRef.push().key;
+const record = {
+id: key,
+recordType: "critical",
+name: $("cName").value.trim(),
+phone: $("cPhone").value.trim(),
+inv: $("cInvoice").value.trim(),
+sku: $("cSku").value.trim(),
+category: $("cCategory").value,
+priority: $("cPriority").value,
+title: $("cTitle").value.trim(),
+criticalStatus: $("cStatus").value,
+owner: $("cOwner").value.trim(),
+followupDate: $("cFollowup").value,
+details: $("cDetails").value.trim(),
+actionTaken: $("cAction").value.trim(),
+date: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
+createdAt: firebase.database.ServerValue.TIMESTAMP
+};
+
+```
+try {
+    toast("Saving to cloud...", "info");
+    await criticalRef.child(key).set(record);
+    event.target.reset();
+    toast("Critical complaint saved.");
+} catch (error) {
+    toast("Save failed: " + error.message, "error");
+} finally {
+    loading(button, false, '<i class="fas fa-cloud-arrow-up"></i> Save Critical Complaint');
+}
+```
+
 });
 
-refs.reviews.on('value', s => {
-    reviewRecords = [];
-    s.forEach(c => { const v = c.val(); if (v && v.isDeleted !== true) reviewRecords.push(v); });
-    renderReviewMetrics();
-});
-
-refs.ai.on('value', s => {
-    knowledgeMemory = [];
-    s.forEach(c => { const v = c.val(); if (v && v.isDeleted !== true) knowledgeMemory.push(v); });
-});
-
-function updateUI() {
-    const tickets = activeTickets();
-    document.getElementById('countTotal').innerText = tickets.length;
-    document.getElementById('countCompanyPickup').innerText = tickets.filter(t => normalizeLegacyStatus(t.status) === 'CompanyPickup').length;
-    document.getElementById('countWH').innerText = tickets.filter(t => normalizeLegacyStatus(t.status) === 'WHReceived').length;
-    document.getElementById('countRTO').innerText = tickets.filter(t => normalizeLegacyStatus(t.status) === 'RTO').length;
-
-    const tableBody = document.getElementById('crmTableBody');
-    tableBody.innerHTML = '';
-
-    tickets.forEach(item => {
-        const s = normalizeLegacyStatus(item.status);
-        const media = normalizeMediaItems(item);
-        tableBody.innerHTML += `
-            <tr onclick="openModal('${escapeHTML(item.id)}')">
-                <td><strong>${escapeHTML(item.name)}</strong><br><small style="color:#64748b;">ID: ${escapeHTML(item.inv)}</small><br><small>${escapeHTML(item.phone || '')}</small></td>
-                <td><span style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;font-size:0.8rem;">${escapeHTML(item.sku)}</span></td>
-                <td><strong>${escapeHTML(item.awbNo)}</strong><br><small style="color:#64748b;">${escapeHTML(item.courier)}</small></td>
-                <td><span class="pipeline-badge status-${String(s).replace(/\s+/g, '')}"><i class="fas fa-truck-fast"></i> ${escapeHTML(getReadableStatus(s))}</span></td>
-                <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHTML(item.note || 'No notes added')}</td>
-                <td onclick="event.stopPropagation();"><button class="soft-delete-btn" onclick="softDeleteRecord('${escapeHTML(item.id)}')">Soft Delete</button>${media.length ? '<br><br><a class="track-link" href="'+escapeHTML(media[0].url)+'" target="_blank"><i class="fas fa-photo-film"></i> Media</a>' : ''}</td>
-            </tr>`;
-    });
+async function deleteWarranty(path, serviceKey) {
+if (!confirm("Delete this warranty entry permanently?")) return;
+const updates = {};
+updates[path] = null;
+if (serviceKey) updates[serviceKey] = null;
+try {
+await root.update(updates);
+toast("Warranty entry deleted.");
+} catch (error) {
+toast("Delete failed: " + error.message, "error");
+}
 }
 
-document.getElementById('crmForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const id = Date.now();
-    const liveStamp = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-    const mediaFiles = [];
-    const invImg = document.getElementById('invoiceImageLink').value.trim();
-    const mediaUrl = document.getElementById('mediaUrl').value.trim();
-    if (invImg) mediaFiles.push({ type: 'invoice_or_product_image', url: invImg, addedAt: liveStamp });
-    if (mediaUrl) mediaFiles.push({ type: 'general_media', url: mediaUrl, addedAt: liveStamp });
-
-    const ticket = {
-        id,
-        name: document.getElementById('custName').value,
-        phone: document.getElementById('custPhone').value,
-        inv: document.getElementById('invNo').value,
-        sku: document.getElementById('sku').value,
-        serial: document.getElementById('serial').value || 'N/A',
-        source: document.getElementById('source').value,
-        warrantyExpiry: document.getElementById('warrantyExpiry').value,
-        invoiceImageLink: invImg,
-        mediaUrl,
-        mediaFiles,
-        awbNo: document.getElementById('awbNo').value,
-        courier: getSelectedCourierValue(),
-        status: document.getElementById('status').value,
-        note: document.getElementById('issueNote').value,
-        inwardDate: '',
-        outwardDate: '',
-        date: liveStamp
-    };
-    db.child(id).set(ticket).then(() => writeAudit('CREATE_LEGACY_TICKET', { path: 'noor_cloud_tickets', recordId: id }));
-    alert("Operation Case Registered on Cloud Pipeline!");
-    this.reset();
-    toggleCourierOverride('courier','manualCourier');
-});
-
-function openModal(id) {
-    currentEditingID = id;
-    const ticket = allTickets.find(t => String(t.id) === String(id));
-    if (!ticket) return;
-    const s = normalizeLegacyStatus(ticket.status);
-    document.getElementById('modalTicketID').innerText = `Internal Case System ID: #${id}`;
-    document.getElementById('editName').value = ticket.name || '';
-    document.getElementById('editPhone').value = ticket.phone || '';
-    document.getElementById('editAwb').value = ticket.awbNo || '';
-    document.getElementById('editStatus').value = s;
-    document.getElementById('editInDate').value = ticket.inwardDate || '';
-    document.getElementById('editOutDate').value = ticket.outwardDate || '';
-    document.getElementById('editNote').value = ticket.note || '';
-    syncModalPipeline(s);
-    document.getElementById('editModal').style.display = "block";
+async function deleteService(path) {
+if (!confirm("Delete this service / replacement entry permanently?")) return;
+try {
+await root.child(path).remove();
+toast("Service entry deleted.");
+} catch (error) {
+toast("Delete failed: " + error.message, "error");
+}
 }
 
-function syncModalPipeline(statusValue) {
-    document.querySelectorAll('.pipe-step').forEach(el => el.className = 'pipe-step');
-    if(statusValue === 'ClientSent') document.getElementById('pipeStep1').classList.add('active-sent');
-    if(statusValue === 'CompanyPickup') document.getElementById('pipeStep2').classList.add('active-pickup');
-    if(statusValue === 'WHReceived') document.getElementById('pipeStep3').classList.add('active-wh');
-    if(statusValue === 'ReadyToShip') document.getElementById('pipeStep4').classList.add('active-ready');
-    if(statusValue === 'Dispatched') document.getElementById('pipeStep5').classList.add('active-dispatched');
-    if(statusValue === 'Delivered') document.getElementById('pipeStep6').classList.add('active-done');
-    if(statusValue === 'RTO') document.getElementById('pipeStep7').classList.add('active-rto');
+async function deleteCritical(path) {
+if (!confirm("Delete this critical complaint permanently?")) return;
+try {
+await root.child(path).remove();
+toast("Critical complaint deleted.");
+} catch (error) {
+toast("Delete failed: " + error.message, "error");
+}
 }
 
-function closeModal() { document.getElementById('editModal').style.display = "none"; }
+function openService(path) {
+editKey = path;
+const record = services.find(item => item._path === path);
+if (!record) return;
+$("modalId").textContent = "Internal Case ID: #" + (record.id || record._key);
+$("eName").value = record.name || "";
+$("ePhone").value = record.phone || "";
+$("eAwb").value = record.awbNo || "";
+const currentStatus = norm(record.status);
+$("eStatus").value = [...$("eStatus").options].some(option => option.value === currentStatus)
+? currentStatus
+: "Pending";
+$("eIn").value = record.inwardDate || "";
+$("eOut").value = record.outwardDate || "";
+$("eNote").value = record.note || "";
+paintPipeline(currentStatus);
+$("editModal").style.display = "block";
+}
 
-function saveFullUpdate() {
-    const up = {
-        name: document.getElementById('editName').value,
-        phone: document.getElementById('editPhone').value,
-        awbNo: document.getElementById('editAwb').value,
-        status: document.getElementById('editStatus').value,
-        inwardDate: document.getElementById('editInDate').value,
-        outwardDate: document.getElementById('editOutDate').value,
-        note: document.getElementById('editNote').value
-    };
-    db.child(currentEditingID).update(up).then(() => writeAudit('UPDATE_LEGACY_TICKET', { path: 'noor_cloud_tickets', recordId: currentEditingID }));
+function closeModal() {
+$("editModal").style.display = "none";
+editKey = null;
+}
+
+function paintPipeline(status) {
+["st1", "st2", "st3", "st4", "st5", "st6", "st7"].forEach(id => { $(id).className = "step"; });
+const map = {
+ClientSent: ["st1", "on1"],
+CompanyPickup: ["st2", "on2"],
+WHReceived: ["st3", "on3"],
+ReadyToShip: ["st4", "on4"],
+Dispatched: ["st5", "on5"],
+Delivered: ["st6", "on6"],
+RTO: ["st7", "on7"]
+};
+if (map[status]) $(map[status][0]).classList.add(map[status][1]);
+}
+
+async function saveServiceEdit() {
+if (!editKey) return;
+const button = $("eSave");
+loading(button, true, "");
+const patch = {
+name: $("eName").value.trim(),
+phone: $("ePhone").value.trim(),
+awbNo: $("eAwb").value.trim(),
+status: $("eStatus").value,
+inwardDate: $("eIn").value,
+outwardDate: $("eOut").value,
+note: $("eNote").value.trim(),
+updatedAt: firebase.database.ServerValue.TIMESTAMP
+};
+
+```
+try {
+    await root.child(editKey).update(patch);
     closeModal();
-    alert("Pipeline Synced Realtime!");
+    toast("Pipeline updated.");
+} catch (error) {
+    toast("Update failed: " + error.message, "error");
+} finally {
+    loading(button, false, '<i class="fas fa-save"></i> Save Changes');
+}
+```
+
 }
 
-function renderGraphs() {
-    const courierElement = document.getElementById('courierChart');
-    const pipelineElement = document.getElementById('pipelineChart');
-    if (!courierElement || !pipelineElement) return;
-    const tickets = activeTickets();
-    const courierCounts = {};
-    tickets.forEach(t => courierCounts[t.courier || 'Others'] = (courierCounts[t.courier || 'Others'] || 0) + 1);
-    const courierLabels = Object.keys(courierCounts).slice(0, 6);
-    const pipelineValues = {
-        'Client Sent': tickets.filter(t => normalizeLegacyStatus(t.status) === 'ClientSent').length,
-        'We Pickup': tickets.filter(t => normalizeLegacyStatus(t.status) === 'CompanyPickup').length,
-        'WH Received': tickets.filter(t => normalizeLegacyStatus(t.status) === 'WHReceived').length,
-        'Ready': tickets.filter(t => normalizeLegacyStatus(t.status) === 'ReadyToShip').length,
-        'Dispatched': tickets.filter(t => normalizeLegacyStatus(t.status) === 'Dispatched').length,
-        'Delivered': tickets.filter(t => normalizeLegacyStatus(t.status) === 'Delivered').length,
-        'RTO': tickets.filter(t => normalizeLegacyStatus(t.status) === 'RTO').length
-    };
-    if (courierChart) courierChart.destroy();
-    if (pipelineChart) pipelineChart.destroy();
-    courierChart = new Chart(courierElement.getContext('2d'), {
-        type: 'bar',
-        data: { labels: courierLabels.length ? courierLabels : ['No Data'], datasets: [{ data: courierLabels.length ? courierLabels.map(k => courierCounts[k]) : [0], backgroundColor: ['#2563eb','#3b82f6','#f59e0b','#10b981','#cbd5e1','#ef4444'], borderRadius: 6 }] },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-    pipelineChart = new Chart(pipelineElement.getContext('2d'), {
-        type: 'doughnut',
-        data: { labels: Object.keys(pipelineValues), datasets: [{ data: Object.values(pipelineValues), backgroundColor: ['#3b82f6','#06b6d4','#a855f7','#10b981','#f59e0b','#059669','#ef4444'] }] },
-        options: { responsive: true }
-    });
+const csv = value => '"' + String(value ?? "").replace(/"/g, '""') + '"';
+
+function download(name, header, rows) {
+const content = "\ufeff" + header + "\n" + rows.join("\n");
+const link = document.createElement("a");
+link.href = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
+link.download = name;
+link.click();
+URL.revokeObjectURL(link.href);
 }
 
-function exportExcel() {
-    const tickets = activeTickets();
-    if(tickets.length === 0) return alert("No Data Found to Export!");
-    let csv = "Order_Invoice_ID,Customer_Name,Phone,Model_SKU,Tracking_AWB,Courier_Partner,Current_Stage,Warranty_Expiry,Media_URL,Live_Notes\n";
-    tickets.forEach(t => {
-        csv += `"${String(t.inv || '').replace(/"/g,'""')}","${String(t.name || '').replace(/"/g,'""')}","${String(t.phone || '').replace(/"/g,'""')}","${String(t.sku || '').replace(/"/g,'""')}","${String(t.awbNo || '').replace(/"/g,'""')}","${String(t.courier || '').replace(/"/g,'""')}","${String(t.status || '').replace(/"/g,'""')}","${String(t.warrantyExpiry || '').replace(/"/g,'""')}","${String(normalizeMediaItems(t).map(m => m.url).join(' | ')).replace(/"/g,'""')}","${String(t.note || '').replace(/"/g,'""')}"\n`;
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = 'Noor_Tech_Enterprise_Report.csv';
-    a.click();
+function exportWarranty() {
+const rows = combinedWarrantyRows();
+download(
+"HELETT_Warranty_All_Records.csv",
+"Type,Customer,Phone,Invoice,SKU,Serial,Warranty_Expiry,AWB,Courier,Status,Note",
+rows.map(item => [
+item._displayType,
+item.name,
+item.phone,
+item.inv || item.invoice,
+item.sku,
+item.serial || item.sn,
+item.warrantyExpiry,
+item.awbNo || item.pipelineAwb,
+item.courier || item.pipelineCourier,
+item._displayType === "Warranty Only"
+? (item.attachedToPipeline ? statusText(item.pipelineStatus) : "Warranty Only")
+: statusText(item.status),
+item.warrantyNote || item.note
+].map(csv).join(","))
+);
 }
 
-function renderAllEnterprise() {
-    const tickets = activeTickets();
-    const now = new Date();
-    document.getElementById('dashToday').innerText = tickets.filter(t => {
-        const d = parseRecordDate(t.date);
-        return d && d.toDateString() === now.toDateString();
-    }).length;
-    document.getElementById('dashMonth').innerText = tickets.filter(t => {
-        const d = parseRecordDate(t.date);
-        return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    }).length;
-    document.getElementById('dashCritical').innerText = tickets.filter(isCriticalTicket).length;
-    const repairDays = tickets.map(t => {
-        const a = parseRecordDate(t.inwardDate || t.date);
-        const b = parseRecordDate(t.outwardDate);
-        return a && b ? Math.max(0, Math.round((b - a) / 86400000)) : null;
-    }).filter(x => x !== null);
-    document.getElementById('dashAvgRepair').innerText = repairDays.length ? Math.round(repairDays.reduce((a,b)=>a+b,0)/repairDays.length) : 0;
-
-    document.getElementById('enterpriseDashboardBody').innerHTML = tickets.slice(0,100).map(t => `
-        <tr onclick="openModal('${escapeHTML(t.id)}')">
-            <td>${escapeHTML(t.name || '')}<br><small>${escapeHTML(t.phone || '')}</small></td>
-            <td>${escapeHTML(t.inv || '')}</td>
-            <td>${escapeHTML(t.sku || '')}</td>
-            <td>${escapeHTML(getReadableStatus(t.status))}</td>
-            <td>${isCriticalTicket(t) ? '<span class="priority-tag">Critical</span>' : '<span class="pipeline-badge status-ClientSent">Normal</span>'}</td>
-        </tr>
-    `).join('');
-
-    renderCustomerCrm();
-    fillTicketSelects();
-    renderWarrantyBody();
-    renderReviewMetrics();
+function exportService() {
+download(
+"HELETT_Service_Report.csv",
+"Customer,Phone,Invoice,SKU,AWB,Courier,Status,Inward,Outward,Note",
+services.map(item => [
+item.name, item.phone, item.inv, item.sku, item.awbNo, item.courier,
+statusText(item.status), item.inwardDate, item.outwardDate, item.note
+].map(csv).join(","))
+);
 }
 
-function renderCustomerCrm() {
-    const map = {};
-    activeTickets().forEach(t => {
-        const key = t.phone || t.name || 'Unknown';
-        if (!map[key]) map[key] = { name: t.name, phone: t.phone, invoices: [], sku: t.sku };
-        if (t.inv) map[key].invoices.push(t.inv);
-        if (t.sku) map[key].sku = t.sku;
-    });
-    document.getElementById('customerCrmBody').innerHTML = Object.keys(map).map(k => {
-        const c = map[k];
-        return `<tr><td>${escapeHTML(c.name || '')}</td><td>${escapeHTML(c.phone || '')}</td><td>${escapeHTML(c.invoices.join(', '))}</td><td>${escapeHTML(c.sku || '')}</td><td>${c.invoices.length} interaction(s)</td></tr>`;
-    }).join('') || '<tr><td colspan="5" class="empty-state">No customers found.</td></tr>';
+function exportCritical() {
+download(
+"HELETT_Critical_Report.csv",
+"Priority,Customer,Phone,Invoice,SKU,Category,Title,Status,Owner,Followup,Details,Action",
+criticals.map(item => [
+item.priority, item.name, item.phone, item.inv || item.invoice, item.sku,
+item.category, item.title, item.criticalStatus || item.status, item.owner,
+item.followupDate || item.followup, item.details || item.note, item.actionTaken || item.action
+].map(csv).join(","))
+);
 }
 
-function fillTicketSelects() {
-    const html = '<option value="">Select Ticket</option>' + activeTickets().map(t => `<option value="${escapeHTML(t.id)}">${escapeHTML(t.name || '')} - ${escapeHTML(t.inv || '')} - ${escapeHTML(t.sku || '')}</option>`).join('');
-    ['serviceTicket','shipTicket'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = html; });
-}
+$("wSearch").addEventListener("input", debounce(() => {
+pages.warranty = 1;
+renderWarranty();
+}));
+$("sSearch").addEventListener("input", debounce(() => {
+pages.service = 1;
+renderService();
+}));
+$("cSearch").addEventListener("input", debounce(() => {
+pages.critical = 1;
+renderCritical();
+}));
 
-function saveWarrantyRecord() {
-    const id = refs.warranty.push().key;
-    const data = {
-        id,
-        name: document.getElementById('wName').value,
-        phone: document.getElementById('wPhone').value,
-        invoice: document.getElementById('wInvoice').value,
-        sku: document.getElementById('wSku').value,
-        serial: document.getElementById('wSerial').value,
-        amazonOrderId: document.getElementById('wAmazon').value,
-        marketplace: document.getElementById('wMarketplace').value,
-        expiry: document.getElementById('wExpiry').value,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-    };
-    refs.warranty.child(id).set(data).then(() => writeAudit('CREATE_WARRANTY', { path: 'noor_warranty', recordId: id }));
-    alert('Warranty saved.');
-}
+$("wFilter").addEventListener("change", () => {
+pages.warranty = 1;
+renderWarranty();
+});
+$("sFilter").addEventListener("change", () => {
+pages.service = 1;
+renderService();
+});
+$("cFilter").addEventListener("change", () => {
+pages.critical = 1;
+renderCritical();
+});
 
-function renderWarrantyBody() {
-    const body = document.getElementById('warrantyBody');
-    if (!body) return;
-    body.innerHTML = warrantyRecords.map(w => `<tr><td>${escapeHTML(w.name)}</td><td>${escapeHTML(w.invoice)}</td><td>${escapeHTML(w.sku)}</td><td>${escapeHTML(w.expiry)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty-state">No warranty records.</td></tr>';
-}
+window.addEventListener("click", event => {
+if (event.target === $("editModal")) closeModal();
+}); </script>
 
-function saveServiceUpdate() {
-    const id = document.getElementById('serviceTicket').value;
-    if (!id) return alert('Select ticket.');
-    applyWorkflowTriggers(id, {
-        engineerAssigned: document.getElementById('serviceEngineer').value,
-        serviceStage: document.getElementById('serviceStage').value,
-        serviceNote: document.getElementById('serviceNote').value
-    }).then(() => alert('Service update saved.'));
-}
-
-function saveWarehouseStock() {
-    const payload = {
-        sku: document.getElementById('stockSku').value,
-        qty: document.getElementById('stockQty').value,
-        location: document.getElementById('stockLocation').value,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-    };
-    refs.settings.child('warehouse_stock').push(payload).then(() => writeAudit('WAREHOUSE_STOCK_UPDATE', { path: 'noor_settings' }));
-    alert('Warehouse stock saved.');
-}
-
-function saveShipmentUpdate() {
-    const id = document.getElementById('shipTicket').value;
-    if (!id) return alert('Select ticket.');
-    applyWorkflowTriggers(id, {
-        courier: document.getElementById('shipCourier').value,
-        awbNo: document.getElementById('shipAwb').value,
-        status: 'Dispatched'
-    }).then(() => alert('Shipment saved.'));
-}
-
-function saveReviewRecord() {
-    const id = refs.reviews.push().key;
-    const data = {
-        id,
-        name: document.getElementById('reviewName').value,
-        phone: document.getElementById('reviewPhone').value,
-        invoice: document.getElementById('reviewInvoice').value,
-        sku: document.getElementById('reviewSku').value,
-        rating: document.getElementById('reviewRating').value,
-        status: document.getElementById('reviewStatus').value,
-        note: document.getElementById('reviewNote').value,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-    };
-    refs.reviews.child(id).set(data).then(() => writeAudit('CREATE_REVIEW', { path: 'noor_reviews', recordId: id }));
-    alert('Review saved.');
-}
-
-function renderReviewMetrics() {
-    const p = reviewRecords.filter(r => r.status === 'Pending Bad Review').length;
-    const u = reviewRecords.filter(r => r.status === 'Upgraded Live Positive Feedback').length;
-    const a = document.getElementById('pendingBadReviews');
-    const b = document.getElementById('upgradedPositiveReviews');
-    if (a) a.innerText = p;
-    if (b) b.innerText = u;
-}
-
-function saveKnowledgeEntry() {
-    const id = refs.ai.push().key;
-    const issue = document.getElementById('kbIssue').value;
-    const solution = document.getElementById('kbSolution').value;
-    const data = { id, issue, solution, sku: document.getElementById('kbSku').value, createdAt: firebase.database.ServerValue.TIMESTAMP };
-    refs.ai.child(id).set(data).then(() => writeAudit('CREATE_AI_KB', { path: 'noor_ai', recordId: id }));
-    renderTemplates(issue, solution);
-    alert('Knowledge saved.');
-}
-
-function searchKnowledgeBase() {
-    const q = document.getElementById('kbIssue').value.toLowerCase();
-    const hit = knowledgeMemory.find(k => String(k.issue || '').toLowerCase().includes(q) || String(k.solution || '').toLowerCase().includes(q));
-    if (hit) renderTemplates(hit.issue, hit.solution);
-    else renderTemplates(q || 'reported issue', autoSolution(q));
-}
-
-function autoSolution(text) {
-    text = String(text || '').toLowerCase();
-    if (text.includes('billquick') || text.includes('driver')) return 'Reinstall compatible driver, restart spooler, reconnect POS printer, and run test print.';
-    if (text.includes('battery')) return 'Replace battery pack and verify charging circuit.';
-    if (text.includes('print')) return 'Clean printhead and run print quality module test.';
-    return 'Perform standard QC diagnosis and update customer after verification.';
-}
-
-function renderTemplates(issue, solution) {
-    document.getElementById('kbResult').innerHTML = `<strong>${escapeHTML(issue)}</strong><br>${escapeHTML(solution)}`;
-    document.getElementById('tplEnglish').innerText = `Dear Customer, we reviewed your concern regarding ${issue}. Recommended action: ${solution}. Our support team will update you shortly.`;
-    document.getElementById('tplHindi').innerText = `Namaste, humne aapki samasya "${issue}" review ki hai. Recommended action: ${solution}. Hamari support team jald update karegi.`;
-    document.getElementById('tplTamil').innerText = `Vanakkam, ungal "${issue}" issue review seiyappattathu. Recommended action: ${solution}. Support team update seiyum.`;
-}
-
-function copyTemplate(id) {
-    navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => alert('Copied.'));
-}
-
-function saveProductMaster() {
-    const id = document.getElementById('pmSku').value || refs.productMaster.push().key;
-    const data = {
-        sku: document.getElementById('pmSku').value,
-        name: document.getElementById('pmName').value,
-        manual: document.getElementById('pmManual').value,
-        firmware: document.getElementById('pmFirmware').value,
-        issues: document.getElementById('pmIssues').value,
-        updatedAt: firebase.database.ServerValue.TIMESTAMP
-    };
-    refs.productMaster.child(id).set(data).then(() => writeAudit('UPSERT_PRODUCT_MASTER', { path: 'noor_product_master', recordId: id }));
-    alert('Product saved.');
-}
-
-function saveReportConfig() {
-    const id = refs.reports.push().key;
-    const data = { id, from: document.getElementById('reportFrom').value, to: document.getElementById('reportTo').value, type: document.getElementById('reportType').value, createdAt: firebase.database.ServerValue.TIMESTAMP };
-    refs.reports.child(id).set(data).then(() => writeAudit('SAVE_REPORT_CONFIG', { path: 'noor_reports', recordId: id }));
-    alert('Report config saved.');
-}
-
-function exportEnterpriseReport() {
-    exportExcel();
-}
-
-function saveSettings() {
-    const data = { company: document.getElementById('setCompany').value, support: document.getElementById('setSupport').value, email: document.getElementById('setEmail').value, updatedAt: firebase.database.ServerValue.TIMESTAMP };
-    refs.settings.child('company_profile').set(data).then(() => writeAudit('SAVE_SETTINGS', { path: 'noor_settings' }));
-    alert('Settings saved.');
-}
-
-function renderAuditLogs() {
-    refs.audit.limitToLast(50).once('value').then(s => {
-        const rows = [];
-        s.forEach(c => rows.push(c.val()));
-        rows.reverse();
-        document.getElementById('auditBody').innerHTML = rows.map(r => `<tr><td>${escapeHTML(r.actionType)}</td><td>${escapeHTML((r.payload || {}).path || '')}</td><td>${escapeHTML((r.payload || {}).recordId || '')}</td><td>${escapeHTML(r.createdAt || '')}</td></tr>`).join('') || '<tr><td colspan="4" class="empty-state">No audit logs.</td></tr>';
-    });
-}
-
-document.getElementById('search').addEventListener('input', debounce(function(e) {
-    const term = e.target.value.toLowerCase();
-    document.querySelectorAll('#crmTableBody tr').forEach(row => row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none');
-}, 500));
-
-document.getElementById('customerSearch').addEventListener('input', debounce(renderCustomerCrm, 500));
-
-writeAudit('PORTAL_LOADED', { path: 'noor_cloud_tickets' }).catch(() => {});
-</script>
 </body>
 </html>
+::: ​​
