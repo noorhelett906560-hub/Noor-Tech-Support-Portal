@@ -1,3 +1,5 @@
+html
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -591,7 +593,7 @@ tr:hover {
 <div class="sidebar">
     <h2>HELETT<sup>&reg;</sup> CRM</h2>
 
-```
+
 <div class="nav-item active" onclick="showPage('warrantyPage', this)">
     <i class="fas fa-shield-halved"></i>
     Warranty Hub
@@ -606,7 +608,6 @@ tr:hover {
     <i class="fas fa-triangle-exclamation"></i>
     Critical Complaint Queue
 </div>
-```
 
 </div>
 
@@ -614,7 +615,7 @@ tr:hover {
 
 <section id="warrantyPage" class="page active">
 
-```
+
 <div class="header">
     <h2>
         <i class="fas fa-shield-halved" style="color: var(--secondary);"></i>
@@ -837,13 +838,12 @@ tr:hover {
         <tbody id="wBody"></tbody>
     </table>
 </div>
-```
 
 </section>
 
 <section id="servicePage" class="page">
 
-```
+
 <div class="header">
 
     <h2>
@@ -946,13 +946,12 @@ tr:hover {
         <tbody id="sBody"></tbody>
     </table>
 </div>
-```
 
 </section>
 
 <section id="criticalPage" class="page">
 
-```
+
 <div class="header">
 
     <h2>
@@ -1117,7 +1116,6 @@ tr:hover {
         <tbody id="cBody"></tbody>
     </table>
 </div>
-```
 
 </section>
 
@@ -1125,7 +1123,7 @@ tr:hover {
 
 <div id="editModal" class="modal">
 
-```
+
 <div class="modal-content">
 
     <span class="close" onclick="closeModal()">&times;</span>
@@ -1183,7 +1181,6 @@ tr:hover {
         </button>
     </div>
 </div>
-```
 
 </div>
 
@@ -1203,6 +1200,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const root = firebase.database().ref("noor_cloud_tickets");
+const auditRef = firebase.database().ref("noor_audit_logs");
 const warrantyRef = root.child("_warranty_records");
 const criticalRef = root.child("_critical_complaints");
 
@@ -1359,55 +1357,47 @@ function warrantyState(record) {
     return "Active";
 }
 
-async function restoreAllSoftDeleted() {
+function shiprocketTrackLink(awbNo) {
+    const cleanAwb = String(awbNo || "").trim();
+
+    if (!cleanAwb) {
+        return "";
+    }
+
+    return `<br><a class="track-link" href="https://www.shiprocket.in/shipment-tracking/?tracking_id=${esc(cleanAwb)}" target="_blank" onclick="event.stopPropagation();" style="color: #2563eb; font-weight: 800; text-decoration: none; font-size: 0.8rem;"><i class="fas fa-location-dot"></i> Track Shipment</a>`;
+}
+
+async function writeAudit(actionType, payload) {
     try {
-        const snapshot = await root.once("value");
-        const updates = {};
-        let restoredCount = 0;
-
-        function scanNode(node, currentPath) {
-            if (!node || typeof node !== "object") {
-                return;
-            }
-
-            if (currentPath && node.isDeleted === true) {
-                updates[currentPath + "/isDeleted"] = false;
-                updates[currentPath + "/deletedAt"] = null;
-                restoredCount += 1;
-            }
-
-            Object.entries(node).forEach(([key, value]) => {
-                if (!value || typeof value !== "object") {
-                    return;
-                }
-
-                const childPath = currentPath
-                    ? currentPath + "/" + key
-                    : key;
-
-                scanNode(value, childPath);
-            });
-        }
-
-        scanNode(snapshot.val(), "");
-
-        if (restoredCount > 0) {
-            await root.update(updates);
-
-            toast(
-                restoredCount +
-                " hidden records restored successfully.",
-                "info"
-            );
-        }
+        await auditRef.push({
+            actionType,
+            payload: payload || {},
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            source: "HELETT CRM Enterprise Portal"
+        });
     } catch (error) {
-        toast(
-            "Recovery failed: " + error.message,
-            "error"
-        );
+        console.warn("Audit log write failed", error);
     }
 }
 
+async function softDeletePath(path, actionType, extraPayload = {}) {
+    if (!path) {
+        throw new Error("Missing database path for soft delete.");
+    }
+
+    await root.child(path).update({
+        isDeleted: true,
+        deletedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+
+    await writeAudit(actionType, {
+        path,
+        ...extraPayload
+    });
+}
+async function restoreAllSoftDeleted() {
+    console.info("Soft-delete restore is disabled. Preserved records with isDeleted=true remain hidden from active CRM views.");
+}
 root.on(
     "value",
 
@@ -1420,7 +1410,7 @@ root.on(
             const key = child.key;
             const value = child.val();
 
-            if (!value || typeof value !== "object") {
+            if (!value || typeof value !== "object" || value.isDeleted === true) {
                 return;
             }
 
@@ -1428,7 +1418,8 @@ root.on(
                 Object.entries(value).forEach(([recordKey, recordValue]) => {
                     if (
                         recordValue &&
-                        typeof recordValue === "object"
+                        typeof recordValue === "object" &&
+                        recordValue.isDeleted !== true
                     ) {
                         warranties.push({
                             ...recordValue,
@@ -1448,7 +1439,8 @@ root.on(
                 Object.entries(value).forEach(([recordKey, recordValue]) => {
                     if (
                         recordValue &&
-                        typeof recordValue === "object"
+                        typeof recordValue === "object" &&
+                        recordValue.isDeleted !== true
                     ) {
                         criticals.push({
                             ...recordValue,
@@ -1683,6 +1675,7 @@ function renderWarranty() {
             : "";
 
         const state = warrantyState(record);
+        const awbNo = record.awbNo || record.pipelineAwb || "";
 
         const stateClass =
             state === "Active"
@@ -1733,13 +1726,8 @@ function renderWarranty() {
                         )}
                     </strong>
                     <br>
-                    <small>
-                        ${esc(
-                            record.awbNo ||
-                            record.pipelineAwb ||
-                            "No AWB"
-                        )}
-                    </small>
+                    <small>${esc(awbNo || "No AWB")}</small>
+                    ${shiprocketTrackLink(awbNo)}
                 </td>
 
                 <td>
@@ -1841,7 +1829,9 @@ function renderService() {
         return;
     }
 
-    $("sBody").innerHTML = filtered.map(record => `
+    $("sBody").innerHTML = filtered.map(record => {
+        const awbNo = record.awbNo || record.pipelineAwb || "";
+        return `
         <tr>
 
             <td>
@@ -1859,9 +1849,8 @@ function renderService() {
             </td>
 
             <td>
-                <strong>
-                    ${esc(record.awbNo || "No AWB")}
-                </strong>
+                <strong>${esc(awbNo || "No AWB")}</strong>
+                ${shiprocketTrackLink(awbNo)}
                 <br>
                 <small>
                     ${esc(record.courier || "N/A")}
@@ -1905,7 +1894,8 @@ function renderService() {
             </td>
 
         </tr>
-    `).join("");
+    `;
+    }).join("");
 }
 
 function renderCritical() {
@@ -2257,76 +2247,52 @@ $("criticalForm").addEventListener(
 );
 
 async function deleteWarranty(path, serviceKey) {
-    if (
-        !confirm(
-            "Delete this warranty entry permanently?"
-        )
-    ) {
+    if (!confirm("Are you sure you want to delete this record?")) {
         return;
     }
 
-    const updates = {};
-
-    updates[path] = null;
-
-    if (serviceKey) {
-        updates[serviceKey] = null;
-    }
-
     try {
-        await root.update(updates);
+        await softDeletePath(path, "SOFT_DELETE_WARRANTY", {
+            linkedServiceKey: serviceKey || ""
+        });
 
-        toast("Warranty entry deleted.");
+        if (serviceKey) {
+            await softDeletePath(serviceKey, "SOFT_DELETE_LINKED_SERVICE_FROM_WARRANTY", {
+                sourceWarrantyPath: path
+            });
+        }
+
+        toast("Warranty entry hidden safely.");
     } catch (error) {
-        toast(
-            "Delete failed: " + error.message,
-            "error"
-        );
+        toast("Delete failed: " + error.message, "error");
     }
 }
 
 async function deleteService(path) {
-    if (
-        !confirm(
-            "Delete this service / replacement entry permanently?"
-        )
-    ) {
+    if (!confirm("Are you sure you want to delete this record?")) {
         return;
     }
 
     try {
-        await root.child(path).remove();
-
-        toast("Service entry deleted.");
+        await softDeletePath(path, "SOFT_DELETE_SERVICE");
+        toast("Service entry hidden safely.");
     } catch (error) {
-        toast(
-            "Delete failed: " + error.message,
-            "error"
-        );
+        toast("Delete failed: " + error.message, "error");
     }
 }
 
 async function deleteCritical(path) {
-    if (
-        !confirm(
-            "Delete this critical complaint permanently?"
-        )
-    ) {
+    if (!confirm("Are you sure you want to delete this record?")) {
         return;
     }
 
     try {
-        await root.child(path).remove();
-
-        toast("Critical complaint deleted.");
+        await softDeletePath(path, "SOFT_DELETE_CRITICAL");
+        toast("Critical complaint hidden safely.");
     } catch (error) {
-        toast(
-            "Delete failed: " + error.message,
-            "error"
-        );
+        toast("Delete failed: " + error.message, "error");
     }
 }
-
 function openService(path) {
     editKey = path;
 
