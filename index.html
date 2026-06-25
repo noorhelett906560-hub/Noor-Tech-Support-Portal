@@ -7,9 +7,7 @@ html
 <title>HELETT CRM Enterprise Portal</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
@@ -585,466 +583,453 @@ tr:hover {
     }
 }
 </style>
-
 </head>
 
 <body>
-
 <div class="sidebar">
     <h2>HELETT<sup>&reg;</sup> CRM</h2>
 
+    <div class="nav-item active" onclick="showPage('warrantyPage', this)">
+        <i class="fas fa-shield-halved"></i>
+        Warranty Hub
+    </div>
 
-<div class="nav-item active" onclick="showPage('warrantyPage', this)">
-    <i class="fas fa-shield-halved"></i>
-    Warranty Hub
-</div>
+    <div class="nav-item" onclick="showPage('servicePage', this)">
+        <i class="fas fa-route"></i>
+        Replacement Engine
+    </div>
 
-<div class="nav-item" onclick="showPage('servicePage', this)">
-    <i class="fas fa-route"></i>
-    Replacement Engine
-</div>
-
-<div class="nav-item" onclick="showPage('criticalPage', this)">
-    <i class="fas fa-triangle-exclamation"></i>
-    Critical Complaint Queue
-</div>
-
+    <div class="nav-item" onclick="showPage('criticalPage', this)">
+        <i class="fas fa-triangle-exclamation"></i>
+        Critical Complaint Queue
+    </div>
 </div>
 
 <div class="main">
+    <section id="warrantyPage" class="page active">
+        <div class="header">
+            <h2>
+                <i class="fas fa-shield-halved" style="color: var(--secondary);"></i>
+                Warranty Hub
+            </h2>
 
-<section id="warrantyPage" class="page active">
+            <div>
+                <span id="clock" style="font-weight: 600; color: #64748b;"></span>
 
-
-<div class="header">
-    <h2>
-        <i class="fas fa-shield-halved" style="color: var(--secondary);"></i>
-        Warranty Hub
-    </h2>
-
-    <div>
-        <span id="clock" style="font-weight: 600; color: #64748b;"></span>
-
-        <span class="live-pill">
-            <i class="fas fa-circle-check"></i>
-            LIVE WARRANTY ENGINE ONLINE
-        </span>
-    </div>
-</div>
-
-<p class="summary">
-    All old records remain visible. New warranty data enters Operational Pipeline Matrix only when you manually attach it.
-</p>
-
-<div class="stats">
-
-    <div class="card">
-        <h4>Total Logged</h4>
-        <div id="totalLogged" class="metric">0</div>
-        <small>Old + new records</small>
-    </div>
-
-    <div class="card" style="border-color: var(--success);">
-        <h4>Active Warranty</h4>
-        <div id="activeWarranty" class="metric" style="color: var(--success);">0</div>
-        <small>Warranty still active</small>
-    </div>
-
-    <div class="card" style="border-color: var(--warning);">
-        <h4>Expiring in 30 Days</h4>
-        <div id="expiringWarranty" class="metric" style="color: var(--warning);">0</div>
-        <small>Expiry alert</small>
-    </div>
-
-    <div class="card">
-        <h4>Client Sent</h4>
-        <div id="clientCount" class="metric">0</div>
-        <small>Pipeline only</small>
-    </div>
-
-    <div class="card" style="border-color: var(--cyan);">
-        <h4>We Pickup</h4>
-        <div id="pickupCount" class="metric">0</div>
-        <small>Pipeline only</small>
-    </div>
-
-    <div class="card" style="border-color: var(--purple);">
-        <h4>WH Received</h4>
-        <div id="whCount" class="metric">0</div>
-        <small>Pipeline only</small>
-    </div>
-
-    <div class="card" style="border-color: var(--warning);">
-        <h4>Dispatched</h4>
-        <div id="dispatchCount" class="metric">0</div>
-        <small>Pipeline only</small>
-    </div>
-
-    <div class="card" style="border-color: var(--danger);">
-        <h4>RTO</h4>
-        <div id="rtoCount" class="metric">0</div>
-        <small>Pipeline only</small>
-    </div>
-
-</div>
-
-<div class="panel">
-
-    <h3>
-        <i class="fas fa-square-plus" style="color: var(--secondary);"></i>
-        Log Warranty Detail
-    </h3>
-
-    <form id="warrantyForm">
-
-        <div class="grid">
-
-            <div class="section">
-                <i class="fas fa-user"></i>
-                Customer & Warranty Basics
-            </div>
-
-            <input id="wName" required placeholder="Customer Name">
-
-            <input id="wPhone" required placeholder="Phone Number">
-
-            <input id="wInvoice" required placeholder="Invoice Number / Order ID">
-
-            <div class="section">
-                <i class="fas fa-cube"></i>
-                Product Warranty Identity
-            </div>
-
-            <input id="wSku" required placeholder="Model / SKU">
-
-            <input id="wSerial" placeholder="Product Serial Number">
-
-            <select id="wSource">
-                <option>Amazon</option>
-                <option>Flipkart</option>
-                <option>Direct Website</option>
-                <option>Call</option>
-                <option>WhatsApp</option>
-            </select>
-
-            <div class="section">
-                <i class="fas fa-calendar-check"></i>
-                Warranty Reference
-            </div>
-
-            <input id="wPurchase" type="date" title="Purchase Date">
-
-            <input id="wExpiry" type="date" title="Warranty Expiry">
-
-            <textarea id="wNote" placeholder="Warranty note only..."></textarea>
-
-            <div class="section">
-                <i class="fas fa-link"></i>
-                Optional Repair / Replacement Link
-            </div>
-
-            <label class="attach">
-                <input id="attachPipeline" type="checkbox" onchange="togglePipeline()">
-                Attach this warranty record to Operational Pipeline Matrix
-            </label>
-
-            <div id="pipelineBox" class="pipeline">
-
-                <div class="section">
-                    <i class="fas fa-truck"></i>
-                    Courier Tracking Registry
-                </div>
-
-                <input id="wAwb" placeholder="AWB / Tracking Number">
-
-                <select id="wCourier" onchange="toggleManualCourier()">
-                    <option>Shiprocket</option>
-                    <option>Delhivery</option>
-                    <option>BlueDart</option>
-                    <option>Amazon Shipping</option>
-                    <option>DTDC</option>
-                    <option>Indian Post</option>
-                    <option value="Other">Other / Manual Input</option>
-                </select>
-
-                <input id="manualCourier" class="hidden" placeholder="Type courier name">
-
-                <div class="section">
-                    <i class="fas fa-route"></i>
-                    Operational Pipeline Matrix
-                </div>
-
-                <select id="wStatus">
-                    <option value="ClientSent">1. Client Sent</option>
-                    <option value="CompanyPickup">2. We Pickup / Company Route</option>
-                    <option value="WHReceived">3. WH Received</option>
-                    <option value="ReadyToShip">4. Repaired / Ready to Ship</option>
-                    <option value="Dispatched">5. Dispatched via Courier</option>
-                    <option value="Delivered">6. Delivered / Closed</option>
-                    <option value="RTO">7. RTO</option>
-                </select>
-
-                <textarea id="wIssue" placeholder="Repair / replacement issue note..."></textarea>
-
+                <span class="live-pill">
+                    <i class="fas fa-circle-check"></i>
+                    LIVE WARRANTY ENGINE ONLINE
+                </span>
             </div>
         </div>
 
-        <div class="buttons">
+        <p class="summary">
+            All old records remain visible. New warranty data enters Operational Pipeline Matrix only when you manually attach it.
+        </p>
 
-            <button id="wSave" class="btn green" type="submit">
-                <i class="fas fa-cloud-arrow-up"></i>
-                Save Warranty Detail
+        <div class="stats">
+            <div class="card">
+                <h4>Total Logged</h4>
+                <div id="totalLogged" class="metric">0</div>
+                <small>Old + new records</small>
+            </div>
+
+            <div class="card" style="border-color: var(--success);">
+                <h4>Active Warranty</h4>
+                <div id="activeWarranty" class="metric" style="color: var(--success);">0</div>
+                <small>Warranty still active</small>
+            </div>
+
+            <div class="card" style="border-color: var(--warning);">
+                <h4>Expiring in 30 Days</h4>
+                <div id="expiringWarranty" class="metric" style="color: var(--warning);">0</div>
+                <small>Expiry alert</small>
+            </div>
+
+            <div class="card">
+                <h4>Client Sent</h4>
+                <div id="clientCount" class="metric">0</div>
+                <small>Pipeline only</small>
+            </div>
+
+            <div class="card" style="border-color: var(--cyan);">
+                <h4>We Pickup</h4>
+                <div id="pickupCount" class="metric">0</div>
+                <small>Pipeline only</small>
+            </div>
+
+            <div class="card" style="border-color: var(--purple);">
+                <h4>WH Received</h4>
+                <div id="whCount" class="metric">0</div>
+                <small>Pipeline only</small>
+            </div>
+
+            <div class="card" style="border-color: var(--warning);">
+                <h4>Dispatched</h4>
+                <div id="dispatchCount" class="metric">0</div>
+                <small>Pipeline only</small>
+            </div>
+
+            <div class="card" style="border-color: var(--danger);">
+                <h4>RTO</h4>
+                <div id="rtoCount" class="metric">0</div>
+                <small>Pipeline only</small>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>
+                <i class="fas fa-square-plus" style="color: var(--secondary);"></i>
+                Log Warranty Detail
+            </h3>
+
+            <form id="warrantyForm">
+                <div class="grid">
+                    <div class="section">
+                        <i class="fas fa-user"></i>
+                        Customer & Warranty Basics
+                    </div>
+
+                    <input id="wName" required placeholder="Customer Name">
+                    <input id="wPhone" required placeholder="Phone Number">
+                    <input id="wInvoice" required placeholder="Invoice Number / Order ID">
+
+                    <div class="section">
+                        <i class="fas fa-cube"></i>
+                        Product Warranty Identity
+                    </div>
+
+                    <input id="wSku" required placeholder="Model / SKU">
+                    <input id="wSerial" placeholder="Product Serial Number">
+
+                    <select id="wSource">
+                        <option>Amazon</option>
+                        <option>Flipkart</option>
+                        <option>Direct Website</option>
+                        <option>Call</option>
+                        <option>WhatsApp</option>
+                    </select>
+
+                    <div class="section">
+                        <i class="fas fa-calendar-check"></i>
+                        Warranty Reference
+                    </div>
+
+                    <input id="wPurchase" type="date" title="Purchase Date">
+                    <input id="wExpiry" type="date" title="Warranty Expiry">
+                    <textarea id="wNote" placeholder="Warranty note only..."></textarea>
+
+                    <div class="section">
+                        <i class="fas fa-link"></i>
+                        Optional Repair / Replacement Link
+                    </div>
+
+                    <label class="attach">
+                        <input id="attachPipeline" type="checkbox" onchange="togglePipeline()">
+                        Attach this warranty record to Operational Pipeline Matrix
+                    </label>
+
+                    <div id="pipelineBox" class="pipeline">
+                        <div class="section">
+                            <i class="fas fa-truck"></i>
+                            Courier Tracking Registry
+                        </div>
+
+                        <input id="wAwb" placeholder="AWB / Tracking Number">
+
+                        <select id="wCourier" onchange="toggleManualCourier()">
+                            <option>Shiprocket</option>
+                            <option>Delhivery</option>
+                            <option>BlueDart</option>
+                            <option>Amazon Shipping</option>
+                            <option>DTDC</option>
+                            <option>Indian Post</option>
+                            <option value="Other">Other / Manual Input</option>
+                        </select>
+
+                        <input id="manualCourier" class="hidden" placeholder="Type courier name">
+
+                        <div class="section">
+                            <i class="fas fa-route"></i>
+                            Operational Pipeline Matrix
+                        </div>
+
+                        <select id="wStatus">
+                            <option value="ClientSent">1. Client Sent</option>
+                            <option value="CompanyPickup">2. We Pickup / Company Route</option>
+                            <option value="WHReceived">3. WH Received</option>
+                            <option value="ReadyToShip">4. Repaired / Ready to Ship</option>
+                            <option value="Dispatched">5. Dispatched via Courier</option>
+                            <option value="Delivered">6. Delivered / Closed</option>
+                            <option value="RTO">7. RTO</option>
+                        </select>
+
+                        <textarea id="wIssue" placeholder="Repair / replacement issue note..."></textarea>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button id="wSave" class="btn green" type="submit">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        Save Warranty Detail
+                    </button>
+
+                    <button class="btn blue" type="button" onclick="exportWarranty()">
+                        <i class="fas fa-file-csv"></i>
+                        Download Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="toolbar">
+            <input id="wSearch" placeholder="Search all warranty and old records...">
+
+            <select id="wFilter">
+                <option value="">All Records</option>
+                <option value="Warranty Only">Warranty Only</option>
+                <option value="Pipeline">Pipeline / Old Records</option>
+            </select>
+
+            <button class="btn light" onclick="exportWarranty()">
+                <i class="fas fa-download"></i>
+                Export
             </button>
+        </div>
 
-            <button class="btn blue" type="button" onclick="exportWarranty()">
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer / Invoice</th>
+                        <th>SKU / Serial</th>
+                        <th>Warranty</th>
+                        <th>Courier / AWB</th>
+                        <th>Status</th>
+                        <th>Note</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="wBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="servicePage" class="page">
+        <div class="header">
+            <h2>
+                <i class="fas fa-route" style="color: var(--secondary);"></i>
+                Replacement Engine
+            </h2>
+
+            <span class="live-pill">
+                <i class="fas fa-database"></i>
+                EXISTING LIVE DATA CONNECTED
+            </span>
+        </div>
+
+        <p class="summary">
+            Only service, repair and replacement entries appear here. Warranty-only entries remain separate.
+        </p>
+
+        <div class="stats">
+            <div class="card">
+                <h4>Total Service Cases</h4>
+                <div id="serviceTotal" class="metric">0</div>
+            </div>
+
+            <div class="card">
+                <h4>Client Sent</h4>
+                <div id="sClient" class="metric">0</div>
+            </div>
+
+            <div class="card" style="border-color: var(--cyan);">
+                <h4>We Pickup</h4>
+                <div id="sPickup" class="metric">0</div>
+            </div>
+
+            <div class="card" style="border-color: var(--purple);">
+                <h4>WH Received</h4>
+                <div id="sWh" class="metric">0</div>
+            </div>
+
+            <div class="card" style="border-color: var(--success);">
+                <h4>Ready To Ship</h4>
+                <div id="sReady" class="metric">0</div>
+            </div>
+
+            <div class="card" style="border-color: var(--warning);">
+                <h4>Dispatched</h4>
+                <div id="sDispatch" class="metric">0</div>
+            </div>
+
+            <div class="card" style="border-color: #059669;">
+                <h4>Delivered</h4>
+                <div id="sDelivered" class="metric">0</div>
+            </div>
+
+            <div class="card" style="border-color: var(--danger);">
+                <h4>RTO</h4>
+                <div id="sRto" class="metric">0</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input id="sSearch" placeholder="Search by customer, invoice, SKU, AWB, courier or phone...">
+
+            <select id="sFilter">
+                <option value="">All Statuses</option>
+                <option value="ClientSent">Client Sent</option>
+                <option value="CompanyPickup">We Pickup</option>
+                <option value="WHReceived">WH Received</option>
+                <option value="ReadyToShip">Ready To Ship</option>
+                <option value="Dispatched">Dispatched</option>
+                <option value="Delivered">Delivered</option>
+                <option value="RTO">RTO</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+            </select>
+
+            <button class="btn blue" onclick="exportService()">
                 <i class="fas fa-file-csv"></i>
-                Download Excel
+                Export
             </button>
-
         </div>
-    </form>
-</div>
 
-<div class="toolbar">
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer / Order ID</th>
+                        <th>Model / SKU</th>
+                        <th>AWB / Partner</th>
+                        <th>Current Stage</th>
+                        <th>Inward</th>
+                        <th>Outward</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="sBody"></tbody>
+            </table>
+        </div>
+    </section>
 
-    <input id="wSearch" placeholder="Search all warranty and old records...">
+    <section id="criticalPage" class="page">
+        <div class="header">
+            <h2>
+                <i class="fas fa-triangle-exclamation" style="color: var(--danger);"></i>
+                Critical Complaint Queue
+            </h2>
 
-    <select id="wFilter">
-        <option value="">All Records</option>
-        <option value="Warranty Only">Warranty Only</option>
-        <option value="Pipeline">Pipeline / Old Records</option>
-    </select>
+            <span class="live-pill" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;">
+                <i class="fas fa-bell"></i>
+                IMPORTANT ISSUE REGISTER
+            </span>
+        </div>
 
-    <button class="btn light" onclick="exportWarranty()">
-        <i class="fas fa-download"></i>
-        Export
-    </button>
-</div>
+        <p class="summary">
+            Save important or escalated complaints here. AI, photo, video and media repository options are removed.
+        </p>
 
-<div class="table-card">
-    <table>
-        <thead>
-            <tr>
-                <th>Customer / Invoice</th>
-                <th>SKU / Serial</th>
-                <th>Warranty</th>
-                <th>Courier / AWB</th>
-                <th>Status</th>
-                <th>Note</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody id="wBody"></tbody>
-    </table>
-</div>
-
-</section>
-
-<section id="servicePage" class="page">
-
-
-<div class="header">
-
-    <h2>
-        <i class="fas fa-route" style="color: var(--secondary);"></i>
-        Replacement Engine
-    </h2>
-
-    <span class="live-pill">
-        <i class="fas fa-database"></i>
-        EXISTING LIVE DATA CONNECTED
-    </span>
-</div>
-
-<p class="summary">
-    Only service, repair and replacement entries appear here. Warranty-only entries remain separate.
-</p>
-
-<div class="stats">
-
-    <div class="card">
-        <h4>Total Service Cases</h4>
-        <div id="serviceTotal" class="metric">0</div>
-    </div>
-
-    <div class="card">
-        <h4>Client Sent</h4>
-        <div id="sClient" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--cyan);">
-        <h4>We Pickup</h4>
-        <div id="sPickup" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--purple);">
-        <h4>WH Received</h4>
-        <div id="sWh" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--success);">
-        <h4>Ready To Ship</h4>
-        <div id="sReady" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--warning);">
-        <h4>Dispatched</h4>
-        <div id="sDispatch" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: #059669;">
-        <h4>Delivered</h4>
-        <div id="sDelivered" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--danger);">
-        <h4>RTO</h4>
-        <div id="sRto" class="metric">0</div>
-    </div>
-
-</div>
-
-<div class="toolbar">
-
-    <input id="sSearch" placeholder="Search by customer, invoice, SKU, AWB, courier or phone...">
-
-    <select id="sFilter">
-        <option value="">All Statuses</option>
-        <option value="ClientSent">Client Sent</option>
-        <option value="CompanyPickup">We Pickup</option>
-        <option value="WHReceived">WH Received</option>
-        <option value="ReadyToShip">Ready To Ship</option>
-        <option value="Dispatched">Dispatched</option>
-        <option value="Delivered">Delivered</option>
-        <option value="RTO">RTO</option>
-        <option value="Pending">Pending</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Resolved">Resolved</option>
-    </select>
-
-    <button class="btn blue" onclick="exportService()">
-        <i class="fas fa-file-csv"></i>
-        Export
-    </button>
-</div>
-
-<div class="table-card">
-    <table>
-        <thead>
-            <tr>
-                <th>Customer / Order ID</th>
-                <th>Model / SKU</th>
-                <th>AWB / Partner</th>
-                <th>Current Stage</th>
-                <th>Inward</th>
-                <th>Outward</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody id="sBody"></tbody>
-    </table>
-</div>
-
-</section>
-
-<section id="criticalPage" class="page">
-
-
-<div class="header">
-
-    <h2>
-        <i class="fas fa-triangle-exclamation" style="color: var(--danger);"></i>
-        Critical Complaint Queue
-    </h2>
-
-    <span
-        class="live-pill"
-        style="background: #fee2e2; color: #991b1b; border-color: #fecaca;"
-    >
-        <i class="fas fa-bell"></i>
-        IMPORTANT ISSUE REGISTER
-    </span>
-</div>
-
-<p class="summary">
-    Save important or escalated complaints here. AI, photo, video and media repository options are removed.
-</p>
-
-<div class="stats">
-
-    <div class="card" style="border-color: var(--danger);">
-        <h4>Total Critical</h4>
-        <div id="cTotal" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--warning);">
-        <h4>Open</h4>
-        <div id="cOpen" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--purple);">
-        <h4>Critical / Emergency</h4>
-        <div id="cUrgent" class="metric">0</div>
-    </div>
-
-    <div class="card" style="border-color: var(--success);">
-        <h4>Resolved / Closed</h4>
-        <div id="cSolved" class="metric">0</div>
-    </div>
-
-</div>
-
-<div class="panel">
-
-    <h3>
-        <i class="fas fa-square-plus" style="color: var(--danger);"></i>
-        Save Critical Complaint
-    </h3>
-
-    <form id="criticalForm">
-
-        <div class="grid">
-
-            <div class="section">
-                <i class="fas fa-user"></i>
-                Customer & Product Details
+        <div class="stats">
+            <div class="card" style="border-color: var(--danger);">
+                <h4>Total Critical</h4>
+                <div id="cTotal" class="metric">0</div>
             </div>
 
-            <input id="cName" required placeholder="Customer Name">
-
-            <input id="cPhone" placeholder="Phone Number">
-
-            <input id="cInvoice" placeholder="Invoice / Order ID">
-
-            <input id="cSku" placeholder="SKU / Model">
-
-            <select id="cCategory">
-                <option>Technical Complex</option>
-                <option>Repeated Failure</option>
-                <option>Product Safety</option>
-                <option>Marketplace Escalation</option>
-                <option>Negative Review</option>
-                <option>Logistics Loss / Damage</option>
-                <option>VIP Customer</option>
-                <option>Other</option>
-            </select>
-
-            <select id="cPriority">
-                <option>High</option>
-                <option>Critical</option>
-                <option>Emergency</option>
-            </select>
-
-            <div class="section">
-                <i class="fas fa-clipboard-list"></i>
-                Complaint Management
+            <div class="card" style="border-color: var(--warning);">
+                <h4>Open</h4>
+                <div id="cOpen" class="metric">0</div>
             </div>
 
-            <input id="cTitle" required placeholder="Short Complaint Title">
+            <div class="card" style="border-color: var(--purple);">
+                <h4>Critical / Emergency</h4>
+                <div id="cUrgent" class="metric">0</div>
+            </div>
 
-            <select id="cStatus">
+            <div class="card" style="border-color: var(--success);">
+                <h4>Resolved / Closed</h4>
+                <div id="cSolved" class="metric">0</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>
+                <i class="fas fa-square-plus" style="color: var(--danger);"></i>
+                Save Critical Complaint
+            </h3>
+
+            <form id="criticalForm">
+                <div class="grid">
+                    <div class="section">
+                        <i class="fas fa-user"></i>
+                        Customer & Product Details
+                    </div>
+
+                    <input id="cName" required placeholder="Customer Name">
+                    <input id="cPhone" placeholder="Phone Number">
+                    <input id="cInvoice" placeholder="Invoice / Order ID">
+                    <input id="cSku" placeholder="SKU / Model">
+
+                    <select id="cCategory">
+                        <option>Technical Complex</option>
+                        <option>Repeated Failure</option>
+                        <option>Product Safety</option>
+                        <option>Marketplace Escalation</option>
+                        <option>Negative Review</option>
+                        <option>Logistics Loss / Damage</option>
+                        <option>VIP Customer</option>
+                        <option>Other</option>
+                    </select>
+
+                    <select id="cPriority">
+                        <option>High</option>
+                        <option>Critical</option>
+                        <option>Emergency</option>
+                    </select>
+
+                    <div class="section">
+                        <i class="fas fa-clipboard-list"></i>
+                        Complaint Management
+                    </div>
+
+                    <input id="cTitle" required placeholder="Short Complaint Title">
+
+                    <select id="cStatus">
+                        <option>Open</option>
+                        <option>Investigating</option>
+                        <option>Waiting Customer</option>
+                        <option>Waiting Management</option>
+                        <option>Resolved</option>
+                        <option>Closed</option>
+                    </select>
+
+                    <input id="cOwner" placeholder="Assigned Staff / Owner">
+                    <input id="cFollowup" type="date" title="Next Follow-up Date">
+                    <textarea id="cDetails" required placeholder="Complete critical complaint details..."></textarea>
+                    <textarea id="cAction" placeholder="Action taken / final resolution..."></textarea>
+                </div>
+
+                <div class="buttons">
+                    <button id="cSave" class="btn green" type="submit">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        Save Critical Complaint
+                    </button>
+
+                    <button class="btn blue" type="button" onclick="exportCritical()">
+                        <i class="fas fa-file-csv"></i>
+                        Download Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="toolbar">
+            <input id="cSearch" placeholder="Search critical complaints...">
+
+            <select id="cFilter">
+                <option value="">All Statuses</option>
                 <option>Open</option>
                 <option>Investigating</option>
                 <option>Waiting Customer</option>
@@ -1053,135 +1038,81 @@ tr:hover {
                 <option>Closed</option>
             </select>
 
-            <input id="cOwner" placeholder="Assigned Staff / Owner">
-
-            <input id="cFollowup" type="date" title="Next Follow-up Date">
-
-            <textarea id="cDetails" required placeholder="Complete critical complaint details..."></textarea>
-
-            <textarea id="cAction" placeholder="Action taken / final resolution..."></textarea>
-
+            <button class="btn light" onclick="exportCritical()">
+                <i class="fas fa-download"></i>
+                Export
+            </button>
         </div>
 
-        <div class="buttons">
-
-            <button id="cSave" class="btn green" type="submit">
-                <i class="fas fa-cloud-arrow-up"></i>
-                Save Critical Complaint
-            </button>
-
-            <button class="btn blue" type="button" onclick="exportCritical()">
-                <i class="fas fa-file-csv"></i>
-                Download Excel
-            </button>
-
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Priority</th>
+                        <th>Customer / Invoice</th>
+                        <th>SKU / Category</th>
+                        <th>Complaint</th>
+                        <th>Status / Owner</th>
+                        <th>Follow-up</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="cBody"></tbody>
+            </table>
         </div>
-    </form>
-</div>
-
-<div class="toolbar">
-
-    <input id="cSearch" placeholder="Search critical complaints...">
-
-    <select id="cFilter">
-        <option value="">All Statuses</option>
-        <option>Open</option>
-        <option>Investigating</option>
-        <option>Waiting Customer</option>
-        <option>Waiting Management</option>
-        <option>Resolved</option>
-        <option>Closed</option>
-    </select>
-
-    <button class="btn light" onclick="exportCritical()">
-        <i class="fas fa-download"></i>
-        Export
-    </button>
-</div>
-
-<div class="table-card">
-    <table>
-        <thead>
-            <tr>
-                <th>Priority</th>
-                <th>Customer / Invoice</th>
-                <th>SKU / Category</th>
-                <th>Complaint</th>
-                <th>Status / Owner</th>
-                <th>Follow-up</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody id="cBody"></tbody>
-    </table>
-</div>
-
-</section>
-
+    </section>
 </div>
 
 <div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
 
+        <h3>
+            <i class="fas fa-sliders" style="color: var(--secondary);"></i>
+            Update Return Step Pipeline
+        </h3>
 
-<div class="modal-content">
+        <p id="modalId" style="font-weight: 800; color: var(--secondary);"></p>
 
-    <span class="close" onclick="closeModal()">&times;</span>
+        <div class="pipeline-view">
+            <span id="st1" class="step">Client Sent</span>
+            <span id="st2" class="step">We Pickup</span>
+            <span id="st3" class="step">WH Received</span>
+            <span id="st4" class="step">Ready</span>
+            <span id="st5" class="step">Dispatched</span>
+            <span id="st6" class="step">Closed</span>
+            <span id="st7" class="step">RTO</span>
+        </div>
 
-    <h3>
-        <i class="fas fa-sliders" style="color: var(--secondary);"></i>
-        Update Return Step Pipeline
-    </h3>
+        <div class="grid">
+            <select id="eStatus" onchange="paintPipeline(this.value)">
+                <option value="ClientSent">Client Sent</option>
+                <option value="CompanyPickup">We Pickup</option>
+                <option value="WHReceived">WH Received</option>
+                <option value="ReadyToShip">Ready To Ship</option>
+                <option value="Dispatched">Dispatched</option>
+                <option value="Delivered">Delivered / Closed</option>
+                <option value="RTO">RTO</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+            </select>
 
-    <p id="modalId" style="font-weight: 800; color: var(--secondary);"></p>
+            <input id="eIn" type="date" title="Inward Date">
+            <input id="eOut" type="date" title="Outward Date">
+            <input id="eName" placeholder="Customer Name">
+            <input id="ePhone" placeholder="Phone">
+            <input id="eAwb" placeholder="AWB">
+            <textarea id="eNote" placeholder="Service note"></textarea>
+        </div>
 
-    <div class="pipeline-view">
-        <span id="st1" class="step">Client Sent</span>
-        <span id="st2" class="step">We Pickup</span>
-        <span id="st3" class="step">WH Received</span>
-        <span id="st4" class="step">Ready</span>
-        <span id="st5" class="step">Dispatched</span>
-        <span id="st6" class="step">Closed</span>
-        <span id="st7" class="step">RTO</span>
+        <div class="buttons">
+            <button id="eSave" class="btn blue" onclick="saveServiceEdit()">
+                <i class="fas fa-save"></i>
+                Save Changes
+            </button>
+        </div>
     </div>
-
-    <div class="grid">
-
-        <select id="eStatus" onchange="paintPipeline(this.value)">
-            <option value="ClientSent">Client Sent</option>
-            <option value="CompanyPickup">We Pickup</option>
-            <option value="WHReceived">WH Received</option>
-            <option value="ReadyToShip">Ready To Ship</option>
-            <option value="Dispatched">Dispatched</option>
-            <option value="Delivered">Delivered / Closed</option>
-            <option value="RTO">RTO</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-        </select>
-
-        <input id="eIn" type="date" title="Inward Date">
-
-        <input id="eOut" type="date" title="Outward Date">
-
-        <input id="eName" placeholder="Customer Name">
-
-        <input id="ePhone" placeholder="Phone">
-
-        <input id="eAwb" placeholder="AWB">
-
-        <textarea id="eNote" placeholder="Service note"></textarea>
-
-    </div>
-
-    <div class="buttons">
-        <button id="eSave" class="btn blue" onclick="saveServiceEdit()">
-            <i class="fas fa-save"></i>
-            Save Changes
-        </button>
-    </div>
-</div>
-
 </div>
 
 <div id="toast" class="toast"></div>
@@ -1203,11 +1134,26 @@ const root = firebase.database().ref("noor_cloud_tickets");
 const auditRef = firebase.database().ref("noor_audit_logs");
 const warrantyRef = root.child("_warranty_records");
 const criticalRef = root.child("_critical_complaints");
+const criticalIssueRef = root.child("_critical_issues");
+
+const FULL_RENDER_BATCH_SIZE = 50;
 
 let services = [];
 let warranties = [];
 let criticals = [];
 let editKey = null;
+let renderTimer = null;
+let tableRenderJobs = {};
+
+const liveBuckets = {
+    legacyServices: {},
+    rootServices: {},
+    rootWarranties: {},
+    rootCriticals: {},
+    warrantyRecords: {},
+    criticalComplaints: {},
+    criticalIssues: {}
+};
 
 const $ = id => document.getElementById(id);
 
@@ -1224,16 +1170,11 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function showPage(id, element) {
-    document
-        .querySelectorAll(".page")
-        .forEach(page => page.classList.remove("active"));
-
-    document
-        .querySelectorAll(".nav-item")
-        .forEach(item => item.classList.remove("active"));
-
+    document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
     $(id).classList.add("active");
     element.classList.add("active");
+    scheduleRender(0);
 }
 
 function esc(value) {
@@ -1248,7 +1189,6 @@ function esc(value) {
 function norm(status) {
     if (status === "Client Sent") return "ClientSent";
     if (status === "In Transit") return "Dispatched";
-
     return status || "";
 }
 
@@ -1288,12 +1228,9 @@ function statusClass(status) {
 
 function toast(message, type = "success") {
     const toastBox = $("toast");
-
     toastBox.textContent = message;
     toastBox.className = "toast show " + type;
-
     clearTimeout(toast.timer);
-
     toast.timer = setTimeout(() => {
         toastBox.className = "toast";
     }, 4000);
@@ -1301,22 +1238,17 @@ function toast(message, type = "success") {
 
 function loading(button, isLoading, normalHTML) {
     button.disabled = isLoading;
-
     button.innerHTML = isLoading
         ? '<i class="fas fa-spinner fa-spin"></i> Saving...'
         : normalHTML;
 }
 
 function togglePipeline() {
-    $("pipelineBox").classList.toggle(
-        "show",
-        $("attachPipeline").checked
-    );
+    $("pipelineBox").classList.toggle("show", $("attachPipeline").checked);
 }
 
 function toggleManualCourier() {
     const isOther = $("wCourier").value === "Other";
-
     $("manualCourier").classList.toggle("hidden", !isOther);
 
     if (!isOther) {
@@ -1333,9 +1265,7 @@ function courierValue() {
 }
 
 function warrantyState(record) {
-    const expiry = record.warrantyExpiry
-        ? new Date(record.warrantyExpiry)
-        : null;
+    const expiry = record.warrantyExpiry ? new Date(record.warrantyExpiry) : null;
 
     if (!expiry || Number.isNaN(expiry.getTime())) {
         return "Not Set";
@@ -1343,17 +1273,10 @@ function warrantyState(record) {
 
     const today = new Date();
     const next30Days = new Date();
-
     next30Days.setDate(today.getDate() + 30);
 
-    if (expiry < today) {
-        return "Expired";
-    }
-
-    if (expiry <= next30Days) {
-        return "Expiring";
-    }
-
+    if (expiry < today) return "Expired";
+    if (expiry <= next30Days) return "Expiring";
     return "Active";
 }
 
@@ -1394,100 +1317,170 @@ async function softDeletePath(path, actionType, extraPayload = {}) {
         path,
         ...extraPayload
     });
+
+    forgetLocalRecord(path);
+    publishLiveData();
 }
+
 async function restoreAllSoftDeleted() {
-    console.info("Soft-delete restore is disabled. Preserved records with isDeleted=true remain hidden from active CRM views.");
+    console.info("Soft-delete restore is disabled. Records with isDeleted=true remain hidden from active CRM views.");
 }
-root.on(
-    "value",
 
-    snapshot => {
-        services = [];
-        warranties = [];
-        criticals = [];
+function newestSort(a, b) {
+    const av = Number(a.updatedAt || a.createdAt || 0);
+    const bv = Number(b.updatedAt || b.createdAt || 0);
 
-        snapshot.forEach(child => {
-            const key = child.key;
-            const value = child.val();
-
-            if (!value || typeof value !== "object" || value.isDeleted === true) {
-                return;
-            }
-
-            if (key === "_warranty_records") {
-                Object.entries(value).forEach(([recordKey, recordValue]) => {
-                    if (
-                        recordValue &&
-                        typeof recordValue === "object" &&
-                        recordValue.isDeleted !== true
-                    ) {
-                        warranties.push({
-                            ...recordValue,
-                            _key: recordKey,
-                            _path: "_warranty_records/" + recordKey
-                        });
-                    }
-                });
-
-                return;
-            }
-
-            if (
-                key === "_critical_complaints" ||
-                key === "_critical_issues"
-            ) {
-                Object.entries(value).forEach(([recordKey, recordValue]) => {
-                    if (
-                        recordValue &&
-                        typeof recordValue === "object" &&
-                        recordValue.isDeleted !== true
-                    ) {
-                        criticals.push({
-                            ...recordValue,
-                            _key: recordKey,
-                            _path: key + "/" + recordKey
-                        });
-                    }
-                });
-
-                return;
-            }
-
-            if (key.startsWith("_")) {
-                return;
-            }
-
-            if (value.recordType === "warranty") {
-                warranties.push({
-                    ...value,
-                    _key: key,
-                    _path: key
-                });
-            } else if (value.recordType === "critical") {
-                criticals.push({
-                    ...value,
-                    _key: key,
-                    _path: key
-                });
-            } else {
-                services.push({
-                    ...value,
-                    _key: key,
-                    _path: key
-                });
-            }
-        });
-
-        renderAll();
-    },
-
-    error => {
-        toast(
-            "Firebase read error: " + error.message,
-            "error"
-        );
+    if (av || bv) {
+        return bv - av;
     }
-);
+
+    return String(b._key || "").localeCompare(String(a._key || ""));
+}
+
+function activeValues(...bucketNames) {
+    return bucketNames
+        .flatMap(name => Object.values(liveBuckets[name] || {}))
+        .filter(record => record && record.isDeleted !== true)
+        .sort(newestSort);
+}
+
+function setBucketRecord(bucketName, key, value, path) {
+    if (!value || typeof value !== "object" || value.isDeleted === true) {
+        delete liveBuckets[bucketName][key];
+        return;
+    }
+
+    if (bucketName !== "legacyServices") {
+        delete liveBuckets.legacyServices[key];
+    }
+
+    liveBuckets[bucketName][key] = {
+        ...value,
+        _key: key,
+        _path: path
+    };
+}
+
+function forgetLocalRecord(path) {
+    const key = String(path || "").split("/").pop();
+
+    Object.keys(liveBuckets).forEach(bucketName => {
+        delete liveBuckets[bucketName][path];
+        delete liveBuckets[bucketName][key];
+    });
+}
+
+function clearBucket(bucketName) {
+    liveBuckets[bucketName] = {};
+}
+
+function publishLiveData() {
+    services = activeValues("legacyServices", "rootServices");
+    warranties = activeValues("rootWarranties", "warrantyRecords");
+    criticals = activeValues("rootCriticals", "criticalComplaints", "criticalIssues");
+    scheduleRender();
+}
+
+function scheduleRender(delay = 80) {
+    clearTimeout(renderTimer);
+
+    renderTimer = setTimeout(() => {
+        requestAnimationFrame(renderAll);
+    }, delay);
+}
+
+function debounce(fn, delay = 300) {
+    let timer = null;
+
+    return function debouncedHandler(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+const debouncedScheduleRender = debounce(() => scheduleRender(0), 300);
+
+function handleReaderError(error) {
+    toast("Firebase read error: " + error.message, "error");
+}
+
+function loadLegacyRootServices() {
+    root.once("value")
+        .then(snapshot => {
+            clearBucket("legacyServices");
+
+            snapshot.forEach(child => {
+                const key = child.key;
+                const value = child.val();
+
+                if (
+                    !value ||
+                    typeof value !== "object" ||
+                    key.startsWith("_") ||
+                    value.isDeleted === true ||
+                    value.recordType
+                ) {
+                    return;
+                }
+
+                setBucketRecord(
+                    "legacyServices",
+                    key,
+                    {
+                        ...value,
+                        recordType: "service"
+                    },
+                    key
+                );
+            });
+
+            publishLiveData();
+        })
+        .catch(handleReaderError);
+}
+
+function listenRootRecordType(recordType, bucketName) {
+    root
+        .orderByChild("recordType")
+        .equalTo(recordType)
+        .on(
+            "value",
+            snapshot => {
+                clearBucket(bucketName);
+
+                snapshot.forEach(child => {
+                    setBucketRecord(bucketName, child.key, child.val(), child.key);
+                });
+
+                publishLiveData();
+            },
+            handleReaderError
+        );
+}
+
+function listenModuleRecords(ref, bucketName, pathPrefix) {
+    ref.on(
+        "value",
+        snapshot => {
+            clearBucket(bucketName);
+
+            snapshot.forEach(child => {
+                setBucketRecord(bucketName, child.key, child.val(), pathPrefix + child.key);
+            });
+
+            publishLiveData();
+        },
+        handleReaderError
+    );
+}
+
+loadLegacyRootServices();
+listenRootRecordType("service", "rootServices");
+listenRootRecordType("warranty", "rootWarranties");
+listenRootRecordType("critical", "rootCriticals");
+listenModuleRecords(warrantyRef, "warrantyRecords", "_warranty_records/");
+listenModuleRecords(criticalRef, "criticalComplaints", "_critical_complaints/");
+listenModuleRecords(criticalIssueRef, "criticalIssues", "_critical_issues/");
 
 function combinedWarrantyRows() {
     const linkedServiceKeys = new Set(
@@ -1508,9 +1501,7 @@ function combinedWarrantyRows() {
     }));
 
     const oldServiceRows = services
-        .filter(record =>
-            !linkedServiceKeys.has(String(record._key))
-        )
+        .filter(record => !linkedServiceKeys.has(String(record._key)))
         .map(record => ({
             ...record,
             _displayType: "Pipeline"
@@ -1522,68 +1513,82 @@ function combinedWarrantyRows() {
     ];
 }
 
+function renderRowsChunked(tbodyId, rows, emptyHTML, rowRenderer) {
+    const tbody = $(tbodyId);
+    const token = (tableRenderJobs[tbodyId] || 0) + 1;
+
+    tableRenderJobs[tbodyId] = token;
+    tbody.innerHTML = "";
+
+    if (!rows.length) {
+        tbody.innerHTML = emptyHTML;
+        return;
+    }
+
+    let index = 0;
+
+    function paintBatch() {
+        if (tableRenderJobs[tbodyId] !== token) {
+            return;
+        }
+
+        const end = Math.min(index + FULL_RENDER_BATCH_SIZE, rows.length);
+        let html = "";
+
+        for (; index < end; index += 1) {
+            html += rowRenderer(rows[index], index);
+        }
+
+        tbody.insertAdjacentHTML("beforeend", html);
+
+        if (index < rows.length) {
+            requestAnimationFrame(paintBatch);
+        }
+    }
+
+    requestAnimationFrame(paintBatch);
+}
+
 function renderAll() {
-    renderWarranty();
-    renderService();
-    renderCritical();
+    const activePage = document.querySelector(".page.active");
+    const activeId = activePage ? activePage.id : "warrantyPage";
+
+    if (activeId === "warrantyPage") {
+        renderWarranty();
+    } else if (activeId === "servicePage") {
+        renderService();
+    } else if (activeId === "criticalPage") {
+        renderCritical();
+    }
 }
 
 function countStatus(status) {
-    return services.filter(record =>
-        norm(record.status) === status
-    ).length;
+    return services.filter(record => norm(record.status) === status).length;
 }
 
 function renderWarranty() {
     const rows = combinedWarrantyRows();
     const today = new Date();
     const next30Days = new Date();
-
     next30Days.setDate(today.getDate() + 30);
 
     $("totalLogged").textContent = rows.length;
 
-    $("activeWarranty").textContent =
-        rows.filter(record => {
-            const expiry = record.warrantyExpiry
-                ? new Date(record.warrantyExpiry)
-                : null;
+    $("activeWarranty").textContent = rows.filter(record => {
+        const expiry = record.warrantyExpiry ? new Date(record.warrantyExpiry) : null;
+        return expiry && !Number.isNaN(expiry.getTime()) && expiry >= today;
+    }).length;
 
-            return (
-                expiry &&
-                !Number.isNaN(expiry.getTime()) &&
-                expiry >= today
-            );
-        }).length;
+    $("expiringWarranty").textContent = rows.filter(record => {
+        const expiry = record.warrantyExpiry ? new Date(record.warrantyExpiry) : null;
+        return expiry && !Number.isNaN(expiry.getTime()) && expiry >= today && expiry <= next30Days;
+    }).length;
 
-    $("expiringWarranty").textContent =
-        rows.filter(record => {
-            const expiry = record.warrantyExpiry
-                ? new Date(record.warrantyExpiry)
-                : null;
-
-            return (
-                expiry &&
-                !Number.isNaN(expiry.getTime()) &&
-                expiry >= today &&
-                expiry <= next30Days
-            );
-        }).length;
-
-    $("clientCount").textContent =
-        countStatus("ClientSent");
-
-    $("pickupCount").textContent =
-        countStatus("CompanyPickup");
-
-    $("whCount").textContent =
-        countStatus("WHReceived");
-
-    $("dispatchCount").textContent =
-        countStatus("Dispatched");
-
-    $("rtoCount").textContent =
-        countStatus("RTO");
+    $("clientCount").textContent = countStatus("ClientSent");
+    $("pickupCount").textContent = countStatus("CompanyPickup");
+    $("whCount").textContent = countStatus("WHReceived");
+    $("dispatchCount").textContent = countStatus("Dispatched");
+    $("rtoCount").textContent = countStatus("RTO");
 
     const searchTerm = $("wSearch").value.toLowerCase();
     const filterValue = $("wFilter").value;
@@ -1596,205 +1601,119 @@ function renderWarranty() {
             ${record.sku || ""}
             ${record.serial || record.sn || ""}
             ${record.awbNo || ""}
+            ${record.pipelineAwb || ""}
             ${record.courier || ""}
+            ${record.pipelineCourier || ""}
             ${record.note || record.warrantyNote || ""}
         `.toLowerCase();
 
-        const searchMatch =
-            !searchTerm ||
-            searchableText.includes(searchTerm);
-
-        const filterMatch =
-            !filterValue ||
-            record._displayType === filterValue;
+        const searchMatch = !searchTerm || searchableText.includes(searchTerm);
+        const filterMatch = !filterValue || record._displayType === filterValue;
 
         return searchMatch && filterMatch;
     });
 
-    if (!filtered.length) {
-        $("wBody").innerHTML = `
-            <tr>
-                <td class="empty" colspan="7">
-                    No records found.
-                </td>
-            </tr>
-        `;
+    renderRowsChunked(
+        "wBody",
+        filtered,
+        `<tr><td class="empty" colspan="7">No records found.</td></tr>`,
+        record => {
+            const isWarranty = record._displayType === "Warranty Only";
 
-        return;
-    }
+            const displayedStatus = isWarranty
+                ? (
+                    record.attachedToPipeline
+                        ? "Attached: " + statusText(record.pipelineStatus)
+                        : "Warranty Only"
+                  )
+                : statusText(record.status);
 
-    $("wBody").innerHTML = filtered.map(record => {
-        const isWarranty =
-            record._displayType === "Warranty Only";
+            const displayedStatusClass = isWarranty
+                ? (
+                    record.attachedToPipeline
+                        ? "b-blue"
+                        : "b-green"
+                  )
+                : statusClass(record.status);
 
-        const displayedStatus = isWarranty
-            ? (
-                record.attachedToPipeline
-                    ? "Attached: " +
-                      statusText(record.pipelineStatus)
-                    : "Warranty Only"
-              )
-            : statusText(record.status);
+            const deleteAction = isWarranty
+                ? (
+                    "deleteWarranty('" +
+                    esc(record._path) +
+                    "','" +
+                    esc(record.linkedServiceKey || record.pipelineTicketId || "") +
+                    "')"
+                  )
+                : (
+                    "deleteService('" +
+                    esc(record._path) +
+                    "')"
+                  );
 
-        const displayedStatusClass = isWarranty
-            ? (
-                record.attachedToPipeline
-                    ? "b-blue"
-                    : "b-green"
-              )
-            : statusClass(record.status);
+            const editButton = !isWarranty
+                ? `<button class="small edit" onclick="openService('${esc(record._path)}')"><i class="fas fa-pen"></i> Edit</button>`
+                : "";
 
-        const deleteAction = isWarranty
-            ? (
-                "deleteWarranty('" +
-                esc(record._path) +
-                "','" +
-                esc(
-                    record.linkedServiceKey ||
-                    record.pipelineTicketId ||
-                    ""
-                ) +
-                "')"
-              )
-            : (
-                "deleteService('" +
-                esc(record._path) +
-                "')"
-              );
+            const state = warrantyState(record);
+            const awbNo = record.awbNo || record.pipelineAwb || "";
+            const stateClass = state === "Active" ? "b-green" : state === "Expired" ? "b-red" : "b-yellow";
 
-        const editButton = !isWarranty
-            ? `
-                <button
-                    class="small edit"
-                    onclick="openService('${esc(record._path)}')"
-                >
-                    <i class="fas fa-pen"></i>
-                    Edit
-                </button>
-              `
-            : "";
-
-        const state = warrantyState(record);
-        const awbNo = record.awbNo || record.pipelineAwb || "";
-
-        const stateClass =
-            state === "Active"
-                ? "b-green"
-                : state === "Expired"
-                    ? "b-red"
-                    : "b-yellow";
-
-        return `
-            <tr>
-
-                <td>
-                    <strong>${esc(record.name)}</strong>
-                    <br>
-                    <small>${esc(record.phone || "")}</small>
-                    <br>
-                    <small>
-                        Invoice:
-                        ${esc(record.inv || record.invoice || "")}
-                    </small>
-                </td>
-
-                <td>
-                    <strong>${esc(record.sku || "")}</strong>
-                    <br>
-                    <small>
-                        S/N:
-                        ${esc(record.serial || record.sn || "N/A")}
-                    </small>
-                </td>
-
-                <td>
-                    <span class="badge ${stateClass}">
-                        ${esc(state)}
-                    </span>
-                    <br>
-                    <small>
-                        ${esc(record.warrantyExpiry || "Not set")}
-                    </small>
-                </td>
-
-                <td>
-                    <strong>
-                        ${esc(
-                            record.courier ||
-                            record.pipelineCourier ||
-                            "N/A"
-                        )}
-                    </strong>
-                    <br>
-                    <small>${esc(awbNo || "No AWB")}</small>
-                    ${shiprocketTrackLink(awbNo)}
-                </td>
-
-                <td>
-                    <span class="badge ${displayedStatusClass}">
-                        ${esc(displayedStatus)}
-                    </span>
-                </td>
-
-                <td>
-                    ${esc(
-                        record.warrantyNote ||
-                        record.note ||
-                        ""
-                    )}
-                </td>
-
-                <td>
-                    <div class="actions">
-
-                        ${editButton}
-
-                        <button
-                            class="small delete"
-                            onclick="${deleteAction}"
-                        >
-                            <i class="fas fa-trash"></i>
-                            Delete
-                        </button>
-
-                    </div>
-                </td>
-
-            </tr>
-        `;
-    }).join("");
+            return `
+                <tr>
+                    <td>
+                        <strong>${esc(record.name)}</strong>
+                        <br>
+                        <small>${esc(record.phone || "")}</small>
+                        <br>
+                        <small>Invoice: ${esc(record.inv || record.invoice || "")}</small>
+                    </td>
+                    <td>
+                        <strong>${esc(record.sku || "")}</strong>
+                        <br>
+                        <small>S/N: ${esc(record.serial || record.sn || "N/A")}</small>
+                    </td>
+                    <td>
+                        <span class="badge ${stateClass}">${esc(state)}</span>
+                        <br>
+                        <small>${esc(record.warrantyExpiry || "Not set")}</small>
+                    </td>
+                    <td>
+                        <strong>${esc(record.courier || record.pipelineCourier || "N/A")}</strong>
+                        <br>
+                        <small>${esc(awbNo || "No AWB")}</small>
+                        ${shiprocketTrackLink(awbNo)}
+                    </td>
+                    <td>
+                        <span class="badge ${displayedStatusClass}">${esc(displayedStatus)}</span>
+                    </td>
+                    <td>${esc(record.warrantyNote || record.note || "")}</td>
+                    <td>
+                        <div class="actions">
+                            ${editButton}
+                            <button class="small delete" onclick="${deleteAction}">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    );
 }
 
 function renderService() {
-    $("serviceTotal").textContent =
-        services.length;
+    $("serviceTotal").textContent = services.length;
+    $("sClient").textContent = countStatus("ClientSent");
+    $("sPickup").textContent = countStatus("CompanyPickup");
+    $("sWh").textContent = countStatus("WHReceived");
+    $("sReady").textContent = countStatus("ReadyToShip");
+    $("sDispatch").textContent = countStatus("Dispatched");
+    $("sDelivered").textContent = countStatus("Delivered");
+    $("sRto").textContent = countStatus("RTO");
 
-    $("sClient").textContent =
-        countStatus("ClientSent");
-
-    $("sPickup").textContent =
-        countStatus("CompanyPickup");
-
-    $("sWh").textContent =
-        countStatus("WHReceived");
-
-    $("sReady").textContent =
-        countStatus("ReadyToShip");
-
-    $("sDispatch").textContent =
-        countStatus("Dispatched");
-
-    $("sDelivered").textContent =
-        countStatus("Delivered");
-
-    $("sRto").textContent =
-        countStatus("RTO");
-
-    const searchTerm =
-        $("sSearch").value.toLowerCase();
-
-    const filterValue =
-        $("sFilter").value;
+    const searchTerm = $("sSearch").value.toLowerCase();
+    const filterValue = $("sFilter").value;
 
     const filtered = services.filter(record => {
         const searchableText = `
@@ -1803,139 +1722,84 @@ function renderService() {
             ${record.inv || ""}
             ${record.sku || ""}
             ${record.awbNo || ""}
+            ${record.pipelineAwb || ""}
             ${record.courier || ""}
         `.toLowerCase();
 
-        const searchMatch =
-            !searchTerm ||
-            searchableText.includes(searchTerm);
-
-        const filterMatch =
-            !filterValue ||
-            norm(record.status) === filterValue;
+        const searchMatch = !searchTerm || searchableText.includes(searchTerm);
+        const filterMatch = !filterValue || norm(record.status) === filterValue;
 
         return searchMatch && filterMatch;
     });
 
-    if (!filtered.length) {
-        $("sBody").innerHTML = `
-            <tr>
-                <td class="empty" colspan="7">
-                    No service records found.
-                </td>
-            </tr>
-        `;
+    renderRowsChunked(
+        "sBody",
+        filtered,
+        `<tr><td class="empty" colspan="7">No service records found.</td></tr>`,
+        record => {
+            const awbNo = record.awbNo || record.pipelineAwb || "";
 
-        return;
-    }
-
-    $("sBody").innerHTML = filtered.map(record => {
-        const awbNo = record.awbNo || record.pipelineAwb || "";
-        return `
-        <tr>
-
-            <td>
-                <strong>${esc(record.name)}</strong>
-                <br>
-                <small>${esc(record.phone || "")}</small>
-                <br>
-                <small>
-                    ID: ${esc(record.inv || "")}
-                </small>
-            </td>
-
-            <td>
-                <strong>${esc(record.sku || "")}</strong>
-            </td>
-
-            <td>
-                <strong>${esc(awbNo || "No AWB")}</strong>
-                ${shiprocketTrackLink(awbNo)}
-                <br>
-                <small>
-                    ${esc(record.courier || "N/A")}
-                </small>
-            </td>
-
-            <td>
-                <span class="badge ${statusClass(record.status)}">
-                    ${esc(statusText(record.status))}
-                </span>
-            </td>
-
-            <td>
-                ${esc(record.inwardDate || "Pending")}
-            </td>
-
-            <td>
-                ${esc(record.outwardDate || "Pending")}
-            </td>
-
-            <td>
-                <div class="actions">
-
-                    <button
-                        class="small edit"
-                        onclick="openService('${esc(record._path)}')"
-                    >
-                        <i class="fas fa-pen"></i>
-                        Edit
-                    </button>
-
-                    <button
-                        class="small delete"
-                        onclick="deleteService('${esc(record._path)}')"
-                    >
-                        <i class="fas fa-trash"></i>
-                        Delete
-                    </button>
-
-                </div>
-            </td>
-
-        </tr>
-    `;
-    }).join("");
+            return `
+                <tr>
+                    <td>
+                        <strong>${esc(record.name)}</strong>
+                        <br>
+                        <small>${esc(record.phone || "")}</small>
+                        <br>
+                        <small>ID: ${esc(record.inv || "")}</small>
+                    </td>
+                    <td>
+                        <strong>${esc(record.sku || "")}</strong>
+                    </td>
+                    <td>
+                        <strong>${esc(awbNo || "No AWB")}</strong>
+                        ${shiprocketTrackLink(awbNo)}
+                        <br>
+                        <small>${esc(record.courier || "N/A")}</small>
+                    </td>
+                    <td>
+                        <span class="badge ${statusClass(record.status)}">${esc(statusText(record.status))}</span>
+                    </td>
+                    <td>${esc(record.inwardDate || "Pending")}</td>
+                    <td>${esc(record.outwardDate || "Pending")}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="small edit" onclick="openService('${esc(record._path)}')">
+                                <i class="fas fa-pen"></i>
+                                Edit
+                            </button>
+                            <button class="small delete" onclick="deleteService('${esc(record._path)}')">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    );
 }
 
 function renderCritical() {
-    $("cTotal").textContent =
-        criticals.length;
+    $("cTotal").textContent = criticals.length;
 
-    $("cOpen").textContent =
-        criticals.filter(record =>
-            !["Resolved", "Closed"].includes(
-                record.criticalStatus ||
-                record.status
-            )
-        ).length;
+    $("cOpen").textContent = criticals.filter(record =>
+        !["Resolved", "Closed"].includes(record.criticalStatus || record.status)
+    ).length;
 
-    $("cUrgent").textContent =
-        criticals.filter(record =>
-            ["Critical", "Emergency"].includes(
-                record.priority
-            )
-        ).length;
+    $("cUrgent").textContent = criticals.filter(record =>
+        ["Critical", "Emergency"].includes(record.priority)
+    ).length;
 
-    $("cSolved").textContent =
-        criticals.filter(record =>
-            ["Resolved", "Closed"].includes(
-                record.criticalStatus ||
-                record.status
-            )
-        ).length;
+    $("cSolved").textContent = criticals.filter(record =>
+        ["Resolved", "Closed"].includes(record.criticalStatus || record.status)
+    ).length;
 
-    const searchTerm =
-        $("cSearch").value.toLowerCase();
-
-    const filterValue =
-        $("cFilter").value;
+    const searchTerm = $("cSearch").value.toLowerCase();
+    const filterValue = $("cFilter").value;
 
     const filtered = criticals.filter(record => {
-        const currentStatus =
-            record.criticalStatus ||
-            record.status ||
-            "Open";
+        const currentStatus = record.criticalStatus || record.status || "Open";
 
         const searchableText = `
             ${record.name || ""}
@@ -1947,304 +1811,192 @@ function renderCritical() {
             ${record.owner || ""}
         `.toLowerCase();
 
-        const searchMatch =
-            !searchTerm ||
-            searchableText.includes(searchTerm);
-
-        const filterMatch =
-            !filterValue ||
-            currentStatus === filterValue;
+        const searchMatch = !searchTerm || searchableText.includes(searchTerm);
+        const filterMatch = !filterValue || currentStatus === filterValue;
 
         return searchMatch && filterMatch;
     });
 
-    if (!filtered.length) {
-        $("cBody").innerHTML = `
-            <tr>
-                <td class="empty" colspan="7">
-                    No critical complaints saved.
-                </td>
-            </tr>
-        `;
+    renderRowsChunked(
+        "cBody",
+        filtered,
+        `<tr><td class="empty" colspan="7">No critical complaints saved.</td></tr>`,
+        record => {
+            const currentStatus = record.criticalStatus || record.status || "Open";
+            const priorityClass = ["Critical", "Emergency"].includes(record.priority) ? "b-red" : "b-yellow";
+            const statusClassName = ["Resolved", "Closed"].includes(currentStatus) ? "b-green" : "b-blue";
 
-        return;
-    }
-
-    $("cBody").innerHTML = filtered.map(record => {
-        const currentStatus =
-            record.criticalStatus ||
-            record.status ||
-            "Open";
-
-        const priorityClass =
-            ["Critical", "Emergency"].includes(
-                record.priority
-            )
-                ? "b-red"
-                : "b-yellow";
-
-        const statusClassName =
-            ["Resolved", "Closed"].includes(
-                currentStatus
-            )
-                ? "b-green"
-                : "b-blue";
-
-        return `
-            <tr>
-
-                <td>
-                    <span class="badge ${priorityClass}">
-                        ${esc(record.priority || "High")}
-                    </span>
-                </td>
-
-                <td>
-                    <strong>${esc(record.name)}</strong>
-                    <br>
-                    <small>${esc(record.phone || "")}</small>
-                    <br>
-                    <small>
-                        ${esc(record.inv || record.invoice || "")}
-                    </small>
-                </td>
-
-                <td>
-                    ${esc(record.sku || "")}
-                    <br>
-                    <small>
-                        ${esc(record.category || "")}
-                    </small>
-                </td>
-
-                <td>
-                    <strong>${esc(record.title || "")}</strong>
-                    <br>
-                    <small>
-                        ${esc(record.details || record.note || "")}
-                    </small>
-                </td>
-
-                <td>
-                    <span class="badge ${statusClassName}">
-                        ${esc(currentStatus)}
-                    </span>
-                    <br>
-                    <small>
-                        ${esc(record.owner || "Unassigned")}
-                    </small>
-                </td>
-
-                <td>
-                    ${esc(
-                        record.followupDate ||
-                        record.followup ||
-                        "Not set"
-                    )}
-                </td>
-
-                <td>
-                    <button
-                        class="small delete"
-                        onclick="deleteCritical('${esc(record._path)}')"
-                    >
-                        <i class="fas fa-trash"></i>
-                        Delete
-                    </button>
-                </td>
-
-            </tr>
-        `;
-    }).join("");
+            return `
+                <tr>
+                    <td>
+                        <span class="badge ${priorityClass}">${esc(record.priority || "High")}</span>
+                    </td>
+                    <td>
+                        <strong>${esc(record.name)}</strong>
+                        <br>
+                        <small>${esc(record.phone || "")}</small>
+                        <br>
+                        <small>${esc(record.inv || record.invoice || "")}</small>
+                    </td>
+                    <td>
+                        ${esc(record.sku || "")}
+                        <br>
+                        <small>${esc(record.category || "")}</small>
+                    </td>
+                    <td>
+                        <strong>${esc(record.title || "")}</strong>
+                        <br>
+                        <small>${esc(record.details || record.note || "")}</small>
+                    </td>
+                    <td>
+                        <span class="badge ${statusClassName}">${esc(currentStatus)}</span>
+                        <br>
+                        <small>${esc(record.owner || "Unassigned")}</small>
+                    </td>
+                    <td>${esc(record.followupDate || record.followup || "Not set")}</td>
+                    <td>
+                        <button class="small delete" onclick="deleteCritical('${esc(record._path)}')">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+    );
 }
 
-$("warrantyForm").addEventListener(
-    "submit",
+$("warrantyForm").addEventListener("submit", async event => {
+    event.preventDefault();
 
-    async event => {
-        event.preventDefault();
+    const saveButton = $("wSave");
+    loading(saveButton, true, "");
 
-        const saveButton = $("wSave");
+    const warrantyKey = warrantyRef.push().key;
+    const attachToPipeline = $("attachPipeline").checked;
+    const serviceKey = attachToPipeline ? root.push().key : "";
 
-        loading(saveButton, true, "");
+    const currentDate = new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short"
+    });
 
-        const warrantyKey =
-            warrantyRef.push().key;
+    const warrantyRecord = {
+        id: warrantyKey,
+        recordType: "warranty",
+        name: $("wName").value.trim(),
+        phone: $("wPhone").value.trim(),
+        inv: $("wInvoice").value.trim(),
+        sku: $("wSku").value.trim(),
+        serial: $("wSerial").value.trim() || "N/A",
+        source: $("wSource").value,
+        purchaseDate: $("wPurchase").value,
+        warrantyExpiry: $("wExpiry").value,
+        warrantyNote: $("wNote").value.trim(),
+        attachedToPipeline: attachToPipeline,
+        linkedServiceKey: serviceKey,
+        pipelineTicketId: serviceKey,
+        pipelineStatus: attachToPipeline ? $("wStatus").value : "",
+        pipelineAwb: attachToPipeline ? $("wAwb").value.trim() : "",
+        pipelineCourier: attachToPipeline ? courierValue() : "",
+        date: currentDate,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+    };
 
-        const attachToPipeline =
-            $("attachPipeline").checked;
+    const updates = {};
+    updates["_warranty_records/" + warrantyKey] = warrantyRecord;
 
-        const serviceKey =
-            attachToPipeline
-                ? root.push().key
-                : "";
-
-        const currentDate =
-            new Date().toLocaleString(
-                "en-IN",
-                {
-                    dateStyle: "medium",
-                    timeStyle: "short"
-                }
-            );
-
-        const warrantyRecord = {
-            id: warrantyKey,
-            recordType: "warranty",
-            name: $("wName").value.trim(),
-            phone: $("wPhone").value.trim(),
-            inv: $("wInvoice").value.trim(),
-            sku: $("wSku").value.trim(),
-            serial:
-                $("wSerial").value.trim() ||
-                "N/A",
-            source: $("wSource").value,
-            purchaseDate: $("wPurchase").value,
-            warrantyExpiry: $("wExpiry").value,
-            warrantyNote: $("wNote").value.trim(),
-            attachedToPipeline: attachToPipeline,
-            linkedServiceKey: serviceKey,
-            pipelineTicketId: serviceKey,
-            pipelineStatus: attachToPipeline
-                ? $("wStatus").value
-                : "",
-            pipelineAwb: attachToPipeline
-                ? $("wAwb").value.trim()
-                : "",
-            pipelineCourier: attachToPipeline
-                ? courierValue()
-                : "",
+    if (attachToPipeline) {
+        updates[serviceKey] = {
+            id: serviceKey,
+            recordType: "service",
+            sourceWarrantyPath: "_warranty_records/" + warrantyKey,
+            name: warrantyRecord.name,
+            phone: warrantyRecord.phone,
+            inv: warrantyRecord.inv,
+            sku: warrantyRecord.sku,
+            serial: warrantyRecord.serial,
+            sn: warrantyRecord.serial,
+            source: warrantyRecord.source,
+            warrantyExpiry: warrantyRecord.warrantyExpiry,
+            awbNo: $("wAwb").value.trim(),
+            courier: courierValue(),
+            status: $("wStatus").value,
+            note: $("wIssue").value.trim() || warrantyRecord.warrantyNote,
+            inwardDate: "",
+            outwardDate: "",
             date: currentDate,
-            createdAt:
-                firebase.database.ServerValue.TIMESTAMP
+            createdAt: firebase.database.ServerValue.TIMESTAMP
         };
-
-        const updates = {};
-
-        updates[
-            "_warranty_records/" +
-            warrantyKey
-        ] = warrantyRecord;
-
-        if (attachToPipeline) {
-            updates[serviceKey] = {
-                id: serviceKey,
-                recordType: "service",
-                sourceWarrantyPath:
-                    "_warranty_records/" +
-                    warrantyKey,
-                name: warrantyRecord.name,
-                phone: warrantyRecord.phone,
-                inv: warrantyRecord.inv,
-                sku: warrantyRecord.sku,
-                serial: warrantyRecord.serial,
-                sn: warrantyRecord.serial,
-                source: warrantyRecord.source,
-                warrantyExpiry:
-                    warrantyRecord.warrantyExpiry,
-                awbNo: $("wAwb").value.trim(),
-                courier: courierValue(),
-                status: $("wStatus").value,
-                note:
-                    $("wIssue").value.trim() ||
-                    warrantyRecord.warrantyNote,
-                inwardDate: "",
-                outwardDate: "",
-                date: currentDate,
-                createdAt:
-                    firebase.database.ServerValue.TIMESTAMP
-            };
-        }
-
-        try {
-            await root.update(updates);
-
-            toast(
-                attachToPipeline
-                    ? "Warranty saved and attached to pipeline."
-                    : "Warranty saved separately."
-            );
-
-            event.target.reset();
-
-            togglePipeline();
-            toggleManualCourier();
-        } catch (error) {
-            toast(
-                "Save failed: " + error.message,
-                "error"
-            );
-        } finally {
-            loading(
-                saveButton,
-                false,
-                '<i class="fas fa-cloud-arrow-up"></i> Save Warranty Detail'
-            );
-        }
     }
-);
 
-$("criticalForm").addEventListener(
-    "submit",
+    try {
+        await root.update(updates);
 
-    async event => {
-        event.preventDefault();
+        toast(
+            attachToPipeline
+                ? "Warranty saved and attached to pipeline."
+                : "Warranty saved separately."
+        );
 
-        const saveButton = $("cSave");
-
-        loading(saveButton, true, "");
-
-        const key = criticalRef.push().key;
-
-        const criticalRecord = {
-            id: key,
-            recordType: "critical",
-            name: $("cName").value.trim(),
-            phone: $("cPhone").value.trim(),
-            inv: $("cInvoice").value.trim(),
-            sku: $("cSku").value.trim(),
-            category: $("cCategory").value,
-            priority: $("cPriority").value,
-            title: $("cTitle").value.trim(),
-            criticalStatus: $("cStatus").value,
-            owner: $("cOwner").value.trim(),
-            followupDate: $("cFollowup").value,
-            details: $("cDetails").value.trim(),
-            actionTaken: $("cAction").value.trim(),
-            date:
-                new Date().toLocaleString(
-                    "en-IN",
-                    {
-                        dateStyle: "medium",
-                        timeStyle: "short"
-                    }
-                ),
-            createdAt:
-                firebase.database.ServerValue.TIMESTAMP
-        };
-
-        try {
-            await criticalRef
-                .child(key)
-                .set(criticalRecord);
-
-            toast("Critical complaint saved.");
-
-            event.target.reset();
-        } catch (error) {
-            toast(
-                "Save failed: " + error.message,
-                "error"
-            );
-        } finally {
-            loading(
-                saveButton,
-                false,
-                '<i class="fas fa-cloud-arrow-up"></i> Save Critical Complaint'
-            );
-        }
+        event.target.reset();
+        togglePipeline();
+        toggleManualCourier();
+    } catch (error) {
+        toast("Save failed: " + error.message, "error");
+    } finally {
+        loading(
+            saveButton,
+            false,
+            '<i class="fas fa-cloud-arrow-up"></i> Save Warranty Detail'
+        );
     }
-);
+});
+
+$("criticalForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const saveButton = $("cSave");
+    loading(saveButton, true, "");
+
+    const key = criticalRef.push().key;
+
+    const criticalRecord = {
+        id: key,
+        recordType: "critical",
+        name: $("cName").value.trim(),
+        phone: $("cPhone").value.trim(),
+        inv: $("cInvoice").value.trim(),
+        sku: $("cSku").value.trim(),
+        category: $("cCategory").value,
+        priority: $("cPriority").value,
+        title: $("cTitle").value.trim(),
+        criticalStatus: $("cStatus").value,
+        owner: $("cOwner").value.trim(),
+        followupDate: $("cFollowup").value,
+        details: $("cDetails").value.trim(),
+        actionTaken: $("cAction").value.trim(),
+        date: new Date().toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }),
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    try {
+        await criticalRef.child(key).set(criticalRecord);
+        toast("Critical complaint saved.");
+        event.target.reset();
+    } catch (error) {
+        toast("Save failed: " + error.message, "error");
+    } finally {
+        loading(
+            saveButton,
+            false,
+            '<i class="fas fa-cloud-arrow-up"></i> Save Critical Complaint'
+        );
+    }
+});
 
 async function deleteWarranty(path, serviceKey) {
     if (!confirm("Are you sure you want to delete this record?")) {
@@ -2293,66 +2045,38 @@ async function deleteCritical(path) {
         toast("Delete failed: " + error.message, "error");
     }
 }
+
 function openService(path) {
     editKey = path;
 
-    const record = services.find(
-        item => item._path === path
-    );
+    const record = services.find(item => item._path === path);
 
     if (!record) {
         return;
     }
 
-    $("modalId").textContent =
-        "Internal Case ID: #" +
-        (
-            record.id ||
-            record._key
-        );
+    $("modalId").textContent = "Internal Case ID: #" + (record.id || record._key);
+    $("eName").value = record.name || "";
+    $("ePhone").value = record.phone || "";
+    $("eAwb").value = record.awbNo || "";
 
-    $("eName").value =
-        record.name || "";
+    const currentStatus = norm(record.status);
 
-    $("ePhone").value =
-        record.phone || "";
+    const statusExists = [...$("eStatus").options].some(
+        option => option.value === currentStatus
+    );
 
-    $("eAwb").value =
-        record.awbNo || "";
-
-    const currentStatus =
-        norm(record.status);
-
-    const statusExists =
-        [...$("eStatus").options].some(
-            option =>
-                option.value === currentStatus
-        );
-
-    $("eStatus").value =
-        statusExists
-            ? currentStatus
-            : "Pending";
-
-    $("eIn").value =
-        record.inwardDate || "";
-
-    $("eOut").value =
-        record.outwardDate || "";
-
-    $("eNote").value =
-        record.note || "";
+    $("eStatus").value = statusExists ? currentStatus : "Pending";
+    $("eIn").value = record.inwardDate || "";
+    $("eOut").value = record.outwardDate || "";
+    $("eNote").value = record.note || "";
 
     paintPipeline(currentStatus);
-
-    $("editModal").style.display =
-        "block";
+    $("editModal").style.display = "block";
 }
 
 function closeModal() {
-    $("editModal").style.display =
-        "none";
-
+    $("editModal").style.display = "none";
     editKey = null;
 }
 
@@ -2380,9 +2104,7 @@ function paintPipeline(status) {
     };
 
     if (map[status]) {
-        $(map[status][0])
-            .classList
-            .add(map[status][1]);
+        $(map[status][0]).classList.add(map[status][1]);
     }
 }
 
@@ -2392,7 +2114,6 @@ async function saveServiceEdit() {
     }
 
     const saveButton = $("eSave");
-
     loading(saveButton, true, "");
 
     const patch = {
@@ -2403,23 +2124,16 @@ async function saveServiceEdit() {
         inwardDate: $("eIn").value,
         outwardDate: $("eOut").value,
         note: $("eNote").value.trim(),
-        updatedAt:
-            firebase.database.ServerValue.TIMESTAMP
+        recordType: "service",
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
     };
 
     try {
-        await root
-            .child(editKey)
-            .update(patch);
-
+        await root.child(editKey).update(patch);
         closeModal();
-
         toast("Pipeline updated.");
     } catch (error) {
-        toast(
-            "Update failed: " + error.message,
-            "error"
-        );
+        toast("Update failed: " + error.message, "error");
     } finally {
         loading(
             saveButton,
@@ -2435,35 +2149,21 @@ const csvValue = value =>
         .replace(/"/g, '""') +
     '"';
 
-function downloadCSV(
-    fileName,
-    header,
-    rows
-) {
-    const content =
-        "\ufeff" +
-        header +
-        "\n" +
-        rows.join("\n");
+function downloadCSV(fileName, header, rows) {
+    const content = "\ufeff" + header + "\n" + rows.join("\n");
+    const link = document.createElement("a");
 
-    const link =
-        document.createElement("a");
-
-    link.href =
-        URL.createObjectURL(
-            new Blob(
-                [content],
-                {
-                    type:
-                        "text/csv;charset=utf-8"
-                }
-            )
-        );
+    link.href = URL.createObjectURL(
+        new Blob(
+            [content],
+            {
+                type: "text/csv;charset=utf-8"
+            }
+        )
+    );
 
     link.download = fileName;
-
     link.click();
-
     URL.revokeObjectURL(link.href);
 }
 
@@ -2472,9 +2172,7 @@ function exportWarranty() {
 
     downloadCSV(
         "HELETT_Warranty_All_Records.csv",
-
         "Type,Customer,Phone,Invoice,SKU,Serial,Warranty_Expiry,AWB,Courier,Status,Note",
-
         rows.map(record => [
             record._displayType,
             record.name,
@@ -2493,18 +2191,14 @@ function exportWarranty() {
                   )
                 : statusText(record.status),
             record.warrantyNote || record.note
-        ]
-        .map(csvValue)
-        .join(","))
+        ].map(csvValue).join(","))
     );
 }
 
 function exportService() {
     downloadCSV(
         "HELETT_Service_Report.csv",
-
         "Customer,Phone,Invoice,SKU,AWB,Courier,Status,Inward,Outward,Note",
-
         services.map(record => [
             record.name,
             record.phone,
@@ -2516,18 +2210,14 @@ function exportService() {
             record.inwardDate,
             record.outwardDate,
             record.note
-        ]
-        .map(csvValue)
-        .join(","))
+        ].map(csvValue).join(","))
     );
 }
 
 function exportCritical() {
     downloadCSV(
         "HELETT_Critical_Report.csv",
-
         "Priority,Customer,Phone,Invoice,SKU,Category,Title,Status,Owner,Followup,Details,Action",
-
         criticals.map(record => [
             record.priority,
             record.name,
@@ -2541,9 +2231,7 @@ function exportCritical() {
             record.followupDate || record.followup,
             record.details || record.note,
             record.actionTaken || record.action
-        ]
-        .map(csvValue)
-        .join(","))
+        ].map(csvValue).join(","))
     );
 }
 
@@ -2552,10 +2240,7 @@ function exportCritical() {
     "sSearch",
     "cSearch"
 ].forEach(id => {
-    $(id).addEventListener(
-        "input",
-        renderAll
-    );
+    $(id).addEventListener("input", debouncedScheduleRender);
 });
 
 [
@@ -2563,27 +2248,16 @@ function exportCritical() {
     "sFilter",
     "cFilter"
 ].forEach(id => {
-    $(id).addEventListener(
-        "change",
-        renderAll
-    );
+    $(id).addEventListener("change", debouncedScheduleRender);
 });
 
-window.addEventListener(
-    "click",
-
-    event => {
-        if (
-            event.target ===
-            $("editModal")
-        ) {
-            closeModal();
-        }
+window.addEventListener("click", event => {
+    if (event.target === $("editModal")) {
+        closeModal();
     }
-);
+});
 
 restoreAllSoftDeleted();
 </script>
-
 </body>
 </html>
