@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -789,6 +788,7 @@ tr:hover {
                 <option value="">All Records</option>
                 <option value="Warranty Only">Warranty Only</option>
                 <option value="Pipeline">Pipeline / Old Records</option>
+                <option value="WhatsApp Data">WhatsApp Support Data</option>
             </select>
 
             <button class="btn light" onclick="exportWarranty()">
@@ -805,7 +805,7 @@ tr:hover {
                         <th>SKU / Serial</th>
                         <th>Warranty</th>
                         <th>Courier / AWB</th>
-                        <th>Status</th>
+                        <th>Status / Source</th>
                         <th>Note</th>
                         <th>Action</th>
                     </tr>
@@ -1096,6 +1096,8 @@ tr:hover {
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Resolved">Resolved</option>
+                <option value="Warranty Only">Warranty Only</option>
+                <option value="WhatsApp Data">WhatsApp Support Data</option>
             </select>
 
             <input id="eIn" type="date" title="Inward Date">
@@ -1203,7 +1205,9 @@ function statusText(status) {
         RTO: "RTO",
         Pending: "Pending",
         "In Progress": "In Progress",
-        Resolved: "Resolved"
+        Resolved: "Resolved",
+        "Warranty Only": "Warranty Only",
+        "WhatsApp Data": "WhatsApp Support Data"
     };
 
     return map[norm(status)] || status || "Unknown";
@@ -1220,7 +1224,9 @@ function statusClass(status) {
         RTO: "b-red",
         Pending: "b-yellow",
         "In Progress": "b-blue",
-        Resolved: "b-green"
+        Resolved: "b-green",
+        "Warranty Only": "b-green",
+        "WhatsApp Data": "b-purple"
     };
 
     return map[norm(status)] || "b-blue";
@@ -1497,14 +1503,14 @@ function combinedWarrantyRows() {
 
     const warrantyRows = warranties.map(record => ({
         ...record,
-        _displayType: "Warranty Only"
+        _displayType: record.source === "WhatsApp" ? "WhatsApp Data" : "Warranty Only"
     }));
 
     const oldServiceRows = services
         .filter(record => !linkedServiceKeys.has(String(record._key)))
         .map(record => ({
             ...record,
-            _displayType: "Pipeline"
+            _displayType: record.source === "WhatsApp" ? "WhatsApp Data" : "Pipeline"
         }));
 
     return [
@@ -1605,10 +1611,14 @@ function renderWarranty() {
             ${record.courier || ""}
             ${record.pipelineCourier || ""}
             ${record.note || record.warrantyNote || ""}
+            ${record.source || ""}
         `.toLowerCase();
 
         const searchMatch = !searchTerm || searchableText.includes(searchTerm);
-        const filterMatch = !filterValue || record._displayType === filterValue;
+        let filterMatch = !filterValue || record._displayType === filterValue;
+        if (filterValue === "WhatsApp Data") {
+            filterMatch = record.source === "WhatsApp";
+        }
 
         return searchMatch && filterMatch;
     });
@@ -1618,9 +1628,9 @@ function renderWarranty() {
         filtered,
         `<tr><td class="empty" colspan="7">No records found.</td></tr>`,
         record => {
-            const isWarranty = record._displayType === "Warranty Only";
+            const isWarranty = record._displayType === "Warranty Only" || record.source === "WhatsApp";
 
-            const displayedStatus = isWarranty
+            let displayedStatus = isWarranty
                 ? (
                     record.attachedToPipeline
                         ? "Attached: " + statusText(record.pipelineStatus)
@@ -1628,13 +1638,18 @@ function renderWarranty() {
                   )
                 : statusText(record.status);
 
-            const displayedStatusClass = isWarranty
+            let displayedStatusClass = isWarranty
                 ? (
                     record.attachedToPipeline
                         ? "b-blue"
                         : "b-green"
                   )
                 : statusClass(record.status);
+
+            if (record.source === "WhatsApp") {
+                displayedStatus = "WhatsApp Support Data";
+                displayedStatusClass = "b-purple";
+            }
 
             const deleteAction = isWarranty
                 ? (
@@ -1650,9 +1665,8 @@ function renderWarranty() {
                     "')"
                   );
 
-            const editButton = !isWarranty
-                ? `<button class="small edit" onclick="openService('${esc(record._path)}')"><i class="fas fa-pen"></i> Edit</button>`
-                : "";
+            // BINDING BOTH FOR QUICK AND EASY EDIT MECHANISM
+            const editButton = `<button class="small edit" onclick="openService('${esc(record._path)}')"><i class="fas fa-pen"></i> Edit</button>`;
 
             const state = warrantyState(record);
             const awbNo = record.awbNo || record.pipelineAwb || "";
@@ -1738,6 +1752,13 @@ function renderService() {
         `<tr><td class="empty" colspan="7">No service records found.</td></tr>`,
         record => {
             const awbNo = record.awbNo || record.pipelineAwb || "";
+            let currentDisplayStatus = statusText(record.status);
+            let currentDisplayClass = statusClass(record.status);
+
+            if (record.source === "WhatsApp" && (!record.status || record.status === "Warranty Only")) {
+                currentDisplayStatus = "WhatsApp Support Data";
+                currentDisplayClass = "b-purple";
+            }
 
             return `
                 <tr>
@@ -1758,7 +1779,7 @@ function renderService() {
                         <small>${esc(record.courier || "N/A")}</small>
                     </td>
                     <td>
-                        <span class="badge ${statusClass(record.status)}">${esc(statusText(record.status))}</span>
+                        <span class="badge ${currentDisplayClass}">${esc(currentDisplayStatus)}</span>
                     </td>
                     <td>${esc(record.inwardDate || "Pending")}</td>
                     <td>${esc(record.outwardDate || "Pending")}</td>
@@ -1953,6 +1974,14 @@ $("warrantyForm").addEventListener("submit", async event => {
     }
 });
 
+// PREVENT AUTOMATIC ENTER KEY FORM SUBMISSION TO AVOID HALF DATA LOSS
+document.getElementById("warrantyForm").addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && event.target.tagName !== "TEXTAREA") {
+        event.preventDefault();
+        return false;
+    }
+});
+
 $("criticalForm").addEventListener("submit", async event => {
     event.preventDefault();
 
@@ -2049,18 +2078,23 @@ async function deleteCritical(path) {
 function openService(path) {
     editKey = path;
 
-    const record = services.find(item => item._path === path);
+    // FIND IN EITHER WARRANTY OR SERVICES DATA STREAM COMPATIBLE LOGIC
+    let record = services.find(item => item._path === path);
+    if (!record) {
+        record = warranties.find(item => item._path === path);
+    }
 
     if (!record) {
+        toast("Record data not accessible for editing.", "error");
         return;
     }
 
     $("modalId").textContent = "Internal Case ID: #" + (record.id || record._key);
     $("eName").value = record.name || "";
     $("ePhone").value = record.phone || "";
-    $("eAwb").value = record.awbNo || "";
+    $("eAwb").value = record.awbNo || record.pipelineAwb || "";
 
-    const currentStatus = norm(record.status);
+    const currentStatus = norm(record.status || record.pipelineStatus || "Warranty Only");
 
     const statusExists = [...$("eStatus").options].some(
         option => option.value === currentStatus
@@ -2069,7 +2103,7 @@ function openService(path) {
     $("eStatus").value = statusExists ? currentStatus : "Pending";
     $("eIn").value = record.inwardDate || "";
     $("eOut").value = record.outwardDate || "";
-    $("eNote").value = record.note || "";
+    $("eNote").value = record.note || record.warrantyNote || "";
 
     paintPipeline(currentStatus);
     $("editModal").style.display = "block";
@@ -2116,22 +2150,52 @@ async function saveServiceEdit() {
     const saveButton = $("eSave");
     loading(saveButton, true, "");
 
+    const isWarrantyPath = editKey.startsWith("_warranty_records/");
+
     const patch = {
         name: $("eName").value.trim(),
         phone: $("ePhone").value.trim(),
-        awbNo: $("eAwb").value.trim(),
-        status: $("eStatus").value,
-        inwardDate: $("eIn").value,
-        outwardDate: $("eOut").value,
-        note: $("eNote").value.trim(),
-        recordType: "service",
         updatedAt: firebase.database.ServerValue.TIMESTAMP
     };
 
+    if (isWarrantyPath) {
+        patch.pipelineAwb = $("eAwb").value.trim();
+        patch.pipelineStatus = $("eStatus").value;
+        patch.warrantyNote = $("eNote").value.trim();
+    } else {
+        patch.awbNo = $("eAwb").value.trim();
+        patch.status = $("eStatus").value;
+        patch.inwardDate = $("eIn").value;
+        patch.outwardDate = $("eOut").value;
+        patch.note = $("eNote").value.trim();
+        patch.recordType = "service";
+    }
+
     try {
         await root.child(editKey).update(patch);
+        
+        // SYNC INTERLINKED ENTRY IF EXISTS
+        let currentRecord = warranties.find(item => item._path === editKey) || services.find(item => item._path === editKey);
+        if (currentRecord && currentRecord.linkedServiceKey) {
+            await root.child(currentRecord.linkedServiceKey).update({
+                name: patch.name,
+                phone: patch.phone,
+                awbNo: isWarrantyPath ? patch.pipelineAwb : patch.awbNo,
+                status: isWarrantyPath ? patch.pipelineStatus : patch.status,
+                note: isWarrantyPath ? patch.warrantyNote : patch.note
+            });
+        } else if (currentRecord && currentRecord.sourceWarrantyPath) {
+            await root.child(currentRecord.sourceWarrantyPath).update({
+                name: patch.name,
+                phone: patch.phone,
+                pipelineAwb: isWarrantyPath ? patch.pipelineAwb : patch.awbNo,
+                pipelineStatus: isWarrantyPath ? patch.pipelineStatus : patch.status,
+                warrantyNote: isWarrantyPath ? patch.warrantyNote : patch.note
+            });
+        }
+
         closeModal();
-        toast("Pipeline updated.");
+        toast("Record updated successfully 1000 times!");
     } catch (error) {
         toast("Update failed: " + error.message, "error");
     } finally {
@@ -2183,13 +2247,15 @@ function exportWarranty() {
             record.warrantyExpiry,
             record.awbNo || record.pipelineAwb,
             record.courier || record.pipelineCourier,
-            record._displayType === "Warranty Only"
-                ? (
-                    record.attachedToPipeline
-                        ? statusText(record.pipelineStatus)
-                        : "Warranty Only"
-                  )
-                : statusText(record.status),
+            record.source === "WhatsApp" ? "WhatsApp Support Data" : (
+                record._displayType === "Warranty Only"
+                    ? (
+                        record.attachedToPipeline
+                            ? statusText(record.pipelineStatus)
+                            : "Warranty Only"
+                      )
+                    : statusText(record.status)
+            ),
             record.warrantyNote || record.note
         ].map(csvValue).join(","))
     );
@@ -2206,7 +2272,7 @@ function exportService() {
             record.sku,
             record.awbNo,
             record.courier,
-            statusText(record.status),
+            record.source === "WhatsApp" ? "WhatsApp Support Data" : statusText(record.status),
             record.inwardDate,
             record.outwardDate,
             record.note
