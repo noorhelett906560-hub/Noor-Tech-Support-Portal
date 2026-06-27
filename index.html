@@ -1063,6 +1063,7 @@ tr:hover {
     </section>
 </div>
 
+<!-- ====== UPDATED EDIT MODAL WITH INVOICE & EXPIRY DATE ====== -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -1110,10 +1111,12 @@ tr:hover {
                 <input id="eOut" type="date" title="Outward Date">
             </div>
 
-            <input id="eName" placeholder="Customer Name">
-            <input id="ePhone" placeholder="Phone">
-            <input id="eAwb" placeholder="AWB">
-            <textarea id="eNote" placeholder="Notes..."></textarea>
+            <input id="eName" placeholder="Customer Name" title="Customer Name">
+            <input id="ePhone" placeholder="Phone" title="Phone">
+            <input id="eInvoice" placeholder="Invoice / Order ID" title="Invoice / Order ID">
+            <input id="eExpiry" type="date" title="Warranty Expiry Date">
+            <input id="eAwb" placeholder="AWB Number" title="AWB Number">
+            <textarea id="eNote" placeholder="Notes..." title="Notes"></textarea>
         </div>
 
         <div class="buttons">
@@ -2105,6 +2108,11 @@ function openService(path, origin = 'warranty') {
     $("modalId").textContent = "Internal Case ID: #" + (record.id || record._key);
     $("eName").value = record.name || "";
     $("ePhone").value = record.phone || "";
+    
+    // Yahan pe ab hum INVOICE aur EXPIRY date populate karenge
+    $("eInvoice").value = record.inv || record.invoice || ""; 
+    $("eExpiry").value = record.warrantyExpiry || "";
+
     $("eAwb").value = record.awbNo || record.pipelineAwb || "";
 
     const currentStatus = norm(record.status || record.pipelineStatus || "Warranty Only");
@@ -2181,6 +2189,7 @@ async function saveServiceEdit() {
     const patch = {
         name: $("eName").value.trim(),
         phone: $("ePhone").value.trim(),
+        inv: $("eInvoice").value.trim(), // Invoice updated from Modal
         updatedAt: firebase.database.ServerValue.TIMESTAMP
     };
 
@@ -2190,6 +2199,7 @@ async function saveServiceEdit() {
             patch.pipelineAwb = $("eAwb").value.trim();
             patch.pipelineStatus = $("eStatus").value;
             patch.warrantyNote = $("eNote").value.trim();
+            patch.warrantyExpiry = $("eExpiry").value; // Expiry updated from Modal
         } else {
             patch.awbNo = $("eAwb").value.trim();
             patch.status = $("eStatus").value;
@@ -2197,15 +2207,18 @@ async function saveServiceEdit() {
             patch.outwardDate = $("eOut").value;
             patch.note = $("eNote").value.trim();
             patch.recordType = "service";
+            patch.warrantyExpiry = $("eExpiry").value; // Expiry updated from Modal
         }
     } else {
         // If edited inside Warranty Hub, keep tracking status clean and update structural fields
         if (isWarrantyPath) {
             patch.warrantyNote = $("eNote").value.trim();
             patch.pipelineAwb = $("eAwb").value.trim();
+            patch.warrantyExpiry = $("eExpiry").value; // Expiry updated from Modal
         } else {
             patch.note = $("eNote").value.trim();
             patch.awbNo = $("eAwb").value.trim();
+            patch.warrantyExpiry = $("eExpiry").value; // Expiry updated from Modal
         }
     }
 
@@ -2213,10 +2226,14 @@ async function saveServiceEdit() {
         await root.child(editKey).update(patch);
         
         let currentRecord = warranties.find(item => item._path === editKey) || services.find(item => item._path === editKey);
+        
+        // Dono jagah Invoice aur Expiry sync ho jayein
         if (currentRecord && currentRecord.linkedServiceKey) {
             const syncPayload = {
                 name: patch.name,
                 phone: patch.phone,
+                inv: patch.inv, 
+                warrantyExpiry: patch.warrantyExpiry || currentRecord.warrantyExpiry || "",
                 awbNo: isWarrantyPath ? (patch.pipelineAwb ?? currentRecord.pipelineAwb ?? "") : patch.awbNo,
                 note: isWarrantyPath ? (patch.warrantyNote ?? currentRecord.warrantyNote ?? "") : patch.note
             };
@@ -2228,6 +2245,8 @@ async function saveServiceEdit() {
             const syncPayload = {
                 name: patch.name,
                 phone: patch.phone,
+                inv: patch.inv,
+                warrantyExpiry: patch.warrantyExpiry || currentRecord.warrantyExpiry || "",
                 pipelineAwb: isWarrantyPath ? patch.pipelineAwb : patch.awbNo,
                 warrantyNote: isWarrantyPath ? patch.warrantyNote : patch.note
             };
