@@ -588,17 +588,17 @@ tr:hover {
 <div class="sidebar">
     <h2>HELETT<sup>&reg;</sup> CRM</h2>
 
-    <div class="nav-item active" onclick="showPage('warrantyPage', this)">
+    <div id="nav-warranty" class="nav-item active" onclick="showPage('warrantyPage', this)">
         <i class="fas fa-shield-halved"></i>
         Warranty Hub
     </div>
 
-    <div class="nav-item" onclick="showPage('servicePage', this)">
+    <div id="nav-service" class="nav-item" onclick="showPage('servicePage', this)">
         <i class="fas fa-route"></i>
         Replacement Engine
     </div>
 
-    <div class="nav-item" onclick="showPage('criticalPage', this)">
+    <div id="nav-critical" class="nav-item" onclick="showPage('criticalPage', this)">
         <i class="fas fa-triangle-exclamation"></i>
         Critical Complaint Queue
     </div>
@@ -801,11 +801,11 @@ tr:hover {
             <table>
                 <thead>
                     <tr>
-                        <th>Customer / Invoice</th>
+                        <th>Date & Time / Customer</th>
                         <th>SKU / Serial</th>
-                        <th>Warranty</th>
+                        <th>Warranty Status</th>
                         <th>Courier / AWB</th>
-                        <th>Status / Source</th>
+                        <th>Type Status</th>
                         <th>Note</th>
                         <th>Action</th>
                     </tr>
@@ -901,7 +901,7 @@ tr:hover {
             <table>
                 <thead>
                     <tr>
-                        <th>Customer / Order ID</th>
+                        <th>Date & Time / Customer</th>
                         <th>Model / SKU</th>
                         <th>AWB / Partner</th>
                         <th>Current Stage</th>
@@ -1048,7 +1048,7 @@ tr:hover {
             <table>
                 <thead>
                     <tr>
-                        <th>Priority</th>
+                        <th>Date & Time / Priority</th>
                         <th>Customer / Invoice</th>
                         <th>SKU / Category</th>
                         <th>Complaint</th>
@@ -1067,45 +1067,53 @@ tr:hover {
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
 
-        <h3>
+        <h3 id="modalTitle">
             <i class="fas fa-sliders" style="color: var(--secondary);"></i>
-            Update Return Step Pipeline
+            Update Record Details
         </h3>
 
         <p id="modalId" style="font-weight: 800; color: var(--secondary);"></p>
 
-        <div class="pipeline-view">
-            <span id="st1" class="step">Client Sent</span>
-            <span id="st2" class="step">We Pickup</span>
-            <span id="st3" class="step">WH Received</span>
-            <span id="st4" class="step">Ready</span>
-            <span id="st5" class="step">Dispatched</span>
-            <span id="st6" class="step">Closed</span>
-            <span id="st7" class="step">RTO</span>
+        <!-- PIPELINE STEPS BLOCK: ONLY SHOWN FOR REPLACEMENT ENGINE / PIPELINE ITEMS -->
+        <div id="modalPipelineWrapper">
+            <div class="pipeline-view">
+                <span id="st1" class="step">Client Sent</span>
+                <span id="st2" class="step">We Pickup</span>
+                <span id="st3" class="step">WH Received</span>
+                <span id="st4" class="step">Ready</span>
+                <span id="st5" class="step">Dispatched</span>
+                <span id="st6" class="step">Closed</span>
+                <span id="st7" class="step">RTO</span>
+            </div>
         </div>
 
         <div class="grid">
-            <select id="eStatus" onchange="paintPipeline(this.value)">
-                <option value="ClientSent">Client Sent</option>
-                <option value="CompanyPickup">We Pickup</option>
-                <option value="WHReceived">WH Received</option>
-                <option value="ReadyToShip">Ready To Ship</option>
-                <option value="Dispatched">Dispatched</option>
-                <option value="Delivered">Delivered / Closed</option>
-                <option value="RTO">RTO</option>
-                <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Warranty Only">Warranty Only</option>
-                <option value="WhatsApp Data">WhatsApp Support Data</option>
-            </select>
+            <div id="modalStatusSelectWrapper">
+                <select id="eStatus" onchange="paintPipeline(this.value)">
+                    <option value="ClientSent">Client Sent</option>
+                    <option value="CompanyPickup">We Pickup</option>
+                    <option value="WHReceived">WH Received</option>
+                    <option value="ReadyToShip">Ready To Ship</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="Delivered">Delivered / Closed</option>
+                    <option value="RTO">RTO</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Warranty Only">Warranty Only</option>
+                    <option value="WhatsApp Data">WhatsApp Support Data</option>
+                </select>
+            </div>
 
-            <input id="eIn" type="date" title="Inward Date">
-            <input id="eOut" type="date" title="Outward Date">
+            <div id="modalDatesWrapper" style="display: contents;">
+                <input id="eIn" type="date" title="Inward Date">
+                <input id="eOut" type="date" title="Outward Date">
+            </div>
+
             <input id="eName" placeholder="Customer Name">
             <input id="ePhone" placeholder="Phone">
             <input id="eAwb" placeholder="AWB">
-            <textarea id="eNote" placeholder="Service note"></textarea>
+            <textarea id="eNote" placeholder="Notes..."></textarea>
         </div>
 
         <div class="buttons">
@@ -1144,6 +1152,7 @@ let services = [];
 let warranties = [];
 let criticals = [];
 let editKey = null;
+let editOrigin = 'warranty'; // Tracking modal invocation context ('warranty' or 'service')
 let renderTimer = null;
 let tableRenderJobs = {};
 
@@ -1326,10 +1335,6 @@ async function softDeletePath(path, actionType, extraPayload = {}) {
 
     forgetLocalRecord(path);
     publishLiveData();
-}
-
-async function restoreAllSoftDeleted() {
-    console.info("Soft-delete restore is disabled. Records with isDeleted=true remain hidden from active CRM views.");
 }
 
 function newestSort(a, b) {
@@ -1665,16 +1670,19 @@ function renderWarranty() {
                     "')"
                   );
 
-            // BINDING BOTH FOR QUICK AND EASY EDIT MECHANISM
-            const editButton = `<button class="small edit" onclick="openService('${esc(record._path)}')"><i class="fas fa-pen"></i> Edit</button>`;
+            const editButton = `<button class="small edit" onclick="openService('${esc(record._path)}', 'warranty')"><i class="fas fa-pen"></i> Edit</button>`;
 
             const state = warrantyState(record);
             const awbNo = record.awbNo || record.pipelineAwb || "";
             const stateClass = state === "Active" ? "b-green" : state === "Expired" ? "b-red" : "b-yellow";
+            
+            // Extract logged time safely
+            const timeString = record.date || "N/A";
 
             return `
                 <tr>
                     <td>
+                        <span style="font-size: 0.75rem; color: var(--muted); font-weight: 700; display: block; margin-bottom: 4px;"><i class="fas fa-clock"></i> ${esc(timeString)}</span>
                         <strong>${esc(record.name)}</strong>
                         <br>
                         <small>${esc(record.phone || "")}</small>
@@ -1759,10 +1767,13 @@ function renderService() {
                 currentDisplayStatus = "WhatsApp Support Data";
                 currentDisplayClass = "b-purple";
             }
+            
+            const timeString = record.date || "N/A";
 
             return `
                 <tr>
                     <td>
+                        <span style="font-size: 0.75rem; color: var(--muted); font-weight: 700; display: block; margin-bottom: 4px;"><i class="fas fa-clock"></i> ${esc(timeString)}</span>
                         <strong>${esc(record.name)}</strong>
                         <br>
                         <small>${esc(record.phone || "")}</small>
@@ -1785,7 +1796,7 @@ function renderService() {
                     <td>${esc(record.outwardDate || "Pending")}</td>
                     <td>
                         <div class="actions">
-                            <button class="small edit" onclick="openService('${esc(record._path)}')">
+                            <button class="small edit" onclick="openService('${esc(record._path)}', 'service')">
                                 <i class="fas fa-pen"></i>
                                 Edit
                             </button>
@@ -1846,10 +1857,12 @@ function renderCritical() {
             const currentStatus = record.criticalStatus || record.status || "Open";
             const priorityClass = ["Critical", "Emergency"].includes(record.priority) ? "b-red" : "b-yellow";
             const statusClassName = ["Resolved", "Closed"].includes(currentStatus) ? "b-green" : "b-blue";
+            const timeString = record.date || "N/A";
 
             return `
                 <tr>
                     <td>
+                        <span style="font-size: 0.75rem; color: var(--muted); font-weight: 700; display: block; margin-bottom: 4px;"><i class="fas fa-clock"></i> ${esc(timeString)}</span>
                         <span class="badge ${priorityClass}">${esc(record.priority || "High")}</span>
                     </td>
                     <td>
@@ -1974,7 +1987,6 @@ $("warrantyForm").addEventListener("submit", async event => {
     }
 });
 
-// PREVENT AUTOMATIC ENTER KEY FORM SUBMISSION TO AVOID HALF DATA LOSS
 document.getElementById("warrantyForm").addEventListener("keydown", function(event) {
     if (event.key === "Enter" && event.target.tagName !== "TEXTAREA") {
         event.preventDefault();
@@ -1989,6 +2001,10 @@ $("criticalForm").addEventListener("submit", async event => {
     loading(saveButton, true, "");
 
     const key = criticalRef.push().key;
+    const currentDate = new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short"
+    });
 
     const criticalRecord = {
         id: key,
@@ -2005,10 +2021,7 @@ $("criticalForm").addEventListener("submit", async event => {
         followupDate: $("cFollowup").value,
         details: $("cDetails").value.trim(),
         actionTaken: $("cAction").value.trim(),
-        date: new Date().toLocaleString("en-IN", {
-            dateStyle: "medium",
-            timeStyle: "short"
-        }),
+        date: currentDate,
         createdAt: firebase.database.ServerValue.TIMESTAMP
     };
 
@@ -2075,10 +2088,10 @@ async function deleteCritical(path) {
     }
 }
 
-function openService(path) {
+function openService(path, origin = 'warranty') {
     editKey = path;
+    editOrigin = origin;
 
-    // FIND IN EITHER WARRANTY OR SERVICES DATA STREAM COMPATIBLE LOGIC
     let record = services.find(item => item._path === path);
     if (!record) {
         record = warranties.find(item => item._path === path);
@@ -2105,7 +2118,20 @@ function openService(path) {
     $("eOut").value = record.outwardDate || "";
     $("eNote").value = record.note || record.warrantyNote || "";
 
-    paintPipeline(currentStatus);
+    // CONTROL WHAT VISUALLY APPEARS BASED ON WHERE EDIT WAS CLICKED
+    if (origin === 'warranty') {
+        $("modalTitle").innerHTML = `<i class="fas fa-shield-halved" style="color: var(--secondary);"></i> Update Warranty Details`;
+        $("modalPipelineWrapper").style.display = "none";
+        $("modalStatusSelectWrapper").style.display = "none";
+        $("modalDatesWrapper").style.display = "none";
+    } else {
+        $("modalTitle").innerHTML = `<i class="fas fa-route" style="color: var(--secondary);"></i> Update Return Step Pipeline`;
+        $("modalPipelineWrapper").style.display = "block";
+        $("modalStatusSelectWrapper").style.display = "block";
+        $("modalDatesWrapper").style.display = "contents";
+        paintPipeline(currentStatus);
+    }
+
     $("editModal").style.display = "block";
 }
 
@@ -2124,7 +2150,7 @@ function paintPipeline(status) {
         "st6",
         "st7"
     ].forEach(id => {
-        $(id).className = "step";
+        if($(id)) $(id).className = "step";
     });
 
     const map = {
@@ -2137,7 +2163,7 @@ function paintPipeline(status) {
         RTO: ["st7", "on7"]
     };
 
-    if (map[status]) {
+    if (map[status] && $(map[status][0])) {
         $(map[status][0]).classList.add(map[status][1]);
     }
 }
@@ -2158,44 +2184,61 @@ async function saveServiceEdit() {
         updatedAt: firebase.database.ServerValue.TIMESTAMP
     };
 
-    if (isWarrantyPath) {
-        patch.pipelineAwb = $("eAwb").value.trim();
-        patch.pipelineStatus = $("eStatus").value;
-        patch.warrantyNote = $("eNote").value.trim();
+    // Only update pipeline features if edited via Replacement Engine context
+    if (editOrigin === 'service') {
+        if (isWarrantyPath) {
+            patch.pipelineAwb = $("eAwb").value.trim();
+            patch.pipelineStatus = $("eStatus").value;
+            patch.warrantyNote = $("eNote").value.trim();
+        } else {
+            patch.awbNo = $("eAwb").value.trim();
+            patch.status = $("eStatus").value;
+            patch.inwardDate = $("eIn").value;
+            patch.outwardDate = $("eOut").value;
+            patch.note = $("eNote").value.trim();
+            patch.recordType = "service";
+        }
     } else {
-        patch.awbNo = $("eAwb").value.trim();
-        patch.status = $("eStatus").value;
-        patch.inwardDate = $("eIn").value;
-        patch.outwardDate = $("eOut").value;
-        patch.note = $("eNote").value.trim();
-        patch.recordType = "service";
+        // If edited inside Warranty Hub, keep tracking status clean and update structural fields
+        if (isWarrantyPath) {
+            patch.warrantyNote = $("eNote").value.trim();
+            patch.pipelineAwb = $("eAwb").value.trim();
+        } else {
+            patch.note = $("eNote").value.trim();
+            patch.awbNo = $("eAwb").value.trim();
+        }
     }
 
     try {
         await root.child(editKey).update(patch);
         
-        // SYNC INTERLINKED ENTRY IF EXISTS
         let currentRecord = warranties.find(item => item._path === editKey) || services.find(item => item._path === editKey);
         if (currentRecord && currentRecord.linkedServiceKey) {
-            await root.child(currentRecord.linkedServiceKey).update({
+            const syncPayload = {
                 name: patch.name,
                 phone: patch.phone,
-                awbNo: isWarrantyPath ? patch.pipelineAwb : patch.awbNo,
-                status: isWarrantyPath ? patch.pipelineStatus : patch.status,
-                note: isWarrantyPath ? patch.warrantyNote : patch.note
-            });
+                awbNo: isWarrantyPath ? (patch.pipelineAwb ?? currentRecord.pipelineAwb ?? "") : patch.awbNo,
+                note: isWarrantyPath ? (patch.warrantyNote ?? currentRecord.warrantyNote ?? "") : patch.note
+            };
+            if (editOrigin === 'service') {
+                syncPayload.status = isWarrantyPath ? patch.pipelineStatus : patch.status;
+            }
+            await root.child(currentRecord.linkedServiceKey).update(syncPayload);
         } else if (currentRecord && currentRecord.sourceWarrantyPath) {
-            await root.child(currentRecord.sourceWarrantyPath).update({
+            const syncPayload = {
                 name: patch.name,
                 phone: patch.phone,
                 pipelineAwb: isWarrantyPath ? patch.pipelineAwb : patch.awbNo,
-                pipelineStatus: isWarrantyPath ? patch.pipelineStatus : patch.status,
                 warrantyNote: isWarrantyPath ? patch.warrantyNote : patch.note
-            });
+            };
+            if (editOrigin === 'service') {
+                syncPayload.pipelineStatus = isWarrantyPath ? patch.pipelineStatus : patch.status;
+            }
+            await root.child(currentRecord.sourceWarrantyPath).update(syncPayload);
         }
 
         closeModal();
-        toast("Record updated successfully 1000 times!");
+        toast("Record updated successfully!");
     } catch (error) {
         toast("Update failed: " + error.message, "error");
     } finally {
@@ -2236,8 +2279,9 @@ function exportWarranty() {
 
     downloadCSV(
         "HELETT_Warranty_All_Records.csv",
-        "Type,Customer,Phone,Invoice,SKU,Serial,Warranty_Expiry,AWB,Courier,Status,Note",
+        "Date_Time,Type,Customer,Phone,Invoice,SKU,Serial,Warranty_Expiry,AWB,Courier,Status,Note",
         rows.map(record => [
+            record.date,
             record._displayType,
             record.name,
             record.phone,
@@ -2264,8 +2308,9 @@ function exportWarranty() {
 function exportService() {
     downloadCSV(
         "HELETT_Service_Report.csv",
-        "Customer,Phone,Invoice,SKU,AWB,Courier,Status,Inward,Outward,Note",
+        "Date_Time,Customer,Phone,Invoice,SKU,AWB,Courier,Status,Inward,Outward,Note",
         services.map(record => [
+            record.date,
             record.name,
             record.phone,
             record.inv,
@@ -2283,8 +2328,9 @@ function exportService() {
 function exportCritical() {
     downloadCSV(
         "HELETT_Critical_Report.csv",
-        "Priority,Customer,Phone,Invoice,SKU,Category,Title,Status,Owner,Followup,Details,Action",
+        "Date_Time,Priority,Customer,Phone,Invoice,SKU,Category,Title,Status,Owner,Followup,Details,Action",
         criticals.map(record => [
+            record.date,
             record.priority,
             record.name,
             record.phone,
@@ -2306,7 +2352,7 @@ function exportCritical() {
     "sSearch",
     "cSearch"
 ].forEach(id => {
-    $(id).addEventListener("input", debouncedScheduleRender);
+    if($(id)) $(id).addEventListener("input", debouncedScheduleRender);
 });
 
 [
@@ -2314,7 +2360,7 @@ function exportCritical() {
     "sFilter",
     "cFilter"
 ].forEach(id => {
-    $(id).addEventListener("change", debouncedScheduleRender);
+    if($(id)) $(id).addEventListener("change", debouncedScheduleRender);
 });
 
 window.addEventListener("click", event => {
@@ -2322,8 +2368,6 @@ window.addEventListener("click", event => {
         closeModal();
     }
 });
-
-restoreAllSoftDeleted();
 </script>
 </body>
 </html>
