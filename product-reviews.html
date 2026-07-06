@@ -3,780 +3,7232 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Noor Tech Product Health Dashboard</title>
+  <title>HELETT Review Intelligence DEV</title>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
+
   <style>
     :root {
-      --bg: #f6f8fb;
+      --bg: #f5f7fb;
       --surface: #ffffff;
+      --surface-2: #f8fafc;
       --soft: #eef3f8;
-      --text: #18212f;
-      --muted: #66758a;
-      --line: #dce4ee;
+      --text: #172033;
+      --muted: #68778d;
+      --line: #dbe4ef;
       --primary: #1967d2;
-      --green: #168a4a;
-      --yellow: #b98500;
-      --red: #cf3434;
+      --primary-dark: #0f4fa8;
+      --green: #14864a;
+      --yellow: #b77900;
+      --orange: #dd6b20;
+      --red: #c93636;
+      --purple: #7c3aed;
+      --cyan: #0891b2;
+      --shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
     }
 
     body.dark {
-      --bg: #10151d;
+      --bg: #0f141c;
       --surface: #17202b;
-      --soft: #202b38;
+      --surface-2: #1d2835;
+      --soft: #243142;
       --text: #edf3fb;
       --muted: #a9b7c8;
-      --line: #314051;
-      --primary: #7ab2ff;
+      --line: #334457;
+      --primary: #79adff;
+      --primary-dark: #4f8fe8;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: Arial, sans-serif;
+      font-family: Inter, Arial, sans-serif;
     }
 
-    header {
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: var(--primary);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 22px 16px;
+      background: #111827;
+      color: #ffffff;
+      overflow-y: auto;
+    }
+
+    .brand {
+      padding: 0 10px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 0.3px;
+    }
+
+    .brand p {
+      margin: 7px 0 0;
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dev-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 13px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: #aab5c5;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .sidebar-footer {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
       display: flex;
       justify-content: space-between;
       gap: 16px;
       align-items: center;
-      padding: 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-    }
-
-    h1, h2, h3, p { margin-top: 0; }
-
-    main {
-      padding: 20px;
-      display: grid;
-      gap: 20px;
-    }
-
-    button, input, select, textarea {
-      font: inherit;
-      border-radius: 8px;
-    }
-
-    button {
-      border: 0;
-      padding: 10px 14px;
-      background: var(--primary);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
+      padding: 17px 19px;
+      margin-bottom: 20px;
       border: 1px solid var(--line);
+      border-radius: 14px;
       background: var(--surface);
-      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .top-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .search {
-      width: min(420px, 100%);
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
     }
 
-    .cards, .sku-grid, .analytics, .knowledge-grid {
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .cards {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
+      margin-bottom: 20px;
     }
 
-    .analytics {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .card, .panel {
-      background: var(--surface);
+    .card,
+    .panel {
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 16px;
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
 
-    .card span {
+    .card {
+      padding: 17px;
+    }
+
+    .card .label {
       color: var(--muted);
-      font-size: 12px;
-      font-weight: bold;
+      font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
-    .card strong {
+    .card .value {
       display: block;
       margin-top: 8px;
       font-size: 28px;
+      font-weight: 900;
     }
 
-    .health-bar {
-      height: 8px;
-      border-radius: 999px;
-      background: var(--soft);
-      overflow: hidden;
-      margin: 12px 0;
+    .card .sub {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
-    .health-bar div {
-      height: 100%;
+    .panel {
+      padding: 18px;
+      margin-bottom: 18px;
     }
 
-    .green { color: var(--green); }
-    .yellow { color: var(--yellow); }
-    .red { color: var(--red); }
-    .bg-green { background: var(--green); }
-    .bg-yellow { background: var(--yellow); }
-    .bg-red { background: var(--red); }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
 
-    dl {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    .panel-head h3 {
       margin: 0;
+      font-size: 17px;
     }
 
-    dt {
+    .panel-head p {
+      margin: 5px 0 0;
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.5;
     }
 
-    dd {
-      margin: 2px 0 0;
-      font-weight: bold;
+    .toolbar {
+      display: grid;
+      grid-template-columns:
+        minmax(220px, 1.6fr)
+        repeat(3, minmax(140px, 0.7fr))
+        auto;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
-    table {
+    input,
+    select,
+    textarea {
       width: 100%;
-      border-collapse: collapse;
-      min-width: 760px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
     }
 
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-      vertical-align: top;
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(25, 103, 210, 0.14);
     }
 
-    th {
-      color: var(--muted);
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 800;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn.secondary {
+      background: var(--soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn.danger {
+      background: var(--red);
+    }
+
+    .btn.green {
+      background: var(--green);
+    }
+
+    .btn.orange {
+      background: var(--orange);
+    }
+
+    .btn.small {
+      padding: 7px 9px;
       font-size: 12px;
-      text-transform: uppercase;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
     }
 
     .table-wrap {
       overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 11px;
     }
 
-    .toolbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
+    table {
+      width: 100%;
+      min-width: 1050px;
+      border-collapse: collapse;
+      background: var(--surface);
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--surface-2);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    tr:hover td {
+      background: rgba(25, 103, 210, 0.035);
     }
 
     .pill {
-      display: inline-block;
-      padding: 4px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
       border-radius: 999px;
       background: var(--soft);
       color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .pill.positive {
+      background: #dff5e8;
+      color: #10743d;
+    }
+
+    .pill.neutral {
+      background: #fff2cd;
+      color: #8a6200;
+    }
+
+    .pill.negative {
+      background: #fde2e2;
+      color: #a62323;
+    }
+
+    .pill.info {
+      background: #dfeeff;
+      color: #1257a4;
+    }
+
+    .pill.purple {
+      background: #efe5ff;
+      color: #6d28d9;
+    }
+
+    .text-red {
+      color: var(--red);
+    }
+
+    .text-green {
+      color: var(--green);
+    }
+
+    .text-yellow {
+      color: var(--yellow);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .product-grid,
+    .insight-grid,
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .product-card,
+    .insight-card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-2);
+    }
+
+    .product-card h4,
+    .insight-card h4 {
+      margin: 0 0 7px;
+      font-size: 15px;
+    }
+
+    .product-card p,
+    .insight-card p {
+      margin: 5px 0;
+      color: var(--muted);
       font-size: 12px;
-      font-weight: bold;
+      line-height: 1.5;
     }
 
-    .status-buttons {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .status-buttons button {
+    .health-track {
+      height: 8px;
+      margin: 10px 0;
+      border-radius: 999px;
       background: var(--soft);
-      color: var(--text);
-      padding: 7px 9px;
+      overflow: hidden;
     }
 
-    dialog {
+    .health-track > div {
+      height: 100%;
+    }
+
+    .chart-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: minmax(130px, 220px) 1fr 44px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chart-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      overflow: hidden;
+    }
+
+    .chart-bar > div {
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .empty {
+      padding: 30px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .pager {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 13px;
+    }
+
+    .pager button {
+      min-width: 36px;
+      padding: 8px 9px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 16px;
       background: var(--surface);
       color: var(--text);
-      width: min(560px, calc(100vw - 24px));
+      font-weight: 800;
     }
 
-    form {
-      display: grid;
+    .pager button.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .pager button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      padding: 20px;
+      background: rgba(2, 8, 23, 0.68);
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.show {
+      display: block;
+    }
+
+    .modal {
+      width: min(900px, 100%);
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      background: var(--surface);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
       gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
     }
 
     label {
       display: grid;
       gap: 6px;
       color: var(--muted);
-      font-weight: bold;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(25, 103, 210, 0.20),
+          transparent 38%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(124, 58, 237, 0.16),
+          transparent 36%
+        ),
+        var(--bg);
+    }
+
+    .login-card {
+      width: min(430px, 100%);
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .login-card h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .login-card p {
+      margin: 8px 0 20px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .message {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: #fde2e2;
+      color: #a62323;
+    }
+
+    .message.success {
+      background: #dff5e8;
+      color: #10743d;
+    }
+
+    .message.info {
+      background: #dfeeff;
+      color: #1257a4;
+    }
+
+    .toast {
+      display: none;
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 5000;
+      max-width: 420px;
+      padding: 12px 15px;
+      border-radius: 10px;
+      color: #ffffff;
+      background: #111827;
+      box-shadow: var(--shadow);
+      font-weight: 800;
       font-size: 13px;
     }
 
-    .trend {
-      display: grid;
-      gap: 10px;
+    .toast.show {
+      display: block;
     }
 
-    .trend-row {
-      display: grid;
-      grid-template-columns: 180px 1fr 40px;
-      gap: 10px;
-      align-items: center;
-      background: var(--soft);
-      padding: 10px;
-      border-radius: 8px;
+    .toast.error {
+      background: #b42323;
     }
 
-    .trend-line {
-      height: 8px;
-      background: rgba(25, 103, 210, .25);
-      border-radius: 999px;
-      overflow: hidden;
+    .toast.success {
+      background: #08753d;
     }
 
-    .trend-line div {
-      height: 100%;
-      background: var(--primary);
+    .toast.info {
+      background: #135bb0;
     }
 
-    .hidden { display: none; }
+    @media (max-width: 1150px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
 
-    @media (max-width: 1000px) {
-      .cards, .sku-grid, .knowledge-grid { grid-template-columns: repeat(2, 1fr); }
-      .analytics { grid-template-columns: 1fr; }
+      .product-grid,
+      .insight-grid,
+      .mini-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
-    @media (max-width: 640px) {
-      header { flex-direction: column; align-items: stretch; }
-      .cards, .sku-grid, .knowledge-grid { grid-template-columns: 1fr; }
-      .trend-row { grid-template-columns: 1fr; }
+    @media (max-width: 760px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+      }
+
+      .main {
+        padding: 14px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .cards,
+      .product-grid,
+      .insight-grid,
+      .mini-grid,
+      .form-grid,
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid .full {
+        grid-column: 1;
+      }
+
+      .chart-row {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .action-row .btn {
+        width: auto;
+      }
     }
   </style>
 </head>
+
 <body>
-  <header>
-    <div>
-      <h1>Noor Tech Product Health Dashboard</h1>
-      <p>HELETT review intelligence, support issues, and SKU health.</p>
+
+<section id="loginScreen" class="login-screen">
+  <div class="login-card">
+
+    <div class="dev-badge">
+      <i class="fa-solid fa-flask"></i>
+      SECURE DEV PORTAL
     </div>
-    <div class="top-actions">
-      <input id="searchInput" class="search" type="search" placeholder="Search review, SKU, issue, customer, ticket">
-      <button id="themeBtn">Dark Mode</button>
+
+    <h1>HELETT Review Intelligence</h1>
+
+    <p>
+      Sign in with the Firebase Authentication account created for this
+      Review Intelligence project.
+    </p>
+
+    <form id="loginForm" class="login-form">
+
+      <label>
+        Email
+
+        <input
+          id="loginEmail"
+          type="email"
+          autocomplete="username"
+          required
+          placeholder="Admin email"
+        >
+      </label>
+
+      <label>
+        Password
+
+        <input
+          id="loginPassword"
+          type="password"
+          autocomplete="current-password"
+          required
+          placeholder="Review portal password"
+        >
+      </label>
+
+      <button id="loginBtn" class="btn" type="submit">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Sign In
+      </button>
+
+      <div id="loginMessage" class="message"></div>
+
+    </form>
+  </div>
+</section>
+
+<div id="appShell" class="app-shell hidden">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+
+      <h1>HELETT Review Intelligence</h1>
+
+      <p>
+        Product reviews, negative-review resolution, customer follow-up
+        and SKU health.
+      </p>
+
+      <div class="dev-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        DEV DATABASE
+      </div>
+
     </div>
-  </header>
 
-  <main>
-    <section id="searchResults" class="panel hidden"></section>
+    <nav class="nav-list">
 
-    <section class="cards" id="managementCards"></section>
+      <button class="nav-btn active" data-page="dashboardPage">
+        <i class="fa-solid fa-chart-line"></i>
+        Dashboard
+      </button>
 
-    <section class="panel">
-      <div class="toolbar">
-        <div>
-          <h2>SKU Dashboard</h2>
-          <p>Product health score = 100 - negative review weight - open issue weight - unresolved complaint weight.</p>
-        </div>
-        <div>
-          <button id="importBtn">Import CSV / Excel</button>
-          <button id="manualBtn">Manual Entry</button>
-          <input id="fileInput" type="file" accept=".csv,.tsv,.xlsx,.xls" hidden>
-        </div>
+      <button class="nav-btn" data-page="reviewsPage">
+        <i class="fa-solid fa-star"></i>
+        Reviews
+      </button>
+
+      <button class="nav-btn" data-page="negativePage">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Negative Center
+      </button>
+
+      <button class="nav-btn" data-page="followupsPage">
+        <i class="fa-solid fa-phone-volume"></i>
+        Call & Follow-up
+      </button>
+
+      <button class="nav-btn" data-page="productsPage">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        Product Master
+      </button>
+
+      <button class="nav-btn" data-page="insightsPage">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Smart Insights
+      </button>
+
+      <button class="nav-btn" data-page="trashPage">
+        <i class="fa-solid fa-trash-can-arrow-up"></i>
+        Trash & Audit
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      Existing Noor-CRM is not connected to this page. This portal uses
+      only the separate Review Intelligence Firebase project.
+    </div>
+
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <div>
+
+        <h2 id="pageTitle">
+          Management Dashboard
+        </h2>
+
+        <p id="syncText">
+          Connecting to Firebase...
+        </p>
+
       </div>
-      <div id="skuGrid" class="sku-grid"></div>
-    </section>
 
-    <section class="analytics">
+      <div class="top-actions">
+
+        <span id="userChip" class="user-chip">
+          <i class="fa-solid fa-user-shield"></i>
+        </span>
+
+        <button id="themeBtn" class="btn secondary" type="button">
+          <i class="fa-solid fa-moon"></i>
+          Theme
+        </button>
+
+        <button id="logoutBtn" class="btn danger" type="button">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          Logout
+        </button>
+
+      </div>
+
+    </header>
+
+    <section id="dashboardPage" class="page active">
+
+      <div id="dashboardCards" class="cards"></div>
+
       <div class="panel">
-        <h2>Daily Review Analytics</h2>
-        <canvas id="barChart" height="220"></canvas>
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              SKU Health Overview
+            </h3>
+
+            <p>
+              Health score is calculated from rating mix, open negative
+              cases and unresolved follow-ups.
+            </p>
+
+          </div>
+
+          <button class="btn" type="button" onclick="openProductModal()">
+            <i class="fa-solid fa-plus"></i>
+            Add Product
+          </button>
+
+        </div>
+
+        <div id="dashboardProducts" class="product-grid"></div>
+
       </div>
+
+      <div class="mini-grid">
+
+        <div class="panel">
+
+          <div class="panel-head">
+
+            <div>
+
+              <h3>
+                Top Complaints
+              </h3>
+
+              <p>
+                Based on current real review data.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div id="topComplaints" class="chart-list"></div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-head">
+
+            <div>
+
+              <h3>
+                Rating Distribution
+              </h3>
+
+              <p>
+                1-star to 5-star breakdown.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div id="ratingDistribution" class="chart-list"></div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="reviewsPage" class="page">
+
       <div class="panel">
-        <h2>Review Trend</h2>
-        <canvas id="lineChart" height="220"></canvas>
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Review Register
+            </h3>
+
+            <p>
+              Manual entry, Excel/CSV import and direct Amazon
+              review-page access.
+            </p>
+
+          </div>
+
+          <div class="action-row">
+
+            <button class="btn" type="button" onclick="openReviewModal()">
+              <i class="fa-solid fa-plus"></i>
+              Add Review
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="document.getElementById('reviewImportInput').click()"
+            >
+              <i class="fa-solid fa-file-import"></i>
+              Import Excel/CSV
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="exportReviews()"
+            >
+              <i class="fa-solid fa-file-export"></i>
+              Export
+            </button>
+
+            <input
+              id="reviewImportInput"
+              type="file"
+              accept=".xlsx,.xls,.csv,.tsv"
+              hidden
+            >
+
+          </div>
+
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="reviewSearch"
+            type="search"
+            placeholder="Search title, description, SKU, ASIN, reviewer, issue..."
+          >
+
+          <select id="reviewSkuFilter">
+            <option value="">All SKUs</option>
+          </select>
+
+          <select id="reviewSentimentFilter">
+            <option value="">All Sentiments</option>
+            <option>Positive</option>
+            <option>Neutral</option>
+            <option>Negative</option>
+          </select>
+
+          <select id="reviewStatusFilter">
+            <option value="">All Statuses</option>
+            <option>New</option>
+            <option>Investigating</option>
+            <option>Customer Contacted</option>
+            <option>Waiting</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+
+          <button
+            class="btn secondary"
+            type="button"
+            onclick="clearReviewFilters()"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+            Clear
+          </button>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Rating</th>
+                <th>Review</th>
+                <th>Issue</th>
+                <th>Status</th>
+                <th>Source</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="reviewsBody"></tbody>
+
+          </table>
+
+        </div>
+
+        <div id="reviewsPager" class="pager"></div>
+
       </div>
+
     </section>
 
-    <section class="panel">
-      <h2>Top Complaints Last 30 Days</h2>
-      <div id="trendList" class="trend"></div>
+    <section id="negativePage" class="page">
+
+      <div id="negativeCards" class="cards"></div>
+
+      <div class="panel">
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Negative Review Priority Center
+            </h3>
+
+            <p>
+              1–2 star reviews only. Staff controls the resolution
+              status manually.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="negativeSearch"
+            type="search"
+            placeholder="Search negative review, SKU, issue, status..."
+          >
+
+          <select id="negativeSkuFilter">
+            <option value="">All SKUs</option>
+          </select>
+
+          <select id="negativeStatusFilter">
+            <option value="">All Statuses</option>
+            <option>New</option>
+            <option>Investigating</option>
+            <option>Customer Contacted</option>
+            <option>Waiting</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+
+          <select id="negativeRatingFilter">
+            <option value="">1 & 2 Star</option>
+            <option value="1">1 Star</option>
+            <option value="2">2 Star</option>
+          </select>
+
+          <button
+            class="btn secondary"
+            type="button"
+            onclick="clearNegativeFilters()"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+            Clear
+          </button>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>SKU / ASIN</th>
+                <th>Rating</th>
+                <th>Review & Issue</th>
+                <th>Status</th>
+                <th>Assigned</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="negativeBody"></tbody>
+
+          </table>
+
+        </div>
+
+        <div id="negativePager" class="pager"></div>
+
+      </div>
+
     </section>
 
-    <section class="panel">
-      <h2>Negative Review Center</h2>
-      <div id="negativeTable" class="table-wrap"></div>
+    <section id="followupsPage" class="page">
+
+      <div id="followupCards" class="cards"></div>
+
+      <div class="panel">
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Customer Call & Review Follow-up
+            </h3>
+
+            <p>
+              Track call result, review request, 2–3 day follow-up,
+              received rating and unresolved issues.
+            </p>
+
+          </div>
+
+          <div class="action-row">
+
+            <button
+              class="btn"
+              type="button"
+              onclick="openFollowupModal()"
+            >
+              <i class="fa-solid fa-plus"></i>
+              Add Follow-up
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="exportFollowups()"
+            >
+              <i class="fa-solid fa-file-export"></i>
+              Export
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="followupSearch"
+            type="search"
+            placeholder="Search customer, phone, order ID, SKU, notes..."
+          >
+
+          <select id="followupSkuFilter">
+            <option value="">All SKUs</option>
+          </select>
+
+          <select id="followupStatusFilter">
+            <option value="">All Statuses</option>
+            <option>Not Called</option>
+            <option>Call Pending</option>
+            <option>No Response</option>
+            <option>Customer Interested</option>
+            <option>Review Request Sent</option>
+            <option>Follow-up Due</option>
+            <option>Review Received</option>
+            <option>Negative Review</option>
+            <option>Issue Under Resolution</option>
+            <option>Closed</option>
+          </select>
+
+          <select id="followupDueFilter">
+            <option value="">All Follow-ups</option>
+            <option value="due">Due / Overdue</option>
+            <option value="received">Review Received</option>
+            <option value="pending">Review Pending</option>
+          </select>
+
+          <button
+            class="btn secondary"
+            type="button"
+            onclick="clearFollowupFilters()"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+            Clear
+          </button>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Customer / Order</th>
+                <th>SKU</th>
+                <th>Call</th>
+                <th>Review Request</th>
+                <th>Follow-up</th>
+                <th>Result</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="followupsBody"></tbody>
+
+          </table>
+
+        </div>
+
+        <div id="followupsPager" class="pager"></div>
+
+      </div>
+
     </section>
 
-    <section class="panel">
-      <h2>Support Knowledge Center</h2>
-      <div id="knowledgeGrid" class="knowledge-grid"></div>
+    <section id="productsPage" class="page">
+
+      <div class="panel">
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Amazon Product Master
+            </h3>
+
+            <p>
+              Save Product Name, SKU, ASIN and Amazon review-page link.
+              Open the latest reviews directly from here.
+            </p>
+
+          </div>
+
+          <button class="btn" type="button" onclick="openProductModal()">
+            <i class="fa-solid fa-plus"></i>
+            Add Product
+          </button>
+
+        </div>
+
+        <div id="productsGrid" class="product-grid"></div>
+
+      </div>
+
     </section>
 
-    <section class="panel">
-      <h2>Customer Escalation Center</h2>
-      <form id="ticketForm">
-        <label>Customer<input name="customer" required></label>
-        <label>SKU<select name="sku" id="ticketSku" required></select></label>
-        <label>Priority<select name="priority" required><option>High</option><option>Medium</option><option>Low</option></select></label>
-        <label>Issue<textarea name="issue" rows="3" required></textarea></label>
-        <button type="submit">Create Ticket</button>
-      </form>
-      <div id="ticketList"></div>
+    <section id="insightsPage" class="page">
+
+      <div class="panel">
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Smart Insights — AI Ready
+            </h3>
+
+            <p>
+              This version generates evidence-based operational insights
+              from saved data. A secure AI model can be connected later
+              without changing the database structure.
+            </p>
+
+          </div>
+
+          <button
+            class="btn"
+            type="button"
+            onclick="renderInsights()"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Refresh Insights
+          </button>
+
+        </div>
+
+        <div id="insightsGrid" class="insight-grid"></div>
+
+      </div>
+
     </section>
+
+    <section id="trashPage" class="page">
+
+      <div class="panel">
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Soft-Deleted Records
+            </h3>
+
+            <p>
+              Restore records safely or permanently delete only after
+              verification.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div id="trashList"></div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3>
+              Audit Log
+            </h3>
+
+            <p>
+              Tracks create, update, delete and restore actions performed
+              by the logged-in user.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Action</th>
+                <th>Collection</th>
+                <th>Record</th>
+                <th>User</th>
+              </tr>
+            </thead>
+
+            <tbody id="auditBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
   </main>
 
-  <dialog id="reviewDialog">
-    <form id="reviewForm" method="dialog">
-      <h2>Add Review</h2>
-      <label>Date<input name="date" type="date" required></label>
-      <label>SKU<select name="sku" id="reviewSku" required></select></label>
-      <label>Rating<input name="rating" type="number" min="1" max="5" required></label>
-      <label>Review Title<input name="title" required></label>
-      <label>Review Description<textarea name="description" rows="4" required></textarea></label>
-      <button id="saveReview" type="button">Save Review</button>
-      <button type="submit">Cancel</button>
+</div>
+
+<div id="reviewModal" class="modal-backdrop">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h3 id="reviewModalTitle">
+        Add Review
+      </h3>
+
+      <button
+        class="btn secondary small"
+        type="button"
+        onclick="closeModal('reviewModal')"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+    <form id="reviewForm">
+
+      <input id="reviewId" type="hidden">
+
+      <div class="form-grid">
+
+        <label>
+          Review Date
+          <input id="reviewDate" type="date" required>
+        </label>
+
+        <label>
+          Product / SKU
+          <select id="reviewSku" required></select>
+        </label>
+
+        <label>
+          ASIN
+          <input
+            id="reviewAsin"
+            readonly
+            placeholder="Filled from Product Master"
+          >
+        </label>
+
+        <label>
+          Rating
+
+          <select id="reviewRating" required>
+            <option value="">Select rating</option>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+          </select>
+
+        </label>
+
+        <label class="full">
+          Review Title
+
+          <input
+            id="reviewTitle"
+            required
+            placeholder="Review title"
+          >
+        </label>
+
+        <label class="full">
+          Review Description
+
+          <textarea
+            id="reviewDescription"
+            required
+            placeholder="Complete review text"
+          ></textarea>
+        </label>
+
+        <label>
+          Reviewer Name
+
+          <input
+            id="reviewerName"
+            placeholder="Public reviewer name"
+          >
+        </label>
+
+        <label>
+          Review URL
+
+          <input
+            id="reviewUrl"
+            type="url"
+            placeholder="https://amazon.in/..."
+          >
+        </label>
+
+        <label>
+          Source
+
+          <select id="reviewSource">
+            <option>Manual Entry</option>
+            <option>CSV / Excel Import</option>
+            <option>Amazon Page Capture</option>
+            <option>Other</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+
+          <select id="reviewStatus">
+            <option>New</option>
+            <option>Investigating</option>
+            <option>Customer Contacted</option>
+            <option>Waiting</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+        </label>
+
+        <label>
+          Assigned Staff
+
+          <input
+            id="reviewAssigned"
+            placeholder="Staff name"
+          >
+        </label>
+
+        <label>
+          Issue Type
+
+          <input
+            id="reviewIssueType"
+            placeholder="Auto-detected; can edit"
+          >
+        </label>
+
+        <label class="full">
+          Internal Notes
+
+          <textarea
+            id="reviewNotes"
+            placeholder="Resolution or action notes"
+          ></textarea>
+        </label>
+
+      </div>
+
+      <div class="action-row" style="margin-top: 14px;">
+
+        <button id="saveReviewBtn" class="btn green" type="submit">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Review
+        </button>
+
+        <button
+          class="btn secondary"
+          type="button"
+          onclick="closeModal('reviewModal')"
+        >
+          Cancel
+        </button>
+
+      </div>
+
     </form>
-  </dialog>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script>
-    const PRODUCTS = [
-      "HT15", "HT20", "HT20 Pro", "HT410", "H30C Pro", "H65C", "HE24 Pro",
-      "RapidLabel BT", "H80i", "Face Attendance Device", "InfiniStick"
-    ];
+  </div>
 
-    const issueRules = [
-      { type: "Scanning Issue", terms: ["not scanning", "scan failed", "cannot scan", "scanner"] },
-      { type: "Bluetooth Issue", terms: ["bluetooth", "pairing", "wireless", "bt not"] },
-      { type: "Print Quality", terms: ["print faded", "faded", "light print", "poor print"] },
-      { type: "Driver / USB Issue", terms: ["usb", "driver", "not detected", "device not found"] },
-      { type: "Barcode Issue", terms: ["barcode", "qr", "not readable"] },
-      { type: "Paper / Label Feed", terms: ["paper jam", "label jam", "feed", "stuck"] },
-      { type: "Power Issue", terms: ["power", "not turning on", "dead", "charging"] },
-      { type: "App / Software Issue", terms: ["app", "software", "sync", "firmware"] }
-    ];
+</div>
 
-    const today = new Date();
-    const daysAgo = days => {
-      const d = new Date(today);
-      d.setDate(d.getDate() - days);
-      return d.toISOString().slice(0, 10);
-    };
+<div id="followupModal" class="modal-backdrop">
 
-    function classifyIssue(text) {
-      const value = String(text).toLowerCase();
-      const match = issueRules.find(rule => rule.terms.some(term => value.includes(term)));
-      return match ? match.type : "General Feedback";
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h3 id="followupModalTitle">
+        Add Follow-up
+      </h3>
+
+      <button
+        class="btn secondary small"
+        type="button"
+        onclick="closeModal('followupModal')"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+    <form id="followupForm">
+
+      <input id="followupId" type="hidden">
+
+      <div class="form-grid">
+
+        <label>
+          Customer Name
+          <input id="followupCustomer" required>
+        </label>
+
+        <label>
+          Phone Number
+          <input id="followupPhone" required>
+        </label>
+
+        <label>
+          Amazon Order ID
+          <input id="followupOrderId" required>
+        </label>
+
+        <label>
+          Product / SKU
+          <select id="followupSku" required></select>
+        </label>
+
+        <label>
+          Delivery Date
+          <input id="followupDeliveryDate" type="date">
+        </label>
+
+        <label>
+          Call Date
+          <input id="followupCallDate" type="date">
+        </label>
+
+        <label>
+          Call Result
+
+          <select id="followupCallResult">
+            <option>Not Called</option>
+            <option>No Response</option>
+            <option>Connected</option>
+            <option>Customer Interested</option>
+            <option>Customer Not Interested</option>
+            <option>Issue Reported</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+
+          <select id="followupStatus">
+            <option>Not Called</option>
+            <option>Call Pending</option>
+            <option>No Response</option>
+            <option>Customer Interested</option>
+            <option>Review Request Sent</option>
+            <option>Follow-up Due</option>
+            <option>Review Received</option>
+            <option>Negative Review</option>
+            <option>Issue Under Resolution</option>
+            <option>Closed</option>
+          </select>
+        </label>
+
+        <label>
+          Review Request Sent
+
+          <select id="followupRequestSent">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </label>
+
+        <label>
+          Request Date
+          <input id="followupRequestDate" type="date">
+        </label>
+
+        <label>
+          Expected Review Date
+          <input id="followupExpectedDate" type="date">
+        </label>
+
+        <label>
+          Next Follow-up Date
+          <input id="followupDate" type="date">
+        </label>
+
+        <label>
+          Review Received
+
+          <select id="followupReviewReceived">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </label>
+
+        <label>
+          Received Rating
+
+          <select id="followupRating">
+            <option value="">Not received</option>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+          </select>
+        </label>
+
+        <label>
+          Assigned Staff
+
+          <input
+            id="followupAssigned"
+            placeholder="Staff name"
+          >
+        </label>
+
+        <label>
+          Negative Issue
+
+          <input
+            id="followupNegativeIssue"
+            placeholder="Issue if negative review received"
+          >
+        </label>
+
+        <label class="full">
+          Notes
+
+          <textarea
+            id="followupNotes"
+            placeholder="Call summary, promise, next action"
+          ></textarea>
+        </label>
+
+      </div>
+
+      <div class="action-row" style="margin-top: 14px;">
+
+        <button id="saveFollowupBtn" class="btn green" type="submit">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Follow-up
+        </button>
+
+        <button
+          class="btn secondary"
+          type="button"
+          onclick="closeModal('followupModal')"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<div id="productModal" class="modal-backdrop">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h3 id="productModalTitle">
+        Add Product
+      </h3>
+
+      <button
+        class="btn secondary small"
+        type="button"
+        onclick="closeModal('productModal')"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+    <form id="productForm">
+
+      <input id="productId" type="hidden">
+
+      <div class="form-grid">
+
+        <label>
+          Product Name
+
+          <input
+            id="productName"
+            required
+            placeholder="HELETT product name"
+          >
+        </label>
+
+        <label>
+          SKU
+
+          <input
+            id="productSku"
+            required
+            placeholder="HT20, H30C Pro..."
+          >
+        </label>
+
+        <label>
+          ASIN
+
+          <input
+            id="productAsin"
+            required
+            placeholder="B0XXXXXXXX"
+          >
+        </label>
+
+        <label>
+          Active
+
+          <select id="productActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </label>
+
+        <label class="full">
+          Amazon Product URL
+
+          <input
+            id="productUrl"
+            type="url"
+            placeholder="https://www.amazon.in/dp/ASIN"
+          >
+        </label>
+
+        <label class="full">
+          Amazon Review Page URL
+
+          <input
+            id="productReviewUrl"
+            type="url"
+            placeholder="https://www.amazon.in/product-reviews/ASIN"
+          >
+        </label>
+
+        <label class="full">
+          Notes
+
+          <textarea
+            id="productNotes"
+            placeholder="Compatibility, launch notes, responsible staff"
+          ></textarea>
+        </label>
+
+      </div>
+
+      <div class="action-row" style="margin-top: 14px;">
+
+        <button id="saveProductBtn" class="btn green" type="submit">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Product
+        </button>
+
+        <button
+          class="btn secondary"
+          type="button"
+          onclick="closeModal('productModal')"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBA65EAwVGe324MBNhPBJ9ggZcZ5-YDqJg",
+    authDomain: "helett-review-intelligence-dev.firebaseapp.com",
+    databaseURL:
+      "https://helett-review-intelligence-dev-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "helett-review-intelligence-dev",
+    storageBucket:
+      "helett-review-intelligence-dev.firebasestorage.app",
+    messagingSenderId: "610178751592",
+    appId: "1:610178751592:web:d14f1d1f71830cf5f66fdd"
+  };
+
+  const ADMIN_UID =
+    "dtAXFz4B6ZVQbVqkOEzhTEU2oTx1";
+
+  const ROOT_PATH =
+    "noor_product_reviews";
+
+  const PAGE_SIZE = 25;
+
+  firebase.initializeApp(firebaseConfig);
+
+  const auth =
+    firebase.auth();
+
+  const db =
+    firebase.database();
+
+  const rootRef =
+    db.ref(ROOT_PATH);
+
+  const reviewsRef =
+    rootRef.child("amazon_reviews");
+
+  const followupsRef =
+    rootRef.child("customer_followups");
+
+  const productsRef =
+    rootRef.child("product_master");
+
+  const auditRef =
+    rootRef.child("audit_logs");
+
+  const $ = id =>
+    document.getElementById(id);
+
+  const state = {
+    currentUser: null,
+
+    reviews:
+      new Map(),
+
+    followups:
+      new Map(),
+
+    products:
+      new Map(),
+
+    audits:
+      new Map(),
+
+    listeners: [],
+
+    pages: {
+      reviews: 1,
+      negative: 1,
+      followups: 1
+    },
+
+    activePage:
+      "dashboardPage"
+  };
+
+  const issueRules = [
+    {
+      type: "Scanning Issue",
+
+      terms: [
+        "not scanning",
+        "scan failed",
+        "cannot scan",
+        "scanner",
+        "scan issue"
+      ]
+    },
+
+    {
+      type: "Bluetooth Issue",
+
+      terms: [
+        "bluetooth",
+        "pairing",
+        "wireless",
+        "bt not",
+        "connection lost"
+      ]
+    },
+
+    {
+      type: "Print Quality",
+
+      terms: [
+        "print faded",
+        "faded",
+        "light print",
+        "poor print",
+        "dark print",
+        "blur"
+      ]
+    },
+
+    {
+      type: "Driver / USB Issue",
+
+      terms: [
+        "usb",
+        "driver",
+        "not detected",
+        "device not found",
+        "windows"
+      ]
+    },
+
+    {
+      type: "Barcode / QR Issue",
+
+      terms: [
+        "barcode",
+        "qr",
+        "not readable",
+        "not scanning code"
+      ]
+    },
+
+    {
+      type: "Paper / Label Feed",
+
+      terms: [
+        "paper jam",
+        "label jam",
+        "feed",
+        "stuck",
+        "roll"
+      ]
+    },
+
+    {
+      type: "Power / Charging",
+
+      terms: [
+        "power",
+        "not turning on",
+        "dead",
+        "charging",
+        "battery"
+      ]
+    },
+
+    {
+      type: "App / Software",
+
+      terms: [
+        "app",
+        "software",
+        "sync",
+        "firmware",
+        "update"
+      ]
+    },
+
+    {
+      type: "Delivery / Damage",
+
+      terms: [
+        "damaged",
+        "broken",
+        "delivery",
+        "missing",
+        "used product"
+      ]
+    },
+
+    {
+      type: "Compatibility",
+
+      terms: [
+        "compatible",
+        "mac",
+        "android",
+        "ios",
+        "support"
+      ]
+    }
+  ];
+
+  function todayISO() {
+    return new Date()
+      .toISOString()
+      .slice(0, 10);
+  }
+
+  function toISODate(value) {
+    if (!value) {
+      return "";
     }
 
-    function makeReview(sku, rating, title, description, ago, status) {
-      return {
-        id: "R-" + Math.random().toString(16).slice(2),
-        date: daysAgo(ago),
-        sku,
-        rating,
-        title,
-        description,
-        issueType: classifyIssue(title + " " + description),
-        status: status || (rating <= 2 ? "Open" : rating === 3 ? "Investigating" : "Resolved"),
-        customer: "Customer"
+    const date =
+      new Date(value);
+
+    return Number.isNaN(
+      date.getTime()
+    )
+      ? ""
+      : date
+          .toISOString()
+          .slice(0, 10);
+  }
+
+  function formatDate(value) {
+    if (!value) {
+      return "—";
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return String(value);
+    }
+
+    return date.toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }
+    );
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return "—";
+    }
+
+    const date =
+      new Date(
+        Number(value) || value
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return String(value);
+    }
+
+    return date.toLocaleString(
+      "en-IN",
+      {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }
+    );
+  }
+
+  function escapeHTML(value) {
+    return String(
+      value ?? ""
+    )
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function normalizeText(value) {
+    return String(
+      value ?? ""
+    )
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  function classifyIssue(text) {
+    const value =
+      normalizeText(text);
+
+    const match =
+      issueRules.find(
+        rule =>
+          rule.terms.some(
+            term =>
+              value.includes(term)
+          )
+      );
+
+    return match
+      ? match.type
+      : "General Feedback";
+  }
+
+  function sentimentFromRating(
+    rating
+  ) {
+    const number =
+      Number(rating);
+
+    if (number <= 2) {
+      return "Negative";
+    }
+
+    if (number === 3) {
+      return "Neutral";
+    }
+
+    return "Positive";
+  }
+
+  function sentimentClass(
+    sentiment
+  ) {
+    return String(
+      sentiment || ""
+    ).toLowerCase();
+  }
+
+  function toast(
+    message,
+    type = "success"
+  ) {
+    const box =
+      $("toast");
+
+    box.textContent =
+      message;
+
+    box.className =
+      "toast show " + type;
+
+    clearTimeout(
+      toast.timer
+    );
+
+    toast.timer =
+      setTimeout(
+        () => {
+          box.className =
+            "toast";
+        },
+        4200
+      );
+  }
+
+  function setMessage(
+    id,
+    message,
+    type
+  ) {
+    const box = $(id);
+
+    box.textContent =
+      message;
+
+    box.className =
+      "message show " +
+      type;
+  }
+
+  function clearMessage(id) {
+    const box = $(id);
+
+    box.textContent = "";
+
+    box.className =
+      "message";
+  }
+
+  function setLoading(
+    button,
+    loading,
+    normalHTML
+  ) {
+    button.disabled =
+      loading;
+
+    button.innerHTML =
+      loading
+        ? (
+          '<i class="fa-solid fa-spinner fa-spin"></i>' +
+          " Please wait..."
+        )
+        : normalHTML;
+  }
+
+  function openModal(id) {
+    $(id)
+      .classList
+      .add("show");
+  }
+
+  function closeModal(id) {
+    $(id)
+      .classList
+      .remove("show");
+  }
+
+  function activeRecords(map) {
+    return Array
+      .from(map.values())
+      .filter(
+        item =>
+          item &&
+          item.isDeleted !== true
+      );
+  }
+
+  function deletedRecords(map) {
+    return Array
+      .from(map.values())
+      .filter(
+        item =>
+          item &&
+          item.isDeleted === true
+      );
+  }
+
+  function productBySku(sku) {
+    return (
+      activeRecords(
+        state.products
+      )
+      .find(
+        product =>
+          product.sku === sku
+      ) || null
+    );
+  }
+
+  function reviewSignature(
+    record
+  ) {
+    return [
+      normalizeText(
+        record.asin
+      ),
+
+      normalizeText(
+        record.reviewDate
+      ),
+
+      normalizeText(
+        record.title
+      ),
+
+      normalizeText(
+        record.reviewerName
+      )
+    ].join("|");
+  }
+
+  function isDuplicateReview(
+    candidate,
+    ignoreId = ""
+  ) {
+    const signature =
+      reviewSignature(
+        candidate
+      );
+
+    const candidateUrl =
+      normalizeText(
+        candidate.reviewUrl
+      );
+
+    return activeRecords(
+      state.reviews
+    ).some(record => {
+      if (
+        record._id === ignoreId
+      ) {
+        return false;
+      }
+
+      if (
+        candidateUrl &&
+        normalizeText(
+          record.reviewUrl
+        ) === candidateUrl
+      ) {
+        return true;
+      }
+
+      return (
+        reviewSignature(
+          record
+        ) === signature
+      );
+    });
+  }
+
+  function addDays(
+    dateValue,
+    days
+  ) {
+    if (!dateValue) {
+      return "";
+    }
+
+    const date =
+      new Date(
+        dateValue +
+        "T00:00:00"
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return "";
+    }
+
+    date.setDate(
+      date.getDate() +
+      days
+    );
+
+    return date
+      .toISOString()
+      .slice(0, 10);
+  }
+
+  function isDue(record) {
+    if (
+      record.reviewReceived ===
+      "Yes"
+    ) {
+      return false;
+    }
+
+    if (
+      record.status ===
+      "Closed"
+    ) {
+      return false;
+    }
+
+    const value =
+      record.followupDate ||
+      record.expectedReviewDate;
+
+    if (!value) {
+      return false;
+    }
+
+    const target =
+      new Date(
+        value +
+        "T23:59:59"
+      );
+
+    return (
+      target.getTime() <=
+      Date.now()
+    );
+  }
+
+  function attachMapListeners(
+    ref,
+    map,
+    collectionName
+  ) {
+    const onAdded =
+      snapshot => {
+        map.set(
+          snapshot.key,
+          {
+            ...snapshot.val(),
+            _id:
+              snapshot.key,
+            _collection:
+              collectionName
+          }
+        );
+
+        scheduleRender();
       };
+
+    const onChanged =
+      snapshot => {
+        map.set(
+          snapshot.key,
+          {
+            ...snapshot.val(),
+            _id:
+              snapshot.key,
+            _collection:
+              collectionName
+          }
+        );
+
+        scheduleRender();
+      };
+
+    const onRemoved =
+      snapshot => {
+        map.delete(
+          snapshot.key
+        );
+
+        scheduleRender();
+      };
+
+    ref.on(
+      "child_added",
+      onAdded,
+      firebaseError
+    );
+
+    ref.on(
+      "child_changed",
+      onChanged,
+      firebaseError
+    );
+
+    ref.on(
+      "child_removed",
+      onRemoved,
+      firebaseError
+    );
+
+    state.listeners.push(
+      () => {
+        ref.off(
+          "child_added",
+          onAdded
+        );
+
+        ref.off(
+          "child_changed",
+          onChanged
+        );
+
+        ref.off(
+          "child_removed",
+          onRemoved
+        );
+      }
+    );
+  }
+
+  function firebaseError(error) {
+    toast(
+      "Firebase error: " +
+      error.message,
+      "error"
+    );
+  }
+
+  function startRealtimeListeners() {
+    stopRealtimeListeners();
+
+    state.reviews.clear();
+    state.followups.clear();
+    state.products.clear();
+    state.audits.clear();
+
+    attachMapListeners(
+      reviewsRef,
+      state.reviews,
+      "amazon_reviews"
+    );
+
+    attachMapListeners(
+      followupsRef,
+      state.followups,
+      "customer_followups"
+    );
+
+    attachMapListeners(
+      productsRef,
+      state.products,
+      "product_master"
+    );
+
+    attachMapListeners(
+      auditRef,
+      state.audits,
+      "audit_logs"
+    );
+
+    $("syncText").textContent =
+      "Live Firebase sync active · " +
+      firebaseConfig.projectId;
+  }
+
+  function stopRealtimeListeners() {
+    state.listeners.forEach(
+      detach => detach()
+    );
+
+    state.listeners = [];
+  }
+
+  let renderTimer = null;
+
+  function scheduleRender() {
+    clearTimeout(
+      renderTimer
+    );
+
+    renderTimer =
+      setTimeout(
+        renderAll,
+        90
+      );
+  }
+
+  async function writeAudit(
+    action,
+    collection,
+    recordId,
+    summary
+  ) {
+    if (!state.currentUser) {
+      return;
     }
 
-    let reviews = JSON.parse(localStorage.getItem("noorReviews") || "null") || [
-      makeReview("HT20", 5, "Fast scanner", "Working smoothly with invoices", 0),
-      makeReview("HT20", 2, "Bluetooth not working", "Bluetooth not working after two days", 1),
-      makeReview("HT20", 3, "Barcode not readable", "Barcode not readable on glossy packets", 4),
-      makeReview("HT20 Pro", 1, "USB not detected", "USB not detected on Windows laptop", 5),
-      makeReview("HT410", 2, "Not scanning", "Scanner is not scanning small labels", 8),
-      makeReview("H30C Pro", 2, "Print faded", "Print faded after changing roll", 9),
-      makeReview("HE24 Pro", 3, "Label feed issue", "Label feed gets stuck sometimes", 12),
-      makeReview("RapidLabel BT", 2, "Bluetooth connection lost", "Bluetooth connection lost while printing", 15),
-      makeReview("H80i", 1, "Paper jam", "Paper jam happens daily", 13),
-      makeReview("Face Attendance Device", 3, "Sync delay", "Attendance app sync delay in morning", 10),
-      makeReview("InfiniStick", 2, "Power issue", "Device not turning on after update", 19)
-    ];
+    const key =
+      auditRef.push().key;
 
-    let tickets = JSON.parse(localStorage.getItem("noorTickets") || "[]");
+    await auditRef
+      .child(key)
+      .set({
+        action:
+          action,
 
-    function saveData() {
-      localStorage.setItem("noorReviews", JSON.stringify(reviews));
-      localStorage.setItem("noorTickets", JSON.stringify(tickets));
-    }
+        collection:
+          collection,
 
-    async function fetchReviews() {
-      return reviews;
-    }
+        recordId:
+          recordId,
 
-    async function syncReviews(importedReviews) {
-      reviews = [...importedReviews, ...reviews];
-      saveData();
-      render();
-      return reviews;
-    }
+        summary:
+          summary || "",
 
-    function getProductHealth(sku) {
-      const list = reviews.filter(r => r.sku === sku);
-      const total = list.length;
-      const negative = list.filter(r => r.rating <= 3).length;
-      const open = list.filter(r => r.status === "Open").length;
-      const unresolved = list.filter(r => r.rating <= 2 && r.status !== "Resolved").length;
-      const resolved = list.filter(r => r.status === "Resolved").length;
-      const positive = list.filter(r => r.rating >= 4).length;
-      const avg = total ? list.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
-      const score = Math.max(0, Math.round(100 - negative * 4 - open * 6 - unresolved * 5));
-      const color = score >= 85 ? "green" : score >= 65 ? "yellow" : "red";
-      return { total, negative, open, unresolved, resolved, positive, avg, score, color };
-    }
+        userUid:
+          state.currentUser.uid,
 
-    window.NoorDataLayer = { fetchReviews, syncReviews, getProductHealth };
+        userEmail:
+          state.currentUser.email ||
+          "",
 
-    function render() {
-      renderManagement();
-      renderSkuGrid();
-      renderNegativeTable();
-      renderCharts();
-      renderTrends();
-      renderKnowledge();
-      renderTickets();
-      renderSkuOptions();
-      runSearch();
-    }
-
-    function renderManagement() {
-      const total = reviews.length;
-      const avg = total ? reviews.reduce((s, r) => s + Number(r.rating), 0) / total : 0;
-      const negative = reviews.filter(r => r.rating <= 3).length;
-      const open = reviews.filter(r => r.status === "Open").length;
-      const resolved = reviews.filter(r => r.status === "Resolved").length;
-
-      document.getElementById("managementCards").innerHTML = [
-        ["Total Reviews", total],
-        ["Average Rating", avg.toFixed(1)],
-        ["Negative Reviews", negative],
-        ["Open Issues", open],
-        ["Resolved Issues", resolved]
-      ].map(([label, value]) => `<div class="card"><span>${label}</span><strong>${value}</strong></div>`).join("");
-    }
-
-    function renderSkuGrid() {
-      document.getElementById("skuGrid").innerHTML = PRODUCTS.map(sku => {
-        const h = getProductHealth(sku);
-        return `
-          <div class="card">
-            <span>HELETT Product</span>
-            <h3>${sku}</h3>
-            <strong class="${h.color}">${h.score}%</strong>
-            <div class="health-bar"><div class="bg-${h.color}" style="width:${h.score}%"></div></div>
-            <dl>
-              <div><dt>Total Reviews</dt><dd>${h.total}</dd></div>
-              <div><dt>Average Rating</dt><dd>${h.avg.toFixed(1)}</dd></div>
-              <div><dt>Positive Reviews</dt><dd>${h.positive}</dd></div>
-              <div><dt>Negative Reviews</dt><dd>${h.negative}</dd></div>
-              <div><dt>Open Issues</dt><dd>${h.open}</dd></div>
-              <div><dt>Resolved Issues</dt><dd>${h.resolved}</dd></div>
-            </dl>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderNegativeTable() {
-      const negative = reviews.filter(r => r.rating <= 3);
-      document.getElementById("negativeTable").innerHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th><th>SKU</th><th>Rating</th><th>Issue Type</th><th>Status</th><th>Review</th><th>Buttons</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${negative.map(r => `
-              <tr>
-                <td>${r.date}</td>
-                <td>${r.sku}</td>
-                <td>${r.rating}</td>
-                <td>${r.issueType}</td>
-                <td><span class="pill">${r.status}</span></td>
-                <td><b>${r.title}</b><br>${r.description}</td>
-                <td>
-                  <div class="status-buttons">
-                    <button onclick="setReviewStatus('${r.id}','Open')">Open</button>
-                    <button onclick="setReviewStatus('${r.id}','Investigating')">Investigating</button>
-                    <button onclick="setReviewStatus('${r.id}','Resolved')">Resolved</button>
-                  </div>
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      `;
-    }
-
-    function setReviewStatus(id, status) {
-      reviews = reviews.map(r => r.id === id ? { ...r, status } : r);
-      saveData();
-      render();
-    }
-
-    function renderTrends() {
-      const start = new Date(today);
-      start.setDate(start.getDate() - 30);
-
-      const counts = {};
-      reviews.filter(r => new Date(r.date) >= start && r.rating <= 3).forEach(r => {
-        counts[r.issueType] = (counts[r.issueType] || 0) + 1;
+        createdAt:
+          firebase
+            .database
+            .ServerValue
+            .TIMESTAMP
       });
+  }
 
-      const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-      const max = Math.max(1, ...rows.map(r => r[1]));
+  auth.onAuthStateChanged(
+    async user => {
+      if (!user) {
+        state.currentUser =
+          null;
 
-      document.getElementById("trendList").innerHTML = rows.map(([name, count]) => `
-        <div class="trend-row">
-          <b>${name}</b>
-          <div class="trend-line"><div style="width:${count / max * 100}%"></div></div>
-          <span>${count}</span>
-        </div>
-      `).join("") || "<p>No negative complaints in the last 30 days.</p>";
-    }
+        stopRealtimeListeners();
 
-    function renderKnowledge() {
-      document.getElementById("knowledgeGrid").innerHTML = PRODUCTS.map(sku => `
-        <div class="card">
-          <h3>${sku}</h3>
-          <p><b>Installation:</b> Setup checklist and pairing guide</p>
-          <p><b>Common Errors:</b> ${sku.includes("HT") ? "Scanning, barcode, USB" : "Print, sync, power, app"}</p>
-          <p><b>Solutions:</b> Driver reset, calibration, firmware check</p>
-          <p><b>FAQ:</b> Warranty, compatibility, maintenance</p>
-          <p><b>Videos:</b> Setup and troubleshooting</p>
-          <p><b>Drivers:</b> Windows, Android, utility tools</p>
-        </div>
-      `).join("");
-    }
+        $("loginScreen")
+          .classList
+          .remove("hidden");
 
-    function renderTickets() {
-      document.getElementById("ticketList").innerHTML = tickets.map(t => `
-        <div class="card">
-          <h3>${t.id} - ${t.customer}</h3>
-          <p><b>${t.priority}</b> priority · ${t.sku}</p>
-          <p>${t.issue}</p>
-          <span class="pill">${t.status}</span>
-        </div>
-      `).join("");
-    }
+        $("appShell")
+          .classList
+          .add("hidden");
 
-    function renderSkuOptions() {
-      const options = PRODUCTS.map(sku => `<option>${sku}</option>`).join("");
-      document.getElementById("reviewSku").innerHTML = options;
-      document.getElementById("ticketSku").innerHTML = options;
-    }
-
-    function renderCharts() {
-      drawBarChart();
-      drawLineChart();
-    }
-
-    function setupCanvas(id) {
-      const canvas = document.getElementById(id);
-      const ctx = canvas.getContext("2d");
-      const ratio = devicePixelRatio || 1;
-      const width = canvas.parentElement.clientWidth - 32;
-      const height = Number(canvas.getAttribute("height"));
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
-      canvas.style.width = width + "px";
-      canvas.style.height = height + "px";
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      return { ctx, width, height };
-    }
-
-    function drawBarChart() {
-      const { ctx, width, height } = setupCanvas("barChart");
-      const data = [
-        ["Today", reviews.filter(r => r.date === daysAgo(0)).length],
-        ["Yesterday", reviews.filter(r => r.date === daysAgo(1)).length],
-        ["Weekly", reviews.filter(r => new Date(r.date) >= new Date(Date.now() - 7 * 86400000)).length],
-        ["Monthly", reviews.filter(r => new Date(r.date) >= new Date(Date.now() - 30 * 86400000)).length]
-      ];
-      const max = Math.max(1, ...data.map(x => x[1]));
-      ctx.clearRect(0, 0, width, height);
-      data.forEach(([label, count], i) => {
-        const w = width / data.length - 28;
-        const x = i * (width / data.length) + 16;
-        const h = (height - 50) * count / max;
-        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--primary");
-        ctx.fillRect(x, height - 30 - h, w, h);
-        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--text");
-        ctx.fillText(count, x + 4, height - 38 - h);
-        ctx.fillText(label, x, height - 10);
-      });
-    }
-
-    function drawLineChart() {
-      const { ctx, width, height } = setupCanvas("lineChart");
-      const data = Array.from({ length: 14 }, (_, i) => {
-        const date = daysAgo(13 - i);
-        return { label: date.slice(5), count: reviews.filter(r => r.date === date).length };
-      });
-      const max = Math.max(1, ...data.map(x => x.count));
-      const points = data.map((d, i) => ({
-        x: 16 + i * ((width - 32) / (data.length - 1)),
-        y: height - 30 - ((height - 55) * d.count / max),
-        label: d.label
-      }));
-      ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue("--primary");
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
-      ctx.stroke();
-      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--primary");
-      points.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function runSearch() {
-      const q = document.getElementById("searchInput").value.toLowerCase().trim();
-      const box = document.getElementById("searchResults");
-      if (!q) {
-        box.classList.add("hidden");
         return;
       }
 
-      const reviewMatches = reviews.filter(r => Object.values(r).join(" ").toLowerCase().includes(q));
-      const ticketMatches = tickets.filter(t => Object.values(t).join(" ").toLowerCase().includes(q));
+      if (
+        user.uid !== ADMIN_UID
+      ) {
+        await auth.signOut();
 
-      box.classList.remove("hidden");
-      box.innerHTML = `
-        <h2>Search Results</h2>
-        ${reviewMatches.map(r => `<p><b>Review:</b> ${r.sku} · ${r.issueType} · ${r.title}</p>`).join("")}
-        ${ticketMatches.map(t => `<p><b>Ticket:</b> ${t.id} · ${t.customer} · ${t.issue}</p>`).join("")}
-        ${!reviewMatches.length && !ticketMatches.length ? "<p>No results found.</p>" : ""}
-      `;
-    }
+        setMessage(
+          "loginMessage",
 
-    function normalizeImported(row) {
-      const lower = Object.fromEntries(Object.entries(row).map(([k, v]) => [k.toLowerCase().trim(), v]));
-      const title = lower["review title"] || lower.title || "Imported review";
-      const description = lower["review description"] || lower.description || lower.review || "";
-      const rating = Number(lower.rating || 0);
+          "This account is not authorized for the Review Intelligence database.",
 
-      return {
-        id: "R-" + Math.random().toString(16).slice(2),
-        date: lower.date ? new Date(lower.date).toISOString().slice(0, 10) : daysAgo(0),
-        sku: lower.sku || lower.product || lower["product name"],
-        rating,
-        title,
-        description,
-        issueType: classifyIssue(title + " " + description),
-        status: rating <= 2 ? "Open" : rating === 3 ? "Investigating" : "Resolved",
-        customer: lower.customer || "Imported Review"
-      };
-    }
+          "error"
+        );
 
-    function parseCsv(text) {
-      const lines = text.trim().split(/\r?\n/);
-      const headers = lines.shift().split(",").map(h => h.trim());
-      return lines.map(line => {
-        const values = line.split(",").map(v => v.trim());
-        return headers.reduce((row, h, i) => {
-          row[h] = values[i] || "";
-          return row;
-        }, {});
-      });
-    }
-
-    document.getElementById("themeBtn").onclick = () => {
-      document.body.classList.toggle("dark");
-      renderCharts();
-    };
-
-    document.getElementById("manualBtn").onclick = () => {
-      document.getElementById("reviewDialog").showModal();
-    };
-
-    document.getElementById("saveReview").onclick = () => {
-      const form = document.getElementById("reviewForm");
-      if (!form.reportValidity()) return;
-      const data = Object.fromEntries(new FormData(form));
-      const rating = Number(data.rating);
-      reviews.unshift({
-        id: "R-" + Math.random().toString(16).slice(2),
-        date: data.date,
-        sku: data.sku,
-        rating,
-        title: data.title,
-        description: data.description,
-        issueType: classifyIssue(data.title + " " + data.description),
-        status: rating <= 2 ? "Open" : rating === 3 ? "Investigating" : "Resolved",
-        customer: "Manual Entry"
-      });
-      saveData();
-      form.reset();
-      document.getElementById("reviewDialog").close();
-      render();
-    };
-
-    document.getElementById("importBtn").onclick = () => {
-      document.getElementById("fileInput").click();
-    };
-
-    document.getElementById("fileInput").onchange = async e => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      let rows = [];
-      if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer);
-        rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-      } else {
-        rows = parseCsv(await file.text());
+        return;
       }
 
-      const imported = rows.map(normalizeImported).filter(r => r.sku && r.rating);
-      syncReviews(imported);
-      alert(imported.length + " reviews imported.");
-      e.target.value = "";
+      state.currentUser =
+        user;
+
+      $("loginScreen")
+        .classList
+        .add("hidden");
+
+      $("appShell")
+        .classList
+        .remove("hidden");
+
+      $("userChip").innerHTML =
+        '<i class="fa-solid fa-user-shield"></i> ' +
+        escapeHTML(
+          user.email ||
+          "Admin"
+        );
+
+      startRealtimeListeners();
+    }
+  );
+
+  $("loginForm")
+    .addEventListener(
+      "submit",
+
+      async event => {
+        event.preventDefault();
+
+        clearMessage(
+          "loginMessage"
+        );
+
+        const button =
+          $("loginBtn");
+
+        setLoading(
+          button,
+          true,
+          ""
+        );
+
+        try {
+          await auth
+            .signInWithEmailAndPassword(
+              $("loginEmail")
+                .value
+                .trim(),
+
+              $("loginPassword")
+                .value
+            );
+
+          $("loginPassword")
+            .value =
+            "";
+        }
+        catch (error) {
+          setMessage(
+            "loginMessage",
+
+            humanAuthError(
+              error
+            ),
+
+            "error"
+          );
+        }
+        finally {
+          setLoading(
+            button,
+            false,
+
+            '<i class="fa-solid fa-right-to-bracket"></i>' +
+            " Sign In"
+          );
+        }
+      }
+    );
+
+  function humanAuthError(
+    error
+  ) {
+    const map = {
+      "auth/invalid-email":
+        "Email address is invalid.",
+
+      "auth/user-not-found":
+        "No Review Portal user was found with this email.",
+
+      "auth/wrong-password":
+        "Password is incorrect.",
+
+      "auth/invalid-login-credentials":
+        "Email or password is incorrect.",
+
+      "auth/too-many-requests":
+        "Too many attempts. Please wait and try again."
     };
 
-    document.getElementById("ticketForm").onsubmit = e => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target));
-      tickets.unshift({
-        id: "T-" + Date.now().toString().slice(-6),
-        date: daysAgo(0),
-        status: "Open",
-        ...data
+    return (
+      map[error.code] ||
+      error.message
+    );
+  }
+
+  $("logoutBtn")
+    .addEventListener(
+      "click",
+      () => auth.signOut()
+    );
+
+  $("themeBtn")
+    .addEventListener(
+      "click",
+      () => {
+        document.body
+          .classList
+          .toggle("dark");
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".nav-btn"
+    )
+    .forEach(button => {
+      button.addEventListener(
+        "click",
+        () => {
+          document
+            .querySelectorAll(
+              ".nav-btn"
+            )
+            .forEach(item => {
+              item.classList
+                .remove("active");
+            });
+
+          document
+            .querySelectorAll(
+              ".page"
+            )
+            .forEach(page => {
+              page.classList
+                .remove("active");
+            });
+
+          button.classList
+            .add("active");
+
+          state.activePage =
+            button.dataset.page;
+
+          $(
+            state.activePage
+          )
+          .classList
+          .add("active");
+
+          $("pageTitle")
+            .textContent =
+            button
+              .textContent
+              .trim();
+
+          renderAll();
+        }
+      );
+    });
+
+  function renderAll() {
+    renderSkuOptions();
+    renderDashboard();
+    renderReviews();
+    renderNegativeCenter();
+    renderFollowups();
+    renderProducts();
+    renderInsights();
+    renderTrashAndAudit();
+  }
+
+  function renderDashboard() {
+    const reviews =
+      activeRecords(
+        state.reviews
+      );
+
+    const followups =
+      activeRecords(
+        state.followups
+      );
+
+    const products =
+      activeRecords(
+        state.products
+      );
+
+    const total =
+      reviews.length;
+
+    const avg =
+      total
+        ? (
+          reviews.reduce(
+            (
+              sum,
+              item
+            ) =>
+              sum +
+              Number(
+                item.rating || 0
+              ),
+
+            0
+          ) / total
+        )
+        : 0;
+
+    const positive =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) >= 4
+      ).length;
+
+    const neutral =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) === 3
+      ).length;
+
+    const negative =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 2
+      ).length;
+
+    const openNegative =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 2 &&
+          ![
+            "Resolved",
+            "Closed"
+          ].includes(
+            item.status
+          )
+      ).length;
+
+    const dueFollowups =
+      followups.filter(
+        isDue
+      ).length;
+
+    const received =
+      followups.filter(
+        item =>
+          item.reviewReceived ===
+          "Yes"
+      ).length;
+
+    const cards = [
+      [
+        "Total Reviews",
+        total,
+        "Real saved records"
+      ],
+
+      [
+        "Average Rating",
+        avg.toFixed(2),
+        "Across all saved reviews"
+      ],
+
+      [
+        "Positive",
+        positive,
+        "4–5 star"
+      ],
+
+      [
+        "Neutral",
+        neutral,
+        "3 star"
+      ],
+
+      [
+        "Negative",
+        negative,
+        "1–2 star"
+      ],
+
+      [
+        "Open Negative",
+        openNegative,
+        "Needs action"
+      ],
+
+      [
+        "Follow-up Due",
+        dueFollowups,
+        "Due or overdue"
+      ],
+
+      [
+        "Review Received",
+        received,
+        "From call tracker"
+      ]
+    ];
+
+    $("dashboardCards")
+      .innerHTML =
+      cards
+        .map(
+          (
+            [
+              label,
+              value,
+              sub
+            ]
+          ) => `
+            <div class="card">
+              <span class="label">
+                ${escapeHTML(label)}
+              </span>
+
+              <strong class="value">
+                ${escapeHTML(value)}
+              </strong>
+
+              <span class="sub">
+                ${escapeHTML(sub)}
+              </span>
+            </div>
+          `
+        )
+        .join("");
+
+    if (!products.length) {
+      $("dashboardProducts")
+        .innerHTML =
+        '<div class="empty">' +
+          "Add products in Product Master to start SKU health tracking." +
+        "</div>";
+    }
+    else {
+      $("dashboardProducts")
+        .innerHTML =
+        products
+          .map(
+            product =>
+              productCardHTML(
+                product,
+                true
+              )
+          )
+          .join("");
+    }
+
+    renderComplaintChart(
+      reviews
+    );
+
+    renderRatingChart(
+      reviews
+    );
+  }
+
+  function productHealth(
+    product
+  ) {
+    const reviews =
+      activeRecords(
+        state.reviews
+      )
+      .filter(
+        item =>
+          item.sku ===
+          product.sku
+      );
+
+    const followups =
+      activeRecords(
+        state.followups
+      )
+      .filter(
+        item =>
+          item.sku ===
+          product.sku
+      );
+
+    const total =
+      reviews.length;
+
+    const negative =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 2
+      ).length;
+
+    const openNegative =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 2 &&
+          ![
+            "Resolved",
+            "Closed"
+          ].includes(
+            item.status
+          )
+      ).length;
+
+    const due =
+      followups.filter(
+        isDue
+      ).length;
+
+    const avg =
+      total
+        ? (
+          reviews.reduce(
+            (
+              sum,
+              item
+            ) =>
+              sum +
+              Number(
+                item.rating || 0
+              ),
+
+            0
+          ) / total
+        )
+        : 0;
+
+    const negativeRate =
+      total
+        ? negative / total
+        : 0;
+
+    const score =
+      Math.max(
+        0,
+
+        Math.round(
+          100 -
+          negativeRate * 45 -
+          openNegative * 6 -
+          due * 4
+        )
+      );
+
+    const color =
+      score >= 85
+        ? "var(--green)"
+        : (
+          score >= 65
+            ? "var(--yellow)"
+            : "var(--red)"
+        );
+
+    return {
+      total,
+      negative,
+      openNegative,
+      due,
+      avg,
+      score,
+      color
+    };
+  }
+
+  function productCardHTML(
+    product,
+    compact = false
+  ) {
+    const health =
+      productHealth(
+        product
+      );
+
+    const reviewUrl =
+      product.reviewUrl ||
+      (
+        product.asin
+          ? (
+            "https://www.amazon.in/product-reviews/" +
+            encodeURIComponent(
+              product.asin
+            ) +
+            "?sortBy=recent"
+          )
+          : ""
+      );
+
+    const productUrl =
+      product.amazonUrl ||
+      (
+        product.asin
+          ? (
+            "https://www.amazon.in/dp/" +
+            encodeURIComponent(
+              product.asin
+            )
+          )
+          : ""
+      );
+
+    return `
+      <div class="product-card">
+
+        <div
+          class="panel-head"
+          style="margin-bottom: 8px;"
+        >
+
+          <div>
+
+            <h4>
+              ${escapeHTML(
+                product.productName ||
+                product.sku
+              )}
+            </h4>
+
+            <p>
+              ${escapeHTML(product.sku)}
+              ·
+              ${escapeHTML(
+                product.asin ||
+                "No ASIN"
+              )}
+            </p>
+
+          </div>
+
+          <span
+            class="pill ${
+              product.active === false
+                ? "negative"
+                : "positive"
+            }"
+          >
+            ${
+              product.active === false
+                ? "Inactive"
+                : "Active"
+            }
+          </span>
+
+        </div>
+
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: end;
+          "
+        >
+
+          <div>
+
+            <span
+              class="muted"
+              style="
+                font-size: 11px;
+                font-weight: 800;
+              "
+            >
+              HEALTH SCORE
+            </span>
+
+            <div
+              style="
+                font-size: 25px;
+                font-weight: 900;
+                color: ${health.color};
+              "
+            >
+              ${health.score}%
+            </div>
+
+          </div>
+
+          <div style="text-align: right;">
+
+            <div>
+              ${health.total} reviews
+            </div>
+
+            <div
+              class="muted"
+              style="font-size: 12px;"
+            >
+              Avg ${health.avg.toFixed(1)}
+              ·
+              ${health.openNegative}
+              open negative
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="health-track">
+
+          <div
+            style="
+              width: ${health.score}%;
+              background: ${health.color};
+            "
+          ></div>
+
+        </div>
+
+        <div class="action-row">
+
+          ${
+            reviewUrl
+              ? `
+                <a
+                  class="btn small"
+                  href="${escapeHTML(reviewUrl)}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <i class="fa-brands fa-amazon"></i>
+                  Latest Reviews
+                </a>
+              `
+              : ""
+          }
+
+          ${
+            productUrl
+              ? `
+                <a
+                  class="btn secondary small"
+                  href="${escapeHTML(productUrl)}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <i class="fa-solid fa-up-right-from-square"></i>
+                  Product
+                </a>
+              `
+              : ""
+          }
+
+          ${
+            compact
+              ? ""
+              : `
+                <button
+                  class="btn secondary small"
+                  type="button"
+                  onclick="openProductModal('${escapeHTML(product._id)}')"
+                >
+                  <i class="fa-solid fa-pen"></i>
+                  Edit
+                </button>
+
+                <button
+                  class="btn danger small"
+                  type="button"
+                  onclick="softDelete(
+                    'product_master',
+                    '${escapeHTML(product._id)}',
+                    '${escapeHTML(product.sku)}'
+                  )"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                  Delete
+                </button>
+              `
+          }
+
+        </div>
+
+      </div>
+    `;
+  }
+
+  function renderComplaintChart(
+    reviews
+  ) {
+    const counts = {};
+
+    reviews
+      .filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 3
+      )
+      .forEach(item => {
+        const key =
+          item.issueType ||
+          "General Feedback";
+
+        counts[key] =
+          (
+            counts[key] ||
+            0
+          ) + 1;
       });
-      saveData();
-      e.target.reset();
-      render();
+
+    const rows =
+      Object
+        .entries(counts)
+        .sort(
+          (a, b) =>
+            b[1] - a[1]
+        )
+        .slice(0, 8);
+
+    const max =
+      Math.max(
+        1,
+        ...rows.map(
+          row => row[1]
+        )
+      );
+
+    $("topComplaints")
+      .innerHTML =
+      rows.length
+        ? (
+          rows
+            .map(
+              (
+                [
+                  name,
+                  count
+                ]
+              ) => `
+                <div class="chart-row">
+
+                  <strong>
+                    ${escapeHTML(name)}
+                  </strong>
+
+                  <div class="chart-bar">
+
+                    <div
+                      style="
+                        width: ${
+                          count / max * 100
+                        }%;
+                      "
+                    ></div>
+
+                  </div>
+
+                  <span>
+                    ${count}
+                  </span>
+
+                </div>
+              `
+            )
+            .join("")
+        )
+        : (
+          '<div class="empty">' +
+            "No complaint trends available yet." +
+          "</div>"
+        );
+  }
+
+  function renderRatingChart(
+    reviews
+  ) {
+    const counts =
+      [1, 2, 3, 4, 5]
+        .map(
+          rating => [
+            rating,
+
+            reviews.filter(
+              item =>
+                Number(
+                  item.rating
+                ) === rating
+            ).length
+          ]
+        );
+
+    const max =
+      Math.max(
+        1,
+        ...counts.map(
+          row => row[1]
+        )
+      );
+
+    $("ratingDistribution")
+      .innerHTML =
+      counts
+        .map(
+          (
+            [
+              rating,
+              count
+            ]
+          ) => `
+            <div class="chart-row">
+
+              <strong>
+                ${rating} Star
+              </strong>
+
+              <div class="chart-bar">
+
+                <div
+                  style="
+                    width: ${
+                      count / max * 100
+                    }%;
+
+                    background: ${
+                      rating <= 2
+                        ? "var(--red)"
+                        : (
+                          rating === 3
+                            ? "var(--yellow)"
+                            : "var(--green)"
+                        )
+                    };
+                  "
+                ></div>
+
+              </div>
+
+              <span>
+                ${count}
+              </span>
+
+            </div>
+          `
+        )
+        .join("");
+  }
+
+  function renderSkuOptions() {
+    const products =
+      activeRecords(
+        state.products
+      )
+      .filter(
+        item =>
+          item.active !== false
+      )
+      .sort(
+        (a, b) =>
+          String(a.sku)
+            .localeCompare(
+              String(b.sku)
+            )
+      );
+
+    const options =
+      products
+        .map(
+          product => `
+            <option value="${escapeHTML(product.sku)}">
+              ${escapeHTML(product.sku)}
+              —
+              ${escapeHTML(product.productName || "")}
+            </option>
+          `
+        )
+        .join("");
+
+    [
+      "reviewSku",
+      "followupSku"
+    ].forEach(id => {
+      const current =
+        $(id).value;
+
+      $(id).innerHTML =
+        '<option value="">Select SKU</option>' +
+        options;
+
+      if (
+        [
+          ...$(id).options
+        ].some(
+          option =>
+            option.value ===
+            current
+        )
+      ) {
+        $(id).value =
+          current;
+      }
+    });
+
+    [
+      "reviewSkuFilter",
+      "negativeSkuFilter",
+      "followupSkuFilter"
+    ].forEach(id => {
+      const current =
+        $(id).value;
+
+      $(id).innerHTML =
+        '<option value="">All SKUs</option>' +
+        products
+          .map(
+            product => `
+              <option value="${escapeHTML(product.sku)}">
+                ${escapeHTML(product.sku)}
+              </option>
+            `
+          )
+          .join("");
+
+      if (
+        [
+          ...$(id).options
+        ].some(
+          option =>
+            option.value ===
+            current
+        )
+      ) {
+        $(id).value =
+          current;
+      }
+    });
+  }
+
+  function filteredReviews() {
+    const search =
+      normalizeText(
+        $("reviewSearch").value
+      );
+
+    const sku =
+      $("reviewSkuFilter").value;
+
+    const sentiment =
+      $("reviewSentimentFilter").value;
+
+    const status =
+      $("reviewStatusFilter").value;
+
+    return activeRecords(
+      state.reviews
+    )
+    .filter(item => {
+      const haystack =
+        normalizeText(
+          [
+            item.reviewDate,
+            item.sku,
+            item.asin,
+            item.rating,
+            item.title,
+            item.description,
+            item.reviewerName,
+            item.issueType,
+            item.status,
+            item.source,
+            item.assignedTo
+          ].join(" ")
+        );
+
+      return (
+        (
+          !search ||
+          haystack.includes(search)
+        ) &&
+        (
+          !sku ||
+          item.sku === sku
+        ) &&
+        (
+          !sentiment ||
+          item.sentiment === sentiment
+        ) &&
+        (
+          !status ||
+          item.status === status
+        )
+      );
+    })
+    .sort(
+      (a, b) =>
+        String(
+          b.reviewDate || ""
+        )
+        .localeCompare(
+          String(
+            a.reviewDate || ""
+          )
+        ) ||
+        Number(
+          b.createdAt || 0
+        ) -
+        Number(
+          a.createdAt || 0
+        )
+    );
+  }
+
+  function renderReviews() {
+    const items =
+      filteredReviews();
+
+    const page =
+      paginate(
+        items,
+        "reviews"
+      );
+
+    if (!page.items.length) {
+      $("reviewsBody")
+        .innerHTML =
+        '<tr>' +
+          '<td colspan="8" class="empty">' +
+            "No real reviews saved yet." +
+          "</td>" +
+        "</tr>";
+    }
+    else {
+      $("reviewsBody")
+        .innerHTML =
+        page.items
+          .map(item => `
+            <tr>
+
+              <td>
+                ${formatDate(item.reviewDate)}
+              </td>
+
+              <td>
+
+                <strong>
+                  ${escapeHTML(item.sku)}
+                </strong>
+
+                <br>
+
+                <span class="muted">
+                  ${escapeHTML(item.asin || "")}
+                </span>
+
+              </td>
+
+              <td>
+
+                <strong>
+                  ${escapeHTML(item.rating)} ★
+                </strong>
+
+                <br>
+
+                <span
+                  class="pill ${sentimentClass(item.sentiment)}"
+                >
+                  ${escapeHTML(item.sentiment)}
+                </span>
+
+              </td>
+
+              <td>
+
+                <strong>
+                  ${escapeHTML(item.title)}
+                </strong>
+
+                <br>
+
+                <span class="muted">
+                  ${escapeHTML(item.description)}
+                </span>
+
+                ${
+                  item.reviewUrl
+                    ? `
+                      <br>
+
+                      <a
+                        href="${escapeHTML(item.reviewUrl)}"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        Open review
+                      </a>
+                    `
+                    : ""
+                }
+
+              </td>
+
+              <td>
+                ${escapeHTML(
+                  item.issueType ||
+                  "General Feedback"
+                )}
+              </td>
+
+              <td>
+
+                <span class="pill info">
+                  ${escapeHTML(
+                    item.status ||
+                    "New"
+                  )}
+                </span>
+
+                <br>
+
+                <span class="muted">
+                  ${escapeHTML(
+                    item.assignedTo ||
+                    "Unassigned"
+                  )}
+                </span>
+
+              </td>
+
+              <td>
+                ${escapeHTML(
+                  item.source ||
+                  "Manual Entry"
+                )}
+              </td>
+
+              <td>
+
+                <div class="action-row">
+
+                  <button
+                    class="btn secondary small"
+                    type="button"
+                    onclick="openReviewModal('${escapeHTML(item._id)}')"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                    Edit
+                  </button>
+
+                  <button
+                    class="btn danger small"
+                    type="button"
+                    onclick="softDelete(
+                      'amazon_reviews',
+                      '${escapeHTML(item._id)}',
+                      '${escapeHTML(item.title)}'
+                    )"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                    Delete
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+          `)
+          .join("");
+    }
+
+    renderPager(
+      "reviewsPager",
+      "reviews",
+      page
+    );
+  }
+
+  function filteredNegativeReviews() {
+    const search =
+      normalizeText(
+        $("negativeSearch").value
+      );
+
+    const sku =
+      $("negativeSkuFilter").value;
+
+    const status =
+      $("negativeStatusFilter").value;
+
+    const rating =
+      $("negativeRatingFilter").value;
+
+    return activeRecords(
+      state.reviews
+    )
+    .filter(
+      item =>
+        Number(
+          item.rating
+        ) <= 2
+    )
+    .filter(item => {
+      const haystack =
+        normalizeText(
+          [
+            item.reviewDate,
+            item.sku,
+            item.asin,
+            item.rating,
+            item.title,
+            item.description,
+            item.issueType,
+            item.status,
+            item.assignedTo
+          ].join(" ")
+        );
+
+      return (
+        (
+          !search ||
+          haystack.includes(search)
+        ) &&
+        (
+          !sku ||
+          item.sku === sku
+        ) &&
+        (
+          !status ||
+          item.status === status
+        ) &&
+        (
+          !rating ||
+          Number(item.rating) ===
+          Number(rating)
+        )
+      );
+    })
+    .sort((a, b) => {
+      const aOpen =
+        [
+          "Resolved",
+          "Closed"
+        ].includes(a.status)
+          ? 1
+          : 0;
+
+      const bOpen =
+        [
+          "Resolved",
+          "Closed"
+        ].includes(b.status)
+          ? 1
+          : 0;
+
+      return (
+        aOpen - bOpen ||
+        Number(a.rating) -
+        Number(b.rating) ||
+        String(b.reviewDate)
+          .localeCompare(
+            String(a.reviewDate)
+          )
+      );
+    });
+  }
+
+  function renderNegativeCenter() {
+    const all =
+      activeRecords(
+        state.reviews
+      )
+      .filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 2
+      );
+
+    const open =
+      all.filter(
+        item =>
+          ![
+            "Resolved",
+            "Closed"
+          ].includes(
+            item.status
+          )
+      );
+
+    const oneStar =
+      all.filter(
+        item =>
+          Number(
+            item.rating
+          ) === 1
+      ).length;
+
+    const unresolved7 =
+      open.filter(item => {
+        const date =
+          new Date(
+            (
+              item.reviewDate ||
+              todayISO()
+            ) +
+            "T00:00:00"
+          );
+
+        return (
+          Date.now() -
+          date.getTime() >=
+          7 * 86400000
+        );
+      }).length;
+
+    $("negativeCards")
+      .innerHTML =
+      [
+        [
+          "Total Negative",
+          all.length,
+          "1–2 star"
+        ],
+
+        [
+          "Open Cases",
+          open.length,
+          "Needs resolution"
+        ],
+
+        [
+          "1-Star Reviews",
+          oneStar,
+          "Highest priority"
+        ],
+
+        [
+          "Open 7+ Days",
+          unresolved7,
+          "Escalation required"
+        ]
+      ]
+      .map(
+        (
+          [
+            label,
+            value,
+            sub
+          ]
+        ) => `
+          <div class="card">
+
+            <span class="label">
+              ${label}
+            </span>
+
+            <strong class="value text-red">
+              ${value}
+            </strong>
+
+            <span class="sub">
+              ${sub}
+            </span>
+
+          </div>
+        `
+      )
+      .join("");
+
+    const page =
+      paginate(
+        filteredNegativeReviews(),
+        "negative"
+      );
+
+    if (!page.items.length) {
+      $("negativeBody")
+        .innerHTML =
+        '<tr>' +
+          '<td colspan="7" class="empty">' +
+            "No negative reviews found." +
+          "</td>" +
+        "</tr>";
+    }
+    else {
+      $("negativeBody")
+        .innerHTML =
+        page.items
+          .map(item => `
+            <tr>
+
+              <td>
+                ${formatDate(item.reviewDate)}
+              </td>
+
+              <td>
+
+                <strong>
+                  ${escapeHTML(item.sku)}
+                </strong>
+
+                <br>
+
+                <span class="muted">
+                  ${escapeHTML(item.asin || "")}
+                </span>
+
+              </td>
+
+              <td>
+
+                <span class="pill negative">
+                  ${escapeHTML(item.rating)} ★
+                </span>
+
+              </td>
+
+              <td>
+
+                <strong>
+                  ${escapeHTML(item.title)}
+                </strong>
+
+                <br>
+
+                <span class="muted">
+                  ${escapeHTML(item.description)}
+                </span>
+
+                <br>
+
+                <span class="pill purple">
+                  ${escapeHTML(
+                    item.issueType ||
+                    "General Feedback"
+                  )}
+                </span>
+
+              </td>
+
+              <td>
+
+                <select
+                  onchange="quickReviewStatus(
+                    '${escapeHTML(item._id)}',
+                    this.value
+                  )"
+                >
+                  <option ${item.status === "New" ? "selected" : ""}>
+                    New
+                  </option>
+
+                  <option ${item.status === "Investigating" ? "selected" : ""}>
+                    Investigating
+                  </option>
+
+                  <option ${item.status === "Customer Contacted" ? "selected" : ""}>
+                    Customer Contacted
+                  </option>
+
+                  <option ${item.status === "Waiting" ? "selected" : ""}>
+                    Waiting
+                  </option>
+
+                  <option ${item.status === "Resolved" ? "selected" : ""}>
+                    Resolved
+                  </option>
+
+                  <option ${item.status === "Closed" ? "selected" : ""}>
+                    Closed
+                  </option>
+                </select>
+
+              </td>
+
+              <td>
+                ${escapeHTML(
+                  item.assignedTo ||
+                  "Unassigned"
+                )}
+              </td>
+
+              <td>
+
+                <div class="action-row">
+
+                  <button
+                    class="btn secondary small"
+                    type="button"
+                    onclick="openReviewModal('${escapeHTML(item._id)}')"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                    Edit
+                  </button>
+
+                  ${
+                    item.reviewUrl
+                      ? `
+                        <a
+                          class="btn small"
+                          href="${escapeHTML(item.reviewUrl)}"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          <i class="fa-solid fa-up-right-from-square"></i>
+                          Review
+                        </a>
+                      `
+                      : ""
+                  }
+
+                </div>
+
+              </td>
+
+            </tr>
+          `)
+          .join("");
+    }
+
+    renderPager(
+      "negativePager",
+      "negative",
+      page
+    );
+  }
+
+  function renderFollowups() {
+    const all =
+      activeRecords(
+        state.followups
+      );
+
+    const called =
+      all.filter(
+        item =>
+          item.callDate
+      ).length;
+
+    const sent =
+      all.filter(
+        item =>
+          item.reviewRequestSent ===
+          "Yes"
+      ).length;
+
+    const due =
+      all.filter(
+        isDue
+      ).length;
+
+    const received =
+      all.filter(
+        item =>
+          item.reviewReceived ===
+          "Yes"
+      ).length;
+
+    const negative =
+      all.filter(
+        item =>
+          Number(
+            item.receivedRating
+          ) > 0 &&
+          Number(
+            item.receivedRating
+          ) <= 2
+      ).length;
+
+    $("followupCards")
+      .innerHTML =
+      [
+        [
+          "Total Follow-ups",
+          all.length,
+          "Saved records"
+        ],
+
+        [
+          "Customers Called",
+          called,
+          "Call date entered"
+        ],
+
+        [
+          "Request Sent",
+          sent,
+          "Review request marked"
+        ],
+
+        [
+          "Due / Overdue",
+          due,
+          "Needs attention"
+        ],
+
+        [
+          "Review Received",
+          received,
+          "Confirmed by staff"
+        ],
+
+        [
+          "Negative Received",
+          negative,
+          "1–2 star"
+        ]
+      ]
+      .map(
+        (
+          [
+            label,
+            value,
+            sub
+          ]
+        ) => `
+          <div class="card">
+
+            <span class="label">
+              ${label}
+            </span>
+
+            <strong class="value">
+              ${value}
+            </strong>
+
+            <span class="sub">
+              ${sub}
+            </span>
+
+          </div>
+        `
+      )
+      .join("");
+
+    const search =
+      normalizeText(
+        $("followupSearch").value
+      );
+
+    const sku =
+      $("followupSkuFilter").value;
+
+    const status =
+      $("followupStatusFilter").value;
+
+    const dueFilter =
+      $("followupDueFilter").value;
+
+    const filtered =
+      all.filter(item => {
+        const haystack =
+          normalizeText(
+            [
+              item.customerName,
+              item.phone,
+              item.orderId,
+              item.sku,
+              item.callResult,
+              item.status,
+              item.notes,
+              item.negativeIssue,
+              item.assignedTo
+            ].join(" ")
+          );
+
+        const dueMatch =
+          !dueFilter ||
+          (
+            dueFilter === "due" &&
+            isDue(item)
+          ) ||
+          (
+            dueFilter === "received" &&
+            item.reviewReceived === "Yes"
+          ) ||
+          (
+            dueFilter === "pending" &&
+            item.reviewReceived !== "Yes"
+          );
+
+        return (
+          (
+            !search ||
+            haystack.includes(search)
+          ) &&
+          (
+            !sku ||
+            item.sku === sku
+          ) &&
+          (
+            !status ||
+            item.status === status
+          ) &&
+          dueMatch
+        );
+      })
+      .sort((a, b) => {
+        const aDue =
+          isDue(a)
+            ? 0
+            : 1;
+
+        const bDue =
+          isDue(b)
+            ? 0
+            : 1;
+
+        return (
+          aDue - bDue ||
+          String(
+            a.followupDate ||
+            "9999"
+          )
+          .localeCompare(
+            String(
+              b.followupDate ||
+              "9999"
+            )
+          )
+        );
+      });
+
+    const page =
+      paginate(
+        filtered,
+        "followups"
+      );
+
+    if (!page.items.length) {
+      $("followupsBody")
+        .innerHTML =
+        '<tr>' +
+          '<td colspan="8" class="empty">' +
+            "No customer follow-ups saved yet." +
+          "</td>" +
+        "</tr>";
+    }
+    else {
+      $("followupsBody")
+        .innerHTML =
+        page.items
+          .map(item => {
+            const dueBadge =
+              isDue(item)
+                ? (
+                  '<span class="pill negative">' +
+                    "Due / Overdue" +
+                  "</span>"
+                )
+                : (
+                  '<span class="pill info">' +
+                    "Scheduled" +
+                  "</span>"
+                );
+
+            return `
+              <tr>
+
+                <td>
+
+                  <strong>
+                    ${escapeHTML(item.customerName)}
+                  </strong>
+
+                  <br>
+
+                  <span class="muted">
+                    ${escapeHTML(item.phone)}
+                  </span>
+
+                  <br>
+
+                  <span class="muted">
+                    ${escapeHTML(item.orderId)}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <strong>
+                    ${escapeHTML(item.sku)}
+                  </strong>
+
+                </td>
+
+                <td>
+
+                  ${formatDate(item.callDate)}
+
+                  <br>
+
+                  <span class="muted">
+                    ${escapeHTML(
+                      item.callResult ||
+                      "Not Called"
+                    )}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  ${
+                    item.reviewRequestSent === "Yes"
+                      ? (
+                        '<span class="pill positive">' +
+                          "Sent" +
+                        "</span>"
+                      )
+                      : (
+                        '<span class="pill neutral">' +
+                          "Not Sent" +
+                        "</span>"
+                      )
+                  }
+
+                  <br>
+
+                  <span class="muted">
+                    ${formatDate(item.requestDate)}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  ${formatDate(
+                    item.followupDate ||
+                    item.expectedReviewDate
+                  )}
+
+                  <br>
+
+                  ${dueBadge}
+
+                </td>
+
+                <td>
+
+                  ${
+                    item.reviewReceived === "Yes"
+                      ? `
+                        <span class="pill positive">
+                          Received
+                          ${escapeHTML(item.receivedRating || "")}
+                          ★
+                        </span>
+                      `
+                      : (
+                        '<span class="pill neutral">' +
+                          "Pending" +
+                        "</span>"
+                      )
+                  }
+
+                  ${
+                    item.negativeIssue
+                      ? `
+                        <br>
+
+                        <span class="text-red">
+                          ${escapeHTML(item.negativeIssue)}
+                        </span>
+                      `
+                      : ""
+                  }
+
+                </td>
+
+                <td>
+
+                  <span class="pill info">
+                    ${escapeHTML(
+                      item.status ||
+                      "Not Called"
+                    )}
+                  </span>
+
+                  <br>
+
+                  <span class="muted">
+                    ${escapeHTML(
+                      item.assignedTo ||
+                      "Unassigned"
+                    )}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <div class="action-row">
+
+                    <button
+                      class="btn secondary small"
+                      type="button"
+                      onclick="openFollowupModal('${escapeHTML(item._id)}')"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                      Edit
+                    </button>
+
+                    <button
+                      class="btn danger small"
+                      type="button"
+                      onclick="softDelete(
+                        'customer_followups',
+                        '${escapeHTML(item._id)}',
+                        '${escapeHTML(item.customerName)}'
+                      )"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                      Delete
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+            `;
+          })
+          .join("");
+    }
+
+    renderPager(
+      "followupsPager",
+      "followups",
+      page
+    );
+  }
+
+  function renderProducts() {
+    const products =
+      activeRecords(
+        state.products
+      )
+      .sort(
+        (a, b) =>
+          String(a.sku)
+            .localeCompare(
+              String(b.sku)
+            )
+      );
+
+    $("productsGrid")
+      .innerHTML =
+      products.length
+        ? (
+          products
+            .map(
+              product =>
+                productCardHTML(
+                  product,
+                  false
+                )
+            )
+            .join("")
+        )
+        : (
+          '<div class="empty">' +
+            "No products saved. Add Product Name, SKU, ASIN and Amazon review-page link." +
+          "</div>"
+        );
+  }
+
+  function renderInsights() {
+    const reviews =
+      activeRecords(
+        state.reviews
+      );
+
+    const followups =
+      activeRecords(
+        state.followups
+      );
+
+    const products =
+      activeRecords(
+        state.products
+      );
+
+    const insights = [];
+
+    if (
+      !reviews.length &&
+      !followups.length
+    ) {
+      $("insightsGrid")
+        .innerHTML =
+        '<div class="empty">' +
+          "Save real reviews and follow-ups to generate smart insights." +
+        "</div>";
+
+      return;
+    }
+
+    const complaintCounts = {};
+
+    reviews
+      .filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 3
+      )
+      .forEach(item => {
+        const type =
+          item.issueType ||
+          "General Feedback";
+
+        complaintCounts[type] =
+          (
+            complaintCounts[type] ||
+            0
+          ) + 1;
+      });
+
+    const topComplaint =
+      Object
+        .entries(
+          complaintCounts
+        )
+        .sort(
+          (a, b) =>
+            b[1] - a[1]
+        )[0];
+
+    if (topComplaint) {
+      insights.push({
+        title:
+          "Top Complaint Pattern",
+
+        text:
+          topComplaint[0] +
+          " appears " +
+          topComplaint[1] +
+          " time(s). Prepare a standard troubleshooting checklist and product-improvement note.",
+
+        level:
+          "High"
+      });
+    }
+
+    const risky =
+      products
+        .map(product => ({
+          product:
+            product,
+
+          health:
+            productHealth(
+              product
+            )
+        }))
+        .sort(
+          (a, b) =>
+            a.health.score -
+            b.health.score
+        )[0];
+
+    if (risky) {
+      insights.push({
+        title:
+          "Lowest SKU Health",
+
+        text:
+          risky.product.sku +
+          " has the lowest health score at " +
+          risky.health.score +
+          "%. Open negative cases: " +
+          risky.health.openNegative +
+          "; due follow-ups: " +
+          risky.health.due +
+          ".",
+
+        level:
+          risky.health.score < 65
+            ? "Critical"
+            : "Medium"
+      });
+    }
+
+    const overdue =
+      followups.filter(
+        isDue
+      ).length;
+
+    if (overdue) {
+      insights.push({
+        title:
+          "Follow-up Risk",
+
+        text:
+          overdue +
+          " customer follow-up(s) are due or overdue. Contact these customers first and update the result immediately.",
+
+        level:
+          "High"
+      });
+    }
+
+    const unresolved =
+      reviews.filter(
+        item =>
+          Number(
+            item.rating
+          ) <= 2 &&
+          ![
+            "Resolved",
+            "Closed"
+          ].includes(
+            item.status
+          )
+      );
+
+    if (unresolved.length) {
+      insights.push({
+        title:
+          "Negative Review Workload",
+
+        text:
+          unresolved.length +
+          " negative review(s) are still open. Assign staff and move each case through investigation, contact, waiting and resolution.",
+
+        level:
+          "High"
+      });
+    }
+
+    const received =
+      followups.filter(
+        item =>
+          item.reviewReceived ===
+          "Yes"
+      );
+
+    const receivedRate =
+      followups.length
+        ? Math.round(
+          received.length /
+          followups.length *
+          100
+        )
+        : 0;
+
+    insights.push({
+      title:
+        "Review Follow-up Conversion",
+
+      text:
+        receivedRate +
+        "% of tracked follow-ups are marked as Review Received. Improve call notes and timely 2–3 day follow-up to increase this rate.",
+
+      level:
+        "Info"
+    });
+
+    $("insightsGrid")
+      .innerHTML =
+      insights
+        .map(item => `
+          <div class="insight-card">
+
+            <span
+              class="pill ${
+                item.level === "Critical"
+                  ? "negative"
+                  : (
+                    item.level === "High"
+                      ? "neutral"
+                      : "info"
+                  )
+              }"
+            >
+              ${escapeHTML(item.level)}
+            </span>
+
+            <h4 style="margin-top: 9px;">
+              ${escapeHTML(item.title)}
+            </h4>
+
+            <p>
+              ${escapeHTML(item.text)}
+            </p>
+
+          </div>
+        `)
+        .join("");
+  }
+
+  function renderTrashAndAudit() {
+    const deleted = [
+      ...deletedRecords(
+        state.reviews
+      ),
+
+      ...deletedRecords(
+        state.followups
+      ),
+
+      ...deletedRecords(
+        state.products
+      )
+    ]
+    .sort(
+      (a, b) =>
+        Number(
+          b.deletedAt || 0
+        ) -
+        Number(
+          a.deletedAt || 0
+        )
+    );
+
+    if (!deleted.length) {
+      $("trashList")
+        .innerHTML =
+        '<div class="empty">' +
+          "Trash is empty." +
+        "</div>";
+    }
+    else {
+      $("trashList")
+        .innerHTML = `
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Deleted</th>
+                  <th>Collection</th>
+                  <th>Record</th>
+                  <th>Deleted By</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                ${
+                  deleted
+                    .map(item => {
+                      const title =
+                        item.title ||
+                        item.customerName ||
+                        item.sku ||
+                        item._id;
+
+                      return `
+                        <tr>
+
+                          <td>
+                            ${formatDateTime(item.deletedAt)}
+                          </td>
+
+                          <td>
+                            ${escapeHTML(item._collection)}
+                          </td>
+
+                          <td>
+                            ${escapeHTML(title)}
+                          </td>
+
+                          <td>
+                            ${escapeHTML(item.deletedByEmail || "")}
+                          </td>
+
+                          <td>
+
+                            <div class="action-row">
+
+                              <button
+                                class="btn green small"
+                                type="button"
+                                onclick="restoreRecord(
+                                  '${escapeHTML(item._collection)}',
+                                  '${escapeHTML(item._id)}',
+                                  '${escapeHTML(title)}'
+                                )"
+                              >
+                                <i class="fa-solid fa-trash-can-arrow-up"></i>
+                                Restore
+                              </button>
+
+                              <button
+                                class="btn danger small"
+                                type="button"
+                                onclick="permanentDelete(
+                                  '${escapeHTML(item._collection)}',
+                                  '${escapeHTML(item._id)}',
+                                  '${escapeHTML(title)}'
+                                )"
+                              >
+                                <i class="fa-solid fa-skull-crossbones"></i>
+                                Permanent
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+                      `;
+                    })
+                    .join("")
+                }
+
+              </tbody>
+
+            </table>
+
+          </div>
+        `;
+    }
+
+    const audits =
+      Array
+        .from(
+          state.audits.values()
+        )
+        .sort(
+          (a, b) =>
+            Number(
+              b.createdAt || 0
+            ) -
+            Number(
+              a.createdAt || 0
+            )
+        )
+        .slice(0, 200);
+
+    $("auditBody")
+      .innerHTML =
+      audits.length
+        ? (
+          audits
+            .map(item => `
+              <tr>
+
+                <td>
+                  ${formatDateTime(item.createdAt)}
+                </td>
+
+                <td>
+                  ${escapeHTML(item.action)}
+                </td>
+
+                <td>
+                  ${escapeHTML(item.collection)}
+                </td>
+
+                <td>
+                  ${escapeHTML(
+                    item.summary ||
+                    item.recordId
+                  )}
+                </td>
+
+                <td>
+                  ${escapeHTML(
+                    item.userEmail ||
+                    item.userUid
+                  )}
+                </td>
+
+              </tr>
+            `)
+            .join("")
+        )
+        : (
+          '<tr>' +
+            '<td colspan="5" class="empty">' +
+              "No audit actions recorded yet." +
+            "</td>" +
+          "</tr>"
+        );
+  }
+
+  function paginate(
+    items,
+    type
+  ) {
+    const totalPages =
+      Math.max(
+        1,
+        Math.ceil(
+          items.length /
+          PAGE_SIZE
+        )
+      );
+
+    state.pages[type] =
+      Math.min(
+        Math.max(
+          1,
+          state.pages[type]
+        ),
+
+        totalPages
+      );
+
+    const start =
+      (
+        state.pages[type] -
+        1
+      ) *
+      PAGE_SIZE;
+
+    return {
+      items:
+        items.slice(
+          start,
+          start + PAGE_SIZE
+        ),
+
+      total:
+        items.length,
+
+      totalPages:
+        totalPages,
+
+      start:
+        start,
+
+      end:
+        Math.min(
+          start + PAGE_SIZE,
+          items.length
+        )
     };
+  }
 
-    document.getElementById("searchInput").oninput = runSearch;
-    window.onresize = renderCharts;
+  function renderPager(
+    id,
+    type,
+    page
+  ) {
+    const box = $(id);
 
-    render();
-  </script>
+    if (
+      page.total <= PAGE_SIZE
+    ) {
+      box.innerHTML =
+        '<span class="muted">' +
+          page.total +
+          " record(s)" +
+        "</span>";
+
+      return;
+    }
+
+    const current =
+      state.pages[type];
+
+    const first =
+      Math.max(
+        1,
+        current - 2
+      );
+
+    const last =
+      Math.min(
+        page.totalPages,
+        current + 2
+      );
+
+    const html = [];
+
+    html.push(`
+      <button
+        ${
+          current === 1
+            ? "disabled"
+            : ""
+        }
+        onclick="changePage(
+          '${type}',
+          ${current - 1}
+        )"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+    `);
+
+    for (
+      let number = first;
+      number <= last;
+      number += 1
+    ) {
+      html.push(`
+        <button
+          class="${
+            number === current
+              ? "active"
+              : ""
+          }"
+          onclick="changePage(
+            '${type}',
+            ${number}
+          )"
+        >
+          ${number}
+        </button>
+      `);
+    }
+
+    html.push(`
+      <button
+        ${
+          current === page.totalPages
+            ? "disabled"
+            : ""
+        }
+        onclick="changePage(
+          '${type}',
+          ${current + 1}
+        )"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    `);
+
+    html.push(`
+      <span class="muted">
+        ${page.start + 1}
+        -
+        ${page.end}
+        of
+        ${page.total}
+      </span>
+    `);
+
+    box.innerHTML =
+      html.join("");
+  }
+
+  function changePage(
+    type,
+    page
+  ) {
+    state.pages[type] =
+      page;
+
+    if (
+      type === "reviews"
+    ) {
+      renderReviews();
+    }
+
+    if (
+      type === "negative"
+    ) {
+      renderNegativeCenter();
+    }
+
+    if (
+      type === "followups"
+    ) {
+      renderFollowups();
+    }
+  }
+
+  function openReviewModal(
+    id = ""
+  ) {
+    $("reviewForm").reset();
+
+    $("reviewId").value =
+      "";
+
+    $("reviewDate").value =
+      todayISO();
+
+    $("reviewStatus").value =
+      "New";
+
+    $("reviewSource").value =
+      "Manual Entry";
+
+    $("reviewModalTitle")
+      .textContent =
+      id
+        ? "Edit Review"
+        : "Add Review";
+
+    if (id) {
+      const item =
+        state.reviews.get(id);
+
+      if (!item) {
+        return;
+      }
+
+      $("reviewId").value =
+        id;
+
+      $("reviewDate").value =
+        item.reviewDate || "";
+
+      $("reviewSku").value =
+        item.sku || "";
+
+      $("reviewAsin").value =
+        item.asin || "";
+
+      $("reviewRating").value =
+        item.rating || "";
+
+      $("reviewTitle").value =
+        item.title || "";
+
+      $("reviewDescription").value =
+        item.description || "";
+
+      $("reviewerName").value =
+        item.reviewerName || "";
+
+      $("reviewUrl").value =
+        item.reviewUrl || "";
+
+      $("reviewSource").value =
+        item.source ||
+        "Manual Entry";
+
+      $("reviewStatus").value =
+        item.status ||
+        "New";
+
+      $("reviewAssigned").value =
+        item.assignedTo || "";
+
+      $("reviewIssueType").value =
+        item.issueType || "";
+
+      $("reviewNotes").value =
+        item.notes || "";
+    }
+
+    openModal(
+      "reviewModal"
+    );
+  }
+
+  $("reviewSku")
+    .addEventListener(
+      "change",
+      () => {
+        const product =
+          productBySku(
+            $("reviewSku").value
+          );
+
+        $("reviewAsin").value =
+          product
+            ? (
+              product.asin ||
+              ""
+            )
+            : "";
+      }
+    );
+
+  $("reviewTitle")
+    .addEventListener(
+      "input",
+      autoFillIssue
+    );
+
+  $("reviewDescription")
+    .addEventListener(
+      "input",
+      autoFillIssue
+    );
+
+  function autoFillIssue() {
+    $("reviewIssueType").value =
+      classifyIssue(
+        $("reviewTitle").value +
+        " " +
+        $("reviewDescription").value
+      );
+  }
+
+  $("reviewForm")
+    .addEventListener(
+      "submit",
+
+      async event => {
+        event.preventDefault();
+
+        const button =
+          $("saveReviewBtn");
+
+        setLoading(
+          button,
+          true,
+          ""
+        );
+
+        const id =
+          $("reviewId").value;
+
+        const existing =
+          id
+            ? state.reviews.get(id)
+            : null;
+
+        const product =
+          productBySku(
+            $("reviewSku").value
+          );
+
+        const rating =
+          Number(
+            $("reviewRating").value
+          );
+
+        const record = {
+          reviewDate:
+            $("reviewDate").value,
+
+          sku:
+            $("reviewSku").value,
+
+          asin:
+            $("reviewAsin").value ||
+            (
+              product
+                ? (
+                  product.asin ||
+                  ""
+                )
+                : ""
+            ),
+
+          rating:
+            rating,
+
+          sentiment:
+            sentimentFromRating(
+              rating
+            ),
+
+          title:
+            $("reviewTitle")
+              .value
+              .trim(),
+
+          description:
+            $("reviewDescription")
+              .value
+              .trim(),
+
+          reviewerName:
+            $("reviewerName")
+              .value
+              .trim(),
+
+          reviewUrl:
+            $("reviewUrl")
+              .value
+              .trim(),
+
+          source:
+            $("reviewSource").value,
+
+          status:
+            $("reviewStatus").value,
+
+          assignedTo:
+            $("reviewAssigned")
+              .value
+              .trim(),
+
+          issueType:
+            $("reviewIssueType")
+              .value
+              .trim() ||
+            classifyIssue(
+              $("reviewTitle").value +
+              " " +
+              $("reviewDescription").value
+            ),
+
+          notes:
+            $("reviewNotes")
+              .value
+              .trim(),
+
+          isDeleted:
+            false,
+
+          updatedAt:
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP,
+
+          updatedBy:
+            state.currentUser.uid,
+
+          updatedByEmail:
+            state.currentUser.email ||
+            ""
+        };
+
+        if (!id) {
+          record.createdAt =
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP;
+
+          record.createdBy =
+            state.currentUser.uid;
+
+          record.createdByEmail =
+            state.currentUser.email ||
+            "";
+        }
+        else if (existing) {
+          record.createdAt =
+            existing.createdAt ||
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP;
+
+          record.createdBy =
+            existing.createdBy ||
+            state.currentUser.uid;
+
+          record.createdByEmail =
+            existing.createdByEmail ||
+            state.currentUser.email ||
+            "";
+        }
+
+        if (
+          isDuplicateReview(
+            record,
+            id
+          )
+        ) {
+          toast(
+            "Duplicate review detected. Check Review URL, ASIN, date, title and reviewer.",
+
+            "error"
+          );
+
+          setLoading(
+            button,
+            false,
+
+            '<i class="fa-solid fa-floppy-disk"></i>' +
+            " Save Review"
+          );
+
+          return;
+        }
+
+        try {
+          const key =
+            id ||
+            reviewsRef.push().key;
+
+          await reviewsRef
+            .child(key)
+            .set(record);
+
+          await writeAudit(
+            id
+              ? "UPDATE"
+              : "CREATE",
+
+            "amazon_reviews",
+
+            key,
+
+            record.title
+          );
+
+          closeModal(
+            "reviewModal"
+          );
+
+          toast(
+            id
+              ? "Review updated successfully."
+              : "Review saved successfully."
+          );
+        }
+        catch (error) {
+          toast(
+            "Save failed: " +
+            error.message,
+
+            "error"
+          );
+        }
+        finally {
+          setLoading(
+            button,
+            false,
+
+            '<i class="fa-solid fa-floppy-disk"></i>' +
+            " Save Review"
+          );
+        }
+      }
+    );
+
+  async function quickReviewStatus(
+    id,
+    status
+  ) {
+    try {
+      await reviewsRef
+        .child(id)
+        .update({
+          status:
+            status,
+
+          updatedAt:
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP,
+
+          updatedBy:
+            state.currentUser.uid,
+
+          updatedByEmail:
+            state.currentUser.email ||
+            ""
+        });
+
+      await writeAudit(
+        "STATUS_UPDATE",
+        "amazon_reviews",
+        id,
+        status
+      );
+
+      toast(
+        "Review status updated."
+      );
+    }
+    catch (error) {
+      toast(
+        "Status update failed: " +
+        error.message,
+
+        "error"
+      );
+    }
+  }
+
+  function openFollowupModal(
+    id = ""
+  ) {
+    $("followupForm").reset();
+
+    $("followupId").value =
+      "";
+
+    $("followupStatus").value =
+      "Not Called";
+
+    $("followupRequestSent").value =
+      "No";
+
+    $("followupReviewReceived").value =
+      "No";
+
+    $("followupModalTitle")
+      .textContent =
+      id
+        ? "Edit Follow-up"
+        : "Add Follow-up";
+
+    if (id) {
+      const item =
+        state.followups.get(id);
+
+      if (!item) {
+        return;
+      }
+
+      $("followupId").value =
+        id;
+
+      $("followupCustomer").value =
+        item.customerName || "";
+
+      $("followupPhone").value =
+        item.phone || "";
+
+      $("followupOrderId").value =
+        item.orderId || "";
+
+      $("followupSku").value =
+        item.sku || "";
+
+      $("followupDeliveryDate").value =
+        item.deliveryDate || "";
+
+      $("followupCallDate").value =
+        item.callDate || "";
+
+      $("followupCallResult").value =
+        item.callResult ||
+        "Not Called";
+
+      $("followupStatus").value =
+        item.status ||
+        "Not Called";
+
+      $("followupRequestSent").value =
+        item.reviewRequestSent ||
+        "No";
+
+      $("followupRequestDate").value =
+        item.requestDate || "";
+
+      $("followupExpectedDate").value =
+        item.expectedReviewDate ||
+        "";
+
+      $("followupDate").value =
+        item.followupDate || "";
+
+      $("followupReviewReceived").value =
+        item.reviewReceived ||
+        "No";
+
+      $("followupRating").value =
+        item.receivedRating || "";
+
+      $("followupAssigned").value =
+        item.assignedTo || "";
+
+      $("followupNegativeIssue").value =
+        item.negativeIssue || "";
+
+      $("followupNotes").value =
+        item.notes || "";
+    }
+
+    openModal(
+      "followupModal"
+    );
+  }
+
+  $("followupRequestSent")
+    .addEventListener(
+      "change",
+      autoFollowupDates
+    );
+
+  $("followupRequestDate")
+    .addEventListener(
+      "change",
+      autoFollowupDates
+    );
+
+  $("followupCallDate")
+    .addEventListener(
+      "change",
+      autoFollowupDates
+    );
+
+  function autoFollowupDates() {
+    if (
+      $("followupRequestSent").value !==
+      "Yes"
+    ) {
+      return;
+    }
+
+    const base =
+      $("followupRequestDate").value ||
+      $("followupCallDate").value ||
+      todayISO();
+
+    if (
+      !$("followupRequestDate").value
+    ) {
+      $("followupRequestDate").value =
+        base;
+    }
+
+    if (
+      !$("followupExpectedDate").value
+    ) {
+      $("followupExpectedDate").value =
+        addDays(
+          base,
+          3
+        );
+    }
+
+    if (
+      !$("followupDate").value
+    ) {
+      $("followupDate").value =
+        addDays(
+          base,
+          3
+        );
+    }
+
+    if (
+      $("followupStatus").value ===
+      "Not Called" ||
+      $("followupStatus").value ===
+      "Call Pending"
+    ) {
+      $("followupStatus").value =
+        "Review Request Sent";
+    }
+  }
+
+  $("followupReviewReceived")
+    .addEventListener(
+      "change",
+      () => {
+        if (
+          $("followupReviewReceived").value ===
+          "Yes"
+        ) {
+          $("followupStatus").value =
+            "Review Received";
+        }
+      }
+    );
+
+  $("followupForm")
+    .addEventListener(
+      "submit",
+
+      async event => {
+        event.preventDefault();
+
+        const button =
+          $("saveFollowupBtn");
+
+        setLoading(
+          button,
+          true,
+          ""
+        );
+
+        const id =
+          $("followupId").value;
+
+        const existing =
+          id
+            ? state.followups.get(id)
+            : null;
+
+        const record = {
+          customerName:
+            $("followupCustomer")
+              .value
+              .trim(),
+
+          phone:
+            $("followupPhone")
+              .value
+              .trim(),
+
+          orderId:
+            $("followupOrderId")
+              .value
+              .trim(),
+
+          sku:
+            $("followupSku").value,
+
+          deliveryDate:
+            $("followupDeliveryDate").value,
+
+          callDate:
+            $("followupCallDate").value,
+
+          callResult:
+            $("followupCallResult").value,
+
+          status:
+            $("followupStatus").value,
+
+          reviewRequestSent:
+            $("followupRequestSent").value,
+
+          requestDate:
+            $("followupRequestDate").value,
+
+          expectedReviewDate:
+            $("followupExpectedDate").value,
+
+          followupDate:
+            $("followupDate").value,
+
+          reviewReceived:
+            $("followupReviewReceived").value,
+
+          receivedRating:
+            $("followupRating").value
+              ? Number(
+                $("followupRating").value
+              )
+              : "",
+
+          assignedTo:
+            $("followupAssigned")
+              .value
+              .trim(),
+
+          negativeIssue:
+            $("followupNegativeIssue")
+              .value
+              .trim(),
+
+          notes:
+            $("followupNotes")
+              .value
+              .trim(),
+
+          isDeleted:
+            false,
+
+          updatedAt:
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP,
+
+          updatedBy:
+            state.currentUser.uid,
+
+          updatedByEmail:
+            state.currentUser.email ||
+            ""
+        };
+
+        if (!id) {
+          record.createdAt =
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP;
+
+          record.createdBy =
+            state.currentUser.uid;
+
+          record.createdByEmail =
+            state.currentUser.email ||
+            "";
+        }
+        else if (existing) {
+          record.createdAt =
+            existing.createdAt ||
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP;
+
+          record.createdBy =
+            existing.createdBy ||
+            state.currentUser.uid;
+
+          record.createdByEmail =
+            existing.createdByEmail ||
+            state.currentUser.email ||
+            "";
+        }
+
+        try {
+          const key =
+            id ||
+            followupsRef.push().key;
+
+          await followupsRef
+            .child(key)
+            .set(record);
+
+          await writeAudit(
+            id
+              ? "UPDATE"
+              : "CREATE",
+
+            "customer_followups",
+
+            key,
+
+            record.customerName +
+            " / " +
+            record.orderId
+          );
+
+          closeModal(
+            "followupModal"
+          );
+
+          toast(
+            id
+              ? "Follow-up updated successfully."
+              : "Follow-up saved successfully."
+          );
+        }
+        catch (error) {
+          toast(
+            "Save failed: " +
+            error.message,
+
+            "error"
+          );
+        }
+        finally {
+          setLoading(
+            button,
+            false,
+
+            '<i class="fa-solid fa-floppy-disk"></i>' +
+            " Save Follow-up"
+          );
+        }
+      }
+    );
+
+  function openProductModal(
+    id = ""
+  ) {
+    $("productForm").reset();
+
+    $("productId").value =
+      "";
+
+    $("productActive").value =
+      "true";
+
+    $("productModalTitle")
+      .textContent =
+      id
+        ? "Edit Product"
+        : "Add Product";
+
+    if (id) {
+      const item =
+        state.products.get(id);
+
+      if (!item) {
+        return;
+      }
+
+      $("productId").value =
+        id;
+
+      $("productName").value =
+        item.productName || "";
+
+      $("productSku").value =
+        item.sku || "";
+
+      $("productAsin").value =
+        item.asin || "";
+
+      $("productActive").value =
+        item.active === false
+          ? "false"
+          : "true";
+
+      $("productUrl").value =
+        item.amazonUrl || "";
+
+      $("productReviewUrl").value =
+        item.reviewUrl || "";
+
+      $("productNotes").value =
+        item.notes || "";
+    }
+
+    openModal(
+      "productModal"
+    );
+  }
+
+  $("productAsin")
+    .addEventListener(
+      "blur",
+      () => {
+        const asin =
+          $("productAsin")
+            .value
+            .trim();
+
+        if (!asin) {
+          return;
+        }
+
+        if (
+          !$("productUrl").value
+        ) {
+          $("productUrl").value =
+            "https://www.amazon.in/dp/" +
+            asin;
+        }
+
+        if (
+          !$("productReviewUrl").value
+        ) {
+          $("productReviewUrl").value =
+            "https://www.amazon.in/product-reviews/" +
+            asin +
+            "?sortBy=recent";
+        }
+      }
+    );
+
+  $("productForm")
+    .addEventListener(
+      "submit",
+
+      async event => {
+        event.preventDefault();
+
+        const button =
+          $("saveProductBtn");
+
+        setLoading(
+          button,
+          true,
+          ""
+        );
+
+        const id =
+          $("productId").value;
+
+        const sku =
+          $("productSku")
+            .value
+            .trim();
+
+        const asin =
+          $("productAsin")
+            .value
+            .trim();
+
+        const duplicate =
+          activeRecords(
+            state.products
+          )
+          .some(item =>
+            item._id !== id &&
+            (
+              normalizeText(item.sku) ===
+              normalizeText(sku) ||
+              normalizeText(item.asin) ===
+              normalizeText(asin)
+            )
+          );
+
+        if (duplicate) {
+          toast(
+            "This SKU or ASIN already exists in Product Master.",
+
+            "error"
+          );
+
+          setLoading(
+            button,
+            false,
+
+            '<i class="fa-solid fa-floppy-disk"></i>' +
+            " Save Product"
+          );
+
+          return;
+        }
+
+        const existing =
+          id
+            ? state.products.get(id)
+            : null;
+
+        const record = {
+          productName:
+            $("productName")
+              .value
+              .trim(),
+
+          sku:
+            sku,
+
+          asin:
+            asin,
+
+          active:
+            $("productActive").value ===
+            "true",
+
+          amazonUrl:
+            $("productUrl")
+              .value
+              .trim(),
+
+          reviewUrl:
+            $("productReviewUrl")
+              .value
+              .trim(),
+
+          notes:
+            $("productNotes")
+              .value
+              .trim(),
+
+          isDeleted:
+            false,
+
+          updatedAt:
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP,
+
+          updatedBy:
+            state.currentUser.uid,
+
+          updatedByEmail:
+            state.currentUser.email ||
+            ""
+        };
+
+        if (!id) {
+          record.createdAt =
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP;
+
+          record.createdBy =
+            state.currentUser.uid;
+
+          record.createdByEmail =
+            state.currentUser.email ||
+            "";
+        }
+        else if (existing) {
+          record.createdAt =
+            existing.createdAt ||
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP;
+
+          record.createdBy =
+            existing.createdBy ||
+            state.currentUser.uid;
+
+          record.createdByEmail =
+            existing.createdByEmail ||
+            state.currentUser.email ||
+            "";
+        }
+
+        try {
+          const key =
+            id ||
+            productsRef.push().key;
+
+          await productsRef
+            .child(key)
+            .set(record);
+
+          await writeAudit(
+            id
+              ? "UPDATE"
+              : "CREATE",
+
+            "product_master",
+
+            key,
+
+            record.sku
+          );
+
+          closeModal(
+            "productModal"
+          );
+
+          toast(
+            id
+              ? "Product updated successfully."
+              : "Product saved successfully."
+          );
+        }
+        catch (error) {
+          toast(
+            "Save failed: " +
+            error.message,
+
+            "error"
+          );
+        }
+        finally {
+          setLoading(
+            button,
+            false,
+
+            '<i class="fa-solid fa-floppy-disk"></i>' +
+            " Save Product"
+          );
+        }
+      }
+    );
+
+  function refForCollection(
+    collection
+  ) {
+    if (
+      collection ===
+      "amazon_reviews"
+    ) {
+      return reviewsRef;
+    }
+
+    if (
+      collection ===
+      "customer_followups"
+    ) {
+      return followupsRef;
+    }
+
+    if (
+      collection ===
+      "product_master"
+    ) {
+      return productsRef;
+    }
+
+    throw new Error(
+      "Unknown collection: " +
+      collection
+    );
+  }
+
+  async function softDelete(
+    collection,
+    id,
+    summary
+  ) {
+    if (
+      !confirm(
+        "Move this record to Trash? You can restore it later."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await refForCollection(
+        collection
+      )
+      .child(id)
+      .update({
+        isDeleted:
+          true,
+
+        deletedAt:
+          firebase
+            .database
+            .ServerValue
+            .TIMESTAMP,
+
+        deletedBy:
+          state.currentUser.uid,
+
+        deletedByEmail:
+          state.currentUser.email ||
+          ""
+      });
+
+      await writeAudit(
+        "SOFT_DELETE",
+        collection,
+        id,
+        summary
+      );
+
+      toast(
+        "Record moved to Trash."
+      );
+    }
+    catch (error) {
+      toast(
+        "Delete failed: " +
+        error.message,
+
+        "error"
+      );
+    }
+  }
+
+  async function restoreRecord(
+    collection,
+    id,
+    summary
+  ) {
+    try {
+      await refForCollection(
+        collection
+      )
+      .child(id)
+      .update({
+        isDeleted:
+          false,
+
+        deletedAt:
+          null,
+
+        deletedBy:
+          null,
+
+        deletedByEmail:
+          null,
+
+        updatedAt:
+          firebase
+            .database
+            .ServerValue
+            .TIMESTAMP
+      });
+
+      await writeAudit(
+        "RESTORE",
+        collection,
+        id,
+        summary
+      );
+
+      toast(
+        "Record restored successfully."
+      );
+    }
+    catch (error) {
+      toast(
+        "Restore failed: " +
+        error.message,
+
+        "error"
+      );
+    }
+  }
+
+  async function permanentDelete(
+    collection,
+    id,
+    summary
+  ) {
+    if (
+      !confirm(
+        "PERMANENT DELETE: This cannot be restored. Continue?"
+      )
+    ) {
+      return;
+    }
+
+    if (
+      !confirm(
+        "Final confirmation: permanently remove this record?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await refForCollection(
+        collection
+      )
+      .child(id)
+      .remove();
+
+      await writeAudit(
+        "PERMANENT_DELETE",
+        collection,
+        id,
+        summary
+      );
+
+      toast(
+        "Record permanently deleted."
+      );
+    }
+    catch (error) {
+      toast(
+        "Permanent delete failed: " +
+        error.message,
+
+        "error"
+      );
+    }
+  }
+
+  $("reviewImportInput")
+    .addEventListener(
+      "change",
+
+      async event => {
+        const file =
+          event.target.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        try {
+          const buffer =
+            await file.arrayBuffer();
+
+          const workbook =
+            XLSX.read(
+              buffer,
+              {
+                type: "array"
+              }
+            );
+
+          const rows =
+            XLSX.utils.sheet_to_json(
+              workbook.Sheets[
+                workbook.SheetNames[0]
+              ],
+
+              {
+                defval: ""
+              }
+            );
+
+          let imported = 0;
+          let skipped = 0;
+
+          const batchSignatures =
+            new Set();
+
+          for (
+            const row of rows
+          ) {
+            const lower =
+              Object.fromEntries(
+                Object
+                  .entries(row)
+                  .map(
+                    (
+                      [
+                        key,
+                        value
+                      ]
+                    ) => [
+                      normalizeText(key),
+                      value
+                    ]
+                  )
+              );
+
+            const sku =
+              String(
+                lower.sku ||
+                lower.product ||
+                lower["product name"] ||
+                ""
+              ).trim();
+
+            const product =
+              productBySku(sku);
+
+            const rating =
+              Number(
+                lower.rating ||
+                lower.stars ||
+                0
+              );
+
+            const title =
+              String(
+                lower["review title"] ||
+                lower.title ||
+                "Imported review"
+              ).trim();
+
+            const description =
+              String(
+                lower["review description"] ||
+                lower.description ||
+                lower.review ||
+                lower.comment ||
+                ""
+              ).trim();
+
+            const record = {
+              reviewDate:
+                toISODate(
+                  lower.date ||
+                  lower["review date"]
+                ) ||
+                todayISO(),
+
+              sku:
+                sku,
+
+              asin:
+                String(
+                  lower.asin ||
+                  (
+                    product
+                      ? (
+                        product.asin ||
+                        ""
+                      )
+                      : ""
+                  )
+                ).trim(),
+
+              rating:
+                rating,
+
+              sentiment:
+                sentimentFromRating(
+                  rating
+                ),
+
+              title:
+                title,
+
+              description:
+                description,
+
+              reviewerName:
+                String(
+                  lower.reviewer ||
+                  lower["reviewer name"] ||
+                  lower.customer ||
+                  ""
+                ).trim(),
+
+              reviewUrl:
+                String(
+                  lower["review url"] ||
+                  lower.url ||
+                  lower.link ||
+                  ""
+                ).trim(),
+
+              source:
+                "CSV / Excel Import",
+
+              status:
+                String(
+                  lower.status ||
+                  "New"
+                ).trim(),
+
+              assignedTo:
+                String(
+                  lower.assigned ||
+                  lower["assigned staff"] ||
+                  ""
+                ).trim(),
+
+              issueType:
+                String(
+                  lower["issue type"] ||
+                  ""
+                ).trim() ||
+                classifyIssue(
+                  title +
+                  " " +
+                  description
+                ),
+
+              notes:
+                String(
+                  lower.notes ||
+                  ""
+                ).trim(),
+
+              isDeleted:
+                false,
+
+              createdAt:
+                firebase
+                  .database
+                  .ServerValue
+                  .TIMESTAMP,
+
+              createdBy:
+                state.currentUser.uid,
+
+              createdByEmail:
+                state.currentUser.email ||
+                "",
+
+              updatedAt:
+                firebase
+                  .database
+                  .ServerValue
+                  .TIMESTAMP,
+
+              updatedBy:
+                state.currentUser.uid,
+
+              updatedByEmail:
+                state.currentUser.email ||
+                ""
+            };
+
+            const signature =
+              reviewSignature(
+                record
+              );
+
+            if (
+              !record.sku ||
+              !record.rating ||
+              !record.title ||
+              isDuplicateReview(record) ||
+              batchSignatures.has(
+                signature
+              )
+            ) {
+              skipped += 1;
+              continue;
+            }
+
+            batchSignatures.add(
+              signature
+            );
+
+            const key =
+              reviewsRef.push().key;
+
+            await reviewsRef
+              .child(key)
+              .set(record);
+
+            imported += 1;
+          }
+
+          await writeAudit(
+            "IMPORT",
+
+            "amazon_reviews",
+
+            "batch",
+
+            imported +
+            " imported, " +
+            skipped +
+            " skipped"
+          );
+
+          toast(
+            imported +
+            " review(s) imported. " +
+            skipped +
+            " duplicate/invalid row(s) skipped.",
+
+            "info"
+          );
+        }
+        catch (error) {
+          toast(
+            "Import failed: " +
+            error.message,
+
+            "error"
+          );
+        }
+        finally {
+          event.target.value =
+            "";
+        }
+      }
+    );
+
+  function csvValue(value) {
+    return (
+      '"' +
+      String(
+        value ?? ""
+      )
+      .replace(
+        /"/g,
+        '""'
+      ) +
+      '"'
+    );
+  }
+
+  function downloadCSV(
+    fileName,
+    headers,
+    rows
+  ) {
+    const content =
+      "\ufeff" +
+      headers
+        .map(csvValue)
+        .join(",") +
+      "\n" +
+      rows
+        .map(
+          row =>
+            row
+              .map(csvValue)
+              .join(",")
+        )
+        .join("\n");
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+    link.href =
+      URL.createObjectURL(
+        new Blob(
+          [content],
+          {
+            type:
+              "text/csv;charset=utf-8"
+          }
+        )
+      );
+
+    link.download =
+      fileName;
+
+    link.click();
+
+    URL.revokeObjectURL(
+      link.href
+    );
+  }
+
+  function exportReviews() {
+    const rows =
+      activeRecords(
+        state.reviews
+      );
+
+    downloadCSV(
+      "HELETT_Review_Intelligence_Reviews.csv",
+
+      [
+        "Review Date",
+        "SKU",
+        "ASIN",
+        "Rating",
+        "Sentiment",
+        "Title",
+        "Description",
+        "Reviewer",
+        "Review URL",
+        "Issue Type",
+        "Status",
+        "Assigned Staff",
+        "Source",
+        "Notes"
+      ],
+
+      rows.map(
+        item => [
+          item.reviewDate,
+          item.sku,
+          item.asin,
+          item.rating,
+          item.sentiment,
+          item.title,
+          item.description,
+          item.reviewerName,
+          item.reviewUrl,
+          item.issueType,
+          item.status,
+          item.assignedTo,
+          item.source,
+          item.notes
+        ]
+      )
+    );
+  }
+
+  function exportFollowups() {
+    const rows =
+      activeRecords(
+        state.followups
+      );
+
+    downloadCSV(
+      "HELETT_Review_Followups.csv",
+
+      [
+        "Customer",
+        "Phone",
+        "Order ID",
+        "SKU",
+        "Delivery Date",
+        "Call Date",
+        "Call Result",
+        "Review Request Sent",
+        "Request Date",
+        "Expected Review Date",
+        "Follow-up Date",
+        "Review Received",
+        "Received Rating",
+        "Status",
+        "Assigned Staff",
+        "Negative Issue",
+        "Notes"
+      ],
+
+      rows.map(
+        item => [
+          item.customerName,
+          item.phone,
+          item.orderId,
+          item.sku,
+          item.deliveryDate,
+          item.callDate,
+          item.callResult,
+          item.reviewRequestSent,
+          item.requestDate,
+          item.expectedReviewDate,
+          item.followupDate,
+          item.reviewReceived,
+          item.receivedRating,
+          item.status,
+          item.assignedTo,
+          item.negativeIssue,
+          item.notes
+        ]
+      )
+    );
+  }
+
+  function clearReviewFilters() {
+    $("reviewSearch").value =
+      "";
+
+    $("reviewSkuFilter").value =
+      "";
+
+    $("reviewSentimentFilter").value =
+      "";
+
+    $("reviewStatusFilter").value =
+      "";
+
+    state.pages.reviews =
+      1;
+
+    renderReviews();
+  }
+
+  function clearNegativeFilters() {
+    $("negativeSearch").value =
+      "";
+
+    $("negativeSkuFilter").value =
+      "";
+
+    $("negativeStatusFilter").value =
+      "";
+
+    $("negativeRatingFilter").value =
+      "";
+
+    state.pages.negative =
+      1;
+
+    renderNegativeCenter();
+  }
+
+  function clearFollowupFilters() {
+    $("followupSearch").value =
+      "";
+
+    $("followupSkuFilter").value =
+      "";
+
+    $("followupStatusFilter").value =
+      "";
+
+    $("followupDueFilter").value =
+      "";
+
+    state.pages.followups =
+      1;
+
+    renderFollowups();
+  }
+
+  function debounce(
+    fn,
+    wait = 220
+  ) {
+    let timer;
+
+    return (
+      ...args
+    ) => {
+      clearTimeout(timer);
+
+      timer =
+        setTimeout(
+          () => fn(...args),
+          wait
+        );
+    };
+  }
+
+  $("reviewSearch")
+    .addEventListener(
+      "input",
+
+      debounce(
+        () => {
+          state.pages.reviews =
+            1;
+
+          renderReviews();
+        }
+      )
+    );
+
+  $("negativeSearch")
+    .addEventListener(
+      "input",
+
+      debounce(
+        () => {
+          state.pages.negative =
+            1;
+
+          renderNegativeCenter();
+        }
+      )
+    );
+
+  $("followupSearch")
+    .addEventListener(
+      "input",
+
+      debounce(
+        () => {
+          state.pages.followups =
+            1;
+
+          renderFollowups();
+        }
+      )
+    );
+
+  [
+    "reviewSkuFilter",
+    "reviewSentimentFilter",
+    "reviewStatusFilter"
+  ].forEach(id => {
+    $(id).addEventListener(
+      "change",
+      () => {
+        state.pages.reviews =
+          1;
+
+        renderReviews();
+      }
+    );
+  });
+
+  [
+    "negativeSkuFilter",
+    "negativeStatusFilter",
+    "negativeRatingFilter"
+  ].forEach(id => {
+    $(id).addEventListener(
+      "change",
+      () => {
+        state.pages.negative =
+          1;
+
+        renderNegativeCenter();
+      }
+    );
+  });
+
+  [
+    "followupSkuFilter",
+    "followupStatusFilter",
+    "followupDueFilter"
+  ].forEach(id => {
+    $(id).addEventListener(
+      "change",
+      () => {
+        state.pages.followups =
+          1;
+
+        renderFollowups();
+      }
+    );
+  });
+
+  window.addEventListener(
+    "click",
+
+    event => {
+      [
+        "reviewModal",
+        "followupModal",
+        "productModal"
+      ].forEach(id => {
+        if (
+          event.target === $(id)
+        ) {
+          closeModal(id);
+        }
+      });
+    }
+  );
+</script>
+
 </body>
 </html>
