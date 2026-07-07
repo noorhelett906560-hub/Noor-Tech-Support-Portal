@@ -722,6 +722,59 @@
       background: #135bb0;
     }
 
+
+    .clock-chip {
+      min-width: 190px;
+      justify-content: flex-start;
+    }
+
+    .clock-chip strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    .clock-chip small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.1;
+    }
+
+    .entry-meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+      white-space: nowrap;
+    }
+
+    .entry-time-box {
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .entry-time-box strong {
+      color: var(--text);
+    }
+
+    .import-help {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     @media (max-width: 1150px) {
       .cards {
         grid-template-columns: repeat(2, 1fr);
@@ -838,6 +891,11 @@
         Sign In
       </button>
 
+      <button class="btn secondary" type="button" onclick="sendPasswordReset()">
+        <i class="fa-solid fa-key"></i>
+        Forgot Password
+      </button>
+
       <div id="loginMessage" class="message"></div>
 
     </form>
@@ -932,6 +990,14 @@
           <i class="fa-solid fa-user-shield"></i>
         </span>
 
+        <span class="user-chip clock-chip">
+          <i class="fa-regular fa-clock"></i>
+          <span>
+            <strong id="liveClock">--:--:--</strong>
+            <small id="liveDate">Loading date...</small>
+          </span>
+        </span>
+
         <button id="themeBtn" class="btn secondary" type="button">
           <i class="fa-solid fa-moon"></i>
           Theme
@@ -967,10 +1033,22 @@
 
           </div>
 
-          <button class="btn" type="button" onclick="openProductModal()">
-            <i class="fa-solid fa-plus"></i>
-            Add Product
-          </button>
+          <div class="action-row">
+            <button class="btn" type="button" onclick="openProductModal()">
+              <i class="fa-solid fa-plus"></i>
+              Add Product
+            </button>
+
+            <button class="btn secondary" type="button" onclick="pickImportFile()">
+              <i class="fa-solid fa-file-import"></i>
+              Import Inventory
+            </button>
+
+            <button class="btn secondary" type="button" onclick="downloadProductTemplate()">
+              <i class="fa-solid fa-table"></i>
+              Product Template
+            </button>
+          </div>
 
         </div>
 
@@ -1057,10 +1135,19 @@
             <button
               class="btn secondary"
               type="button"
-              onclick="document.getElementById('reviewImportInput').click()"
+              onclick="pickImportFile()"
             >
               <i class="fa-solid fa-file-import"></i>
-              Import Excel/CSV
+              Smart Import Excel/CSV
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="downloadReviewTemplate()"
+            >
+              <i class="fa-solid fa-table"></i>
+              Review Template
             </button>
 
             <button
@@ -1136,6 +1223,7 @@
                 <th>Issue</th>
                 <th>Status</th>
                 <th>Source</th>
+                <th>Entry Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1226,6 +1314,7 @@
                 <th>Review & Issue</th>
                 <th>Status</th>
                 <th>Assigned</th>
+                <th>Entry Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1272,6 +1361,24 @@
             >
               <i class="fa-solid fa-plus"></i>
               Add Follow-up
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="pickImportFile()"
+            >
+              <i class="fa-solid fa-file-import"></i>
+              Import Call Report
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="downloadFollowupTemplate()"
+            >
+              <i class="fa-solid fa-table"></i>
+              Follow-up Template
             </button>
 
             <button
@@ -1344,6 +1451,7 @@
                 <th>Follow-up</th>
                 <th>Result</th>
                 <th>Status</th>
+                <th>Entry Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1379,10 +1487,22 @@
 
           </div>
 
-          <button class="btn" type="button" onclick="openProductModal()">
-            <i class="fa-solid fa-plus"></i>
-            Add Product
-          </button>
+          <div class="action-row">
+            <button class="btn" type="button" onclick="openProductModal()">
+              <i class="fa-solid fa-plus"></i>
+              Add Product
+            </button>
+
+            <button class="btn secondary" type="button" onclick="pickImportFile()">
+              <i class="fa-solid fa-file-import"></i>
+              Import Inventory
+            </button>
+
+            <button class="btn secondary" type="button" onclick="downloadProductTemplate()">
+              <i class="fa-solid fa-table"></i>
+              Product Template
+            </button>
+          </div>
 
         </div>
 
@@ -1412,14 +1532,25 @@
 
           </div>
 
-          <button
-            class="btn"
-            type="button"
-            onclick="renderInsights()"
-          >
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Refresh Insights
-          </button>
+          <div class="action-row">
+            <button
+              class="btn"
+              type="button"
+              onclick="renderInsights()"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              Refresh Insights
+            </button>
+
+            <button
+              class="btn secondary"
+              type="button"
+              onclick="exportManagementReport()"
+            >
+              <i class="fa-solid fa-file-lines"></i>
+              Management Report
+            </button>
+          </div>
 
         </div>
 
@@ -1522,6 +1653,10 @@
     </div>
 
     <form id="reviewForm">
+
+      <div id="reviewEntryInfo" class="entry-time-box">
+        <strong>Entry Time:</strong> Preparing...
+      </div>
 
       <input id="reviewId" type="hidden">
 
@@ -1696,6 +1831,10 @@
     </div>
 
     <form id="followupForm">
+
+      <div id="followupEntryInfo" class="entry-time-box">
+        <strong>Entry Time:</strong> Preparing...
+      </div>
 
       <input id="followupId" type="hidden">
 
@@ -1881,6 +2020,10 @@
 
     <form id="productForm">
 
+      <div id="productEntryInfo" class="entry-time-box">
+        <strong>Entry Time:</strong> Preparing...
+      </div>
+
       <input id="productId" type="hidden">
 
       <div class="form-grid">
@@ -1922,6 +2065,25 @@
             <option value="true">Active</option>
             <option value="false">Inactive</option>
           </select>
+        </label>
+
+        <label>
+          Total Sellable Stock
+
+          <input
+            id="productStock"
+            type="number"
+            placeholder="Inventory stock"
+          >
+        </label>
+
+        <label>
+          Status Flags
+
+          <input
+            id="productStatusFlags"
+            placeholder="Inventory status / remarks"
+          >
         </label>
 
         <label class="full">
@@ -2251,6 +2413,79 @@
       }
     );
   }
+
+
+  function updateLiveClock() {
+    const clock =
+      $("liveClock");
+
+    const dateLabel =
+      $("liveDate");
+
+    if (!clock || !dateLabel) {
+      return;
+    }
+
+    const now =
+      new Date();
+
+    clock.textContent =
+      now.toLocaleTimeString(
+        "en-IN",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true
+        }
+      );
+
+    dateLabel.textContent =
+      now.toLocaleDateString(
+        "en-IN",
+        {
+          weekday: "short",
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+  }
+
+  function entryMetaHTML(item) {
+    return `
+      <span class="entry-meta">
+        <strong>Created:</strong>
+        ${formatDateTime(item.createdAt)}
+        <br>
+        <strong>Updated:</strong>
+        ${formatDateTime(item.updatedAt)}
+      </span>
+    `;
+  }
+
+  function entryInfoText(item, mode) {
+    if (!item) {
+      return (
+        "<strong>New Entry Time:</strong> " +
+        formatDateTime(new Date().toISOString()) +
+        " · This time will be saved automatically after Save."
+      );
+    }
+
+    return (
+      "<strong>Created:</strong> " +
+      formatDateTime(item.createdAt) +
+      " · <strong>Last Updated:</strong> " +
+      formatDateTime(item.updatedAt) +
+      " · <strong>Mode:</strong> " +
+      mode
+    );
+  }
+
+  updateLiveClock();
+  setInterval(updateLiveClock, 1000);
+
 
   function escapeHTML(value) {
     return String(
@@ -2682,7 +2917,9 @@
 
     $("syncText").textContent =
       "Live Firebase sync active · " +
-      firebaseConfig.projectId;
+      firebaseConfig.projectId +
+      " · Last connected " +
+      formatDateTime(new Date().toISOString());
   }
 
   function stopRealtimeListeners() {
@@ -2890,6 +3127,42 @@
       error.message
     );
   }
+
+
+  async function sendPasswordReset() {
+    const email =
+      $("loginEmail")
+        .value
+        .trim();
+
+    if (!email) {
+      setMessage(
+        "loginMessage",
+        "Pehle email box me apna email likho, phir Forgot Password dabao.",
+        "error"
+      );
+
+      return;
+    }
+
+    try {
+      await auth.sendPasswordResetEmail(email);
+
+      setMessage(
+        "loginMessage",
+        "Password reset email bhej diya gaya. Gmail inbox check karo.",
+        "success"
+      );
+    }
+    catch (error) {
+      setMessage(
+        "loginMessage",
+        humanAuthError(error),
+        "error"
+      );
+    }
+  }
+
 
   $("logoutBtn")
     .addEventListener(
@@ -3397,6 +3670,8 @@
               ·
               ${health.openNegative}
               open negative
+              ·
+              Stock ${escapeHTML(product.totalSellable || "N/A")}
             </div>
 
           </div>
@@ -3412,6 +3687,12 @@
             "
           ></div>
 
+        </div>
+
+        <div class="entry-meta" style="margin-bottom: 10px;">
+          <strong>Created:</strong> ${formatDateTime(product.createdAt)}
+          <br>
+          <strong>Updated:</strong> ${formatDateTime(product.updatedAt)}
         </div>
 
         <div class="action-row">
@@ -3821,7 +4102,7 @@
       $("reviewsBody")
         .innerHTML =
         '<tr>' +
-          '<td colspan="8" class="empty">' +
+          '<td colspan="9" class="empty">' +
             "No real reviews saved yet." +
           "</td>" +
         "</tr>";
@@ -3929,6 +4210,10 @@
                   item.source ||
                   "Manual Entry"
                 )}
+              </td>
+
+              <td>
+                ${entryMetaHTML(item)}
               </td>
 
               <td>
@@ -4175,7 +4460,7 @@
       $("negativeBody")
         .innerHTML =
         '<tr>' +
-          '<td colspan="7" class="empty">' +
+          '<td colspan="8" class="empty">' +
             "No negative reviews found." +
           "</td>" +
         "</tr>";
@@ -4276,6 +4561,10 @@
                   item.assignedTo ||
                   "Unassigned"
                 )}
+              </td>
+
+              <td>
+                ${entryMetaHTML(item)}
               </td>
 
               <td>
@@ -4529,7 +4818,7 @@
       $("followupsBody")
         .innerHTML =
         '<tr>' +
-          '<td colspan="8" class="empty">' +
+          '<td colspan="9" class="empty">' +
             "No customer follow-ups saved yet." +
           "</td>" +
         "</tr>";
@@ -4685,6 +4974,10 @@
                     )}
                   </span>
 
+                </td>
+
+                <td>
+                  ${entryMetaHTML(item)}
                 </td>
 
                 <td>
@@ -5385,6 +5678,9 @@
         ? "Edit Review"
         : "Add Review";
 
+    $("reviewEntryInfo").innerHTML =
+      entryInfoText(null, "New Review");
+
     if (id) {
       const item =
         state.reviews.get(id);
@@ -5436,6 +5732,9 @@
 
       $("reviewNotes").value =
         item.notes || "";
+
+      $("reviewEntryInfo").innerHTML =
+        entryInfoText(item, "Edit Review");
     }
 
     openModal(
@@ -5781,6 +6080,9 @@
         ? "Edit Follow-up"
         : "Add Follow-up";
 
+    $("followupEntryInfo").innerHTML =
+      entryInfoText(null, "New Follow-up");
+
     if (id) {
       const item =
         state.followups.get(id);
@@ -5847,6 +6149,9 @@
 
       $("followupNotes").value =
         item.notes || "";
+
+      $("followupEntryInfo").innerHTML =
+        entryInfoText(item, "Edit Follow-up");
     }
 
     openModal(
@@ -6148,6 +6453,9 @@
         ? "Edit Product"
         : "Add Product";
 
+    $("productEntryInfo").innerHTML =
+      entryInfoText(null, "New Product");
+
     if (id) {
       const item =
         state.products.get(id);
@@ -6173,6 +6481,12 @@
           ? "false"
           : "true";
 
+      $("productStock").value =
+        item.totalSellable || "";
+
+      $("productStatusFlags").value =
+        item.statusFlags || "";
+
       $("productUrl").value =
         item.amazonUrl || "";
 
@@ -6181,6 +6495,9 @@
 
       $("productNotes").value =
         item.notes || "";
+
+      $("productEntryInfo").innerHTML =
+        entryInfoText(item, "Edit Product");
     }
 
     openModal(
@@ -6301,6 +6618,16 @@
           active:
             $("productActive").value ===
             "true",
+
+          totalSellable:
+            $("productStock").value
+              ? Number($("productStock").value)
+              : "",
+
+          statusFlags:
+            $("productStatusFlags")
+              .value
+              .trim(),
 
           amazonUrl:
             $("productUrl")
@@ -6604,187 +6931,580 @@
     }
   }
 
-  $("reviewImportInput")
-    .addEventListener(
-      "change",
+    function pickImportFile() {
+    $("reviewImportInput").click();
+  }
 
-      async event => {
-        const file =
-          event.target.files[0];
+  function normalizeColumnKey(key) {
+    return normalizeText(key)
+      .replace(/[^a-z0-9]/g, "");
+  }
 
-        if (!file) {
+  function rowValue(row, possibleNames) {
+    const cleanRow = {};
+
+    Object
+      .keys(row)
+      .forEach(key => {
+        cleanRow[normalizeColumnKey(key)] =
+          row[key];
+      });
+
+    for (const name of possibleNames) {
+      const key =
+        normalizeColumnKey(name);
+
+      const value =
+        cleanRow[key];
+
+      if (
+        value !== undefined &&
+        value !== null &&
+        String(value).trim() !== ""
+      ) {
+        return value;
+      }
+    }
+
+    return "";
+  }
+
+  function safeFirebaseKey(value, fallback) {
+    const key =
+      normalizeText(value)
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 95);
+
+    return key || fallback;
+  }
+
+  function findExistingProduct(sku, asin) {
+    return activeRecords(state.products)
+      .find(product =>
+        (
+          sku &&
+          normalizeText(product.sku) === normalizeText(sku)
+        ) ||
+        (
+          asin &&
+          normalizeText(product.asin) === normalizeText(asin)
+        )
+      ) || null;
+  }
+
+  function smartImportDate(row) {
+    return (
+      toISODate(
+        rowValue(row, [
+          "Review Date",
+          "Date",
+          "Call Date",
+          "Created Date",
+          "Order Date",
+          "Updated Date"
+        ])
+      ) ||
+      todayISO()
+    );
+  }
+
+  async function smartImportWorkbook(file) {
+    const buffer =
+      await file.arrayBuffer();
+
+    const workbook =
+      XLSX.read(
+        buffer,
+        {
+          type: "array"
+        }
+      );
+
+    const report = {
+      products: 0,
+      productsUpdated: 0,
+      reviews: 0,
+      followups: 0,
+      skipped: 0
+    };
+
+    const productUpdates = {};
+    const reviewUpdates = {};
+    const followupUpdates = {};
+    const batchReviewSignatures =
+      new Set();
+
+    workbook.SheetNames.forEach(sheetName => {
+      const rows =
+        XLSX.utils.sheet_to_json(
+          workbook.Sheets[sheetName],
+          {
+            defval: ""
+          }
+        );
+
+      rows.forEach(row => {
+        const asin =
+          String(
+            rowValue(row, [
+              "ASIN",
+              "asin",
+              "Amazon ASIN"
+            ])
+          )
+            .trim()
+            .toUpperCase();
+
+        const productName =
+          String(
+            rowValue(row, [
+              "Product Name",
+              "Item Name",
+              "Title",
+              "Product Title",
+              "Name"
+            ])
+          )
+            .trim();
+
+        const sku =
+          String(
+            rowValue(row, [
+              "SKU",
+              "sku",
+              "Product SKU",
+              "MSKU",
+              "Seller SKU",
+              "Item SKU",
+              "Product"
+            ]) ||
+            productName
+          )
+            .trim()
+            .replace(/\s+/g, " ");
+
+        const ratingRaw =
+          rowValue(row, [
+            "Rating",
+            "Stars",
+            "Star Rating",
+            "Review Rating"
+          ]);
+
+        const rating =
+          Number(ratingRaw);
+
+        const reviewTitle =
+          String(
+            rowValue(row, [
+              "Review Title",
+              "Title",
+              "Review",
+              "Comment",
+              "Feedback",
+              "Negative Feedback",
+              "Issue"
+            ])
+          )
+            .trim();
+
+        const reviewDescription =
+          String(
+            rowValue(row, [
+              "Review Description",
+              "Description",
+              "Review Text",
+              "Customer Review",
+              "Comment",
+              "Feedback",
+              "Negative Feedback",
+              "Issue",
+              "Remarks",
+              "Notes"
+            ])
+          )
+            .trim();
+
+        const customerName =
+          String(
+            rowValue(row, [
+              "Customer Name",
+              "Customer",
+              "Name",
+              "Buyer Name"
+            ])
+          )
+            .trim();
+
+        const phone =
+          String(
+            rowValue(row, [
+              "Phone",
+              "Phone Number",
+              "Contact Number",
+              "Mobile",
+              "Customer Phone",
+              "Mobile Number"
+            ])
+          )
+            .trim();
+
+        const orderId =
+          String(
+            rowValue(row, [
+              "Order ID",
+              "Amazon Order ID",
+              "OrderId",
+              "Order No",
+              "Invoice",
+              "Invoice No"
+            ])
+          )
+            .trim();
+
+        const executive =
+          String(
+            rowValue(row, [
+              "Executive Name",
+              "Executive",
+              "Assigned Staff",
+              "Staff",
+              "Called By"
+            ])
+          )
+            .trim();
+
+        const updatedStatus =
+          String(
+            rowValue(row, [
+              "Review Updated or not Updated",
+              "Review Updated",
+              "Updated",
+              "Review Received",
+              "Result"
+            ])
+          )
+            .trim();
+
+        const stock =
+          rowValue(row, [
+            "Total Sellable",
+            "Sellable",
+            "Stock",
+            "Quantity",
+            "Qty",
+            "Available"
+          ]);
+
+        const statusFlags =
+          String(
+            rowValue(row, [
+              "Status Flags",
+              "Status",
+              "Inventory Status",
+              "Remarks"
+            ])
+          )
+            .trim();
+
+        const rowDate =
+          smartImportDate(row);
+
+        const looksLikeInventory =
+          asin &&
+          sku &&
+          !ratingRaw &&
+          !phone &&
+          !customerName &&
+          !orderId;
+
+        if (looksLikeInventory) {
+          const existing =
+            findExistingProduct(sku, asin);
+
+          const key =
+            existing
+              ? existing._id
+              : safeFirebaseKey(
+                sku + "_" + asin,
+                productsRef.push().key
+              );
+
+          productUpdates[key] = {
+            ...(existing || {}),
+
+            productName:
+              productName || sku,
+
+            sku:
+              sku,
+
+            asin:
+              asin,
+
+            active:
+              !/inactive|closed|blocked|disabled/i.test(statusFlags),
+
+            totalSellable:
+              stock !== ""
+                ? Number(stock) || stock
+                : (
+                  existing
+                    ? existing.totalSellable || ""
+                    : ""
+                ),
+
+            statusFlags:
+              statusFlags,
+
+            amazonUrl:
+              "https://www.amazon.in/dp/" +
+              encodeURIComponent(asin),
+
+            reviewUrl:
+              "https://www.amazon.in/product-reviews/" +
+              encodeURIComponent(asin) +
+              "?sortBy=recent",
+
+            notes:
+              "Imported from inventory file: " +
+              file.name,
+
+            isDeleted:
+              false,
+
+            updatedAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP,
+
+            updatedBy:
+              state.currentUser.uid,
+
+            updatedByEmail:
+              state.currentUser.email || "",
+
+            createdAt:
+              existing && existing.createdAt
+                ? existing.createdAt
+                : firebase
+                    .database
+                    .ServerValue
+                    .TIMESTAMP,
+
+            createdBy:
+              existing && existing.createdBy
+                ? existing.createdBy
+                : state.currentUser.uid,
+
+            createdByEmail:
+              existing && existing.createdByEmail
+                ? existing.createdByEmail
+                : state.currentUser.email || ""
+          };
+
+          if (existing) {
+            report.productsUpdated += 1;
+          }
+          else {
+            report.products += 1;
+          }
+
           return;
         }
 
-        try {
-          const buffer =
-            await file.arrayBuffer();
+        const looksLikeCallReport =
+          (
+            phone ||
+            customerName ||
+            orderId ||
+            updatedStatus ||
+            executive
+          ) &&
+          sku &&
+          !ratingRaw;
 
-          const workbook =
-            XLSX.read(
-              buffer,
-              {
-                type: "array"
-              }
+        if (looksLikeCallReport) {
+          const key =
+            safeFirebaseKey(
+              [
+                phone,
+                orderId,
+                sku,
+                rowDate
+              ].join("_"),
+              followupsRef.push().key
             );
 
-          const rows =
-            XLSX.utils.sheet_to_json(
-              workbook.Sheets[
-                workbook.SheetNames[0]
-              ],
+          const received =
+            /yes|y|updated|done|received/i.test(updatedStatus);
 
-              {
-                defval: ""
-              }
+          const negativeText =
+            /negative|bad|issue|problem|not|complaint/i.test(
+              reviewTitle + " " + reviewDescription + " " + updatedStatus
             );
 
-          let imported = 0;
-          let skipped = 0;
+          followupUpdates[key] = {
+            customerName:
+              customerName || "Customer",
 
-          const batchSignatures =
-            new Set();
+            phone:
+              phone,
 
-          for (
-            const row of rows
-          ) {
-            const lower =
-              Object.fromEntries(
-                Object
-                  .entries(row)
-                  .map(
-                    (
-                      [
-                        key,
-                        value
-                      ]
-                    ) => [
-                      normalizeText(key),
-                      value
-                    ]
-                  )
-              );
+            orderId:
+              orderId || (
+                "IMPORT-" +
+                key.slice(0, 8)
+              ),
 
-            const sku =
-              String(
-                lower.sku ||
-                lower.product ||
-                lower["product name"] ||
-                ""
-              ).trim();
+            sku:
+              sku,
 
-            const product =
-              productBySku(sku);
+            deliveryDate:
+              "",
 
-            const rating =
-              Number(
-                lower.rating ||
-                lower.stars ||
-                0
-              );
+            callDate:
+              rowDate,
 
-            const title =
-              String(
-                lower["review title"] ||
-                lower.title ||
-                "Imported review"
-              ).trim();
+            callResult:
+              negativeText
+                ? "Issue Reported"
+                : (
+                  received
+                    ? "Customer Interested"
+                    : "Connected"
+                ),
 
-            const description =
-              String(
-                lower["review description"] ||
-                lower.description ||
-                lower.review ||
-                lower.comment ||
-                ""
-              ).trim();
+            status:
+              received
+                ? "Review Received"
+                : "Review Request Sent",
 
-            const record = {
+            reviewRequestSent:
+              "Yes",
+
+            requestDate:
+              rowDate,
+
+            expectedReviewDate:
+              addDays(rowDate, 3),
+
+            followupDate:
+              addDays(rowDate, 3),
+
+            reviewReceived:
+              received
+                ? "Yes"
+                : "No",
+
+            receivedRating:
+              received
+                ? 5
+                : "",
+
+            assignedTo:
+              executive,
+
+            negativeIssue:
+              negativeText
+                ? (
+                  reviewDescription ||
+                  reviewTitle ||
+                  updatedStatus
+                )
+                : "",
+
+            notes:
+              [
+                reviewTitle,
+                reviewDescription,
+                updatedStatus
+              ]
+                .filter(Boolean)
+                .join(" | "),
+
+            isDeleted:
+              false,
+
+            createdAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP,
+
+            createdBy:
+              state.currentUser.uid,
+
+            createdByEmail:
+              state.currentUser.email || "",
+
+            updatedAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP,
+
+            updatedBy:
+              state.currentUser.uid,
+
+            updatedByEmail:
+              state.currentUser.email || ""
+          };
+
+          report.followups += 1;
+
+          if (negativeText) {
+            const reviewKey =
+              reviewsRef.push().key;
+
+            reviewUpdates[reviewKey] = {
               reviewDate:
-                toISODate(
-                  lower.date ||
-                  lower["review date"]
-                ) ||
-                todayISO(),
+                rowDate,
 
               sku:
                 sku,
 
               asin:
-                String(
-                  lower.asin ||
-                  (
-                    product
-                      ? (
-                        product.asin ||
-                        ""
-                      )
-                      : ""
-                  )
-                ).trim(),
+                asin,
 
               rating:
-                rating,
+                1,
 
               sentiment:
-                sentimentFromRating(
-                  rating
-                ),
+                "Negative",
 
               title:
-                title,
+                reviewTitle || "Negative Feedback",
 
               description:
-                description,
+                reviewDescription ||
+                reviewTitle ||
+                "Negative feedback from call report",
 
               reviewerName:
-                String(
-                  lower.reviewer ||
-                  lower["reviewer name"] ||
-                  lower.customer ||
-                  ""
-                ).trim(),
+                customerName,
 
               reviewUrl:
-                String(
-                  lower["review url"] ||
-                  lower.url ||
-                  lower.link ||
-                  ""
-                ).trim(),
+                "",
 
               source:
-                "CSV / Excel Import",
+                "Call Report Import",
 
               status:
-                String(
-                  lower.status ||
-                  "New"
-                ).trim(),
+                "New",
 
               assignedTo:
-                String(
-                  lower.assigned ||
-                  lower["assigned staff"] ||
-                  ""
-                ).trim(),
+                executive,
 
               issueType:
-                String(
-                  lower["issue type"] ||
-                  ""
-                ).trim() ||
                 classifyIssue(
-                  title +
-                  " " +
-                  description
+                  reviewTitle + " " + reviewDescription
                 ),
 
               notes:
-                String(
-                  lower.notes ||
-                  ""
-                ).trim(),
+                "Auto-created from call report import.",
 
               isDeleted:
                 false,
@@ -6799,8 +7519,7 @@
                 state.currentUser.uid,
 
               createdByEmail:
-                state.currentUser.email ||
-                "",
+                state.currentUser.email || "",
 
               updatedAt:
                 firebase
@@ -6812,61 +7531,235 @@
                 state.currentUser.uid,
 
               updatedByEmail:
-                state.currentUser.email ||
-                ""
+                state.currentUser.email || ""
             };
 
-            const signature =
-              reviewSignature(
-                record
-              );
-
-            if (
-              !record.sku ||
-              !record.rating ||
-              !record.title ||
-              isDuplicateReview(record) ||
-              batchSignatures.has(
-                signature
-              )
-            ) {
-              skipped += 1;
-              continue;
-            }
-
-            batchSignatures.add(
-              signature
-            );
-
-            const key =
-              reviewsRef.push().key;
-
-            await reviewsRef
-              .child(key)
-              .set(record);
-
-            imported += 1;
+            report.reviews += 1;
           }
 
-          await writeAudit(
-            "IMPORT",
+          return;
+        }
 
-            "amazon_reviews",
+        const looksLikeReview =
+          sku &&
+          rating &&
+          reviewTitle;
 
-            "batch",
+        if (looksLikeReview) {
+          if (
+            !rating ||
+            rating < 1 ||
+            rating > 5
+          ) {
+            report.skipped += 1;
+            return;
+          }
 
-            imported +
-            " imported, " +
-            skipped +
-            " skipped"
+          const product =
+            productBySku(sku);
+
+          const record = {
+            reviewDate:
+              rowDate,
+
+            sku:
+              sku,
+
+            asin:
+              asin ||
+              (
+                product
+                  ? product.asin || ""
+                  : ""
+              ),
+
+            rating:
+              rating,
+
+            sentiment:
+              sentimentFromRating(rating),
+
+            title:
+              reviewTitle,
+
+            description:
+              reviewDescription || reviewTitle,
+
+            reviewerName:
+              String(
+                rowValue(row, [
+                  "Reviewer Name",
+                  "Reviewer",
+                  "Customer"
+                ])
+              )
+                .trim(),
+
+            reviewUrl:
+              String(
+                rowValue(row, [
+                  "Review URL",
+                  "URL",
+                  "Link"
+                ])
+              )
+                .trim(),
+
+            source:
+              "CSV / Excel Import",
+
+            status:
+              String(
+                rowValue(row, [
+                  "Status"
+                ])
+              )
+                .trim() ||
+              "New",
+
+            assignedTo:
+              executive,
+
+            issueType:
+              String(
+                rowValue(row, [
+                  "Issue Type"
+                ])
+              )
+                .trim() ||
+              classifyIssue(
+                reviewTitle + " " + reviewDescription
+              ),
+
+            notes:
+              String(
+                rowValue(row, [
+                  "Notes"
+                ])
+              )
+                .trim(),
+
+            isDeleted:
+              false,
+
+            createdAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP,
+
+            createdBy:
+              state.currentUser.uid,
+
+            createdByEmail:
+              state.currentUser.email || "",
+
+            updatedAt:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP,
+
+            updatedBy:
+              state.currentUser.uid,
+
+            updatedByEmail:
+              state.currentUser.email || ""
+          };
+
+          const signature =
+            reviewSignature(record);
+
+          if (
+            isDuplicateReview(record) ||
+            batchReviewSignatures.has(signature)
+          ) {
+            report.skipped += 1;
+            return;
+          }
+
+          batchReviewSignatures.add(signature);
+
+          reviewUpdates[reviewsRef.push().key] =
+            record;
+
+          report.reviews += 1;
+          return;
+        }
+
+        report.skipped += 1;
+      });
+    });
+
+    if (
+      Object.keys(productUpdates).length
+    ) {
+      await productsRef.update(productUpdates);
+    }
+
+    if (
+      Object.keys(reviewUpdates).length
+    ) {
+      await reviewsRef.update(reviewUpdates);
+    }
+
+    if (
+      Object.keys(followupUpdates).length
+    ) {
+      await followupsRef.update(followupUpdates);
+    }
+
+    await writeAudit(
+      "SMART_IMPORT",
+      "multi_collection",
+      "batch",
+      report.products +
+      " products, " +
+      report.productsUpdated +
+      " products updated, " +
+      report.reviews +
+      " reviews, " +
+      report.followups +
+      " follow-ups, " +
+      report.skipped +
+      " skipped"
+    );
+
+    return report;
+  }
+
+  $("reviewImportInput")
+    .addEventListener(
+      "change",
+
+      async event => {
+        const file =
+          event.target.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        try {
+          toast(
+            "Smart import started. Please wait...",
+            "info"
           );
 
-          toast(
-            imported +
-            " review(s) imported. " +
-            skipped +
-            " duplicate/invalid row(s) skipped.",
+          const report =
+            await smartImportWorkbook(file);
 
+          toast(
+            report.products +
+            " product(s), " +
+            report.productsUpdated +
+            " product update(s), " +
+            report.reviews +
+            " review(s), " +
+            report.followups +
+            " follow-up(s) imported. " +
+            report.skipped +
+            " row(s) skipped.",
             "info"
           );
         }
@@ -6874,9 +7767,10 @@
           toast(
             "Import failed: " +
             error.message,
-
             "error"
           );
+
+          console.error(error);
         }
         finally {
           event.target.value =
@@ -6945,6 +7839,95 @@
     );
   }
 
+
+  function downloadReviewTemplate() {
+    downloadCSV(
+      "HELETT_Review_Import_Template.csv",
+      [
+        "SKU",
+        "ASIN",
+        "Rating",
+        "Review Title",
+        "Review Description",
+        "Reviewer Name",
+        "Review Date",
+        "Review URL",
+        "Status",
+        "Assigned Staff",
+        "Issue Type",
+        "Notes"
+      ],
+      [
+        [
+          "H30Clite",
+          "B0DWBXDX2M9",
+          "1",
+          "Bluetooth not connecting",
+          "Printer is not pairing with phone.",
+          "Amazon Customer",
+          todayISO(),
+          "https://www.amazon.in/review/example",
+          "New",
+          "Noor",
+          "Bluetooth Issue",
+          "Sample row"
+        ]
+      ]
+    );
+  }
+
+  function downloadFollowupTemplate() {
+    downloadCSV(
+      "HELETT_Followup_Import_Template.csv",
+      [
+        "Date",
+        "Executive Name",
+        "Customer Name",
+        "Contact Number",
+        "SKU",
+        "Order ID",
+        "Issue",
+        "Review Updated or not Updated",
+        "Negative Feedback"
+      ],
+      [
+        [
+          todayISO(),
+          "Jyoti yadav",
+          "Test Customer",
+          "9999999999",
+          "H30Clite",
+          "TEST-ORDER-001",
+          "Customer interested",
+          "Updated",
+          ""
+        ]
+      ]
+    );
+  }
+
+  function downloadProductTemplate() {
+    downloadCSV(
+      "HELETT_Product_Master_Import_Template.csv",
+      [
+        "Product Name",
+        "SKU",
+        "ASIN",
+        "Total Sellable",
+        "Status Flags"
+      ],
+      [
+        [
+          "Helett H30Clite thermal label printer",
+          "H30Clite",
+          "B0DWBXDX2M9",
+          "93",
+          "Active"
+        ]
+      ]
+    );
+  }
+
   function exportReviews() {
     const rows =
       activeRecords(
@@ -6968,7 +7951,9 @@
         "Status",
         "Assigned Staff",
         "Source",
-        "Notes"
+        "Notes",
+        "Created At",
+        "Updated At"
       ],
 
       rows.map(
@@ -6986,7 +7971,9 @@
           item.status,
           item.assignedTo,
           item.source,
-          item.notes
+          item.notes,
+          formatDateTime(item.createdAt),
+          formatDateTime(item.updatedAt)
         ]
       )
     );
@@ -7018,7 +8005,9 @@
         "Status",
         "Assigned Staff",
         "Negative Issue",
-        "Notes"
+        "Notes",
+        "Created At",
+        "Updated At"
       ],
 
       rows.map(
@@ -7039,10 +8028,170 @@
           item.status,
           item.assignedTo,
           item.negativeIssue,
-          item.notes
+          item.notes,
+          formatDateTime(item.createdAt),
+          formatDateTime(item.updatedAt)
         ]
       )
     );
+  }
+
+
+  function buildManagementReportText() {
+    const reviews =
+      activeRecords(state.reviews);
+
+    const followups =
+      activeRecords(state.followups);
+
+    const products =
+      activeRecords(state.products);
+
+    const negative =
+      reviews.filter(
+        item => Number(item.rating) <= 2
+      );
+
+    const openNegative =
+      negative.filter(
+        item =>
+          !["Resolved", "Closed"].includes(item.status)
+      );
+
+    const dueFollowups =
+      followups.filter(isDue);
+
+    const avg =
+      reviews.length
+        ? (
+          reviews.reduce(
+            (sum, item) =>
+              sum + Number(item.rating || 0),
+            0
+          ) / reviews.length
+        ).toFixed(2)
+        : "0.00";
+
+    const complaintCounts = {};
+
+    negative.forEach(item => {
+      const key =
+        item.issueType ||
+        "General Feedback";
+
+      complaintCounts[key] =
+        (complaintCounts[key] || 0) + 1;
+    });
+
+    const complaints =
+      Object
+        .entries(complaintCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(
+          ([name, count]) =>
+            "- " + name + ": " + count
+        )
+        .join("\n") ||
+      "- No negative complaint pattern yet.";
+
+    const skuLines =
+      products
+        .map(product => {
+          const health =
+            productHealth(product);
+
+          return (
+            "- " +
+            product.sku +
+            " | " +
+            (product.productName || "") +
+            " | Health " +
+            health.score +
+            "% | Avg " +
+            health.avg.toFixed(1) +
+            " | Reviews " +
+            health.total +
+            " | Open Negative " +
+            health.openNegative +
+            " | Due Follow-up " +
+            health.due +
+            " | Stock " +
+            (product.totalSellable || "N/A")
+          );
+        })
+        .join("\n") ||
+      "- Product master data not available.";
+
+    return (
+      "HELETT Review Intelligence - Management Report\n" +
+      "Generated: " +
+      formatDateTime(new Date().toISOString()) +
+      "\n\n" +
+      "EXECUTIVE SUMMARY\n" +
+      "Total Reviews: " +
+      reviews.length +
+      "\nAverage Rating: " +
+      avg +
+      "\nNegative Reviews: " +
+      negative.length +
+      "\nOpen Negative Cases: " +
+      openNegative.length +
+      "\nTotal Follow-ups: " +
+      followups.length +
+      "\nFollow-up Due/Overdue: " +
+      dueFollowups.length +
+      "\nProducts in Master: " +
+      products.length +
+      "\n\nSKU HEALTH\n" +
+      skuLines +
+      "\n\nTOP COMPLAINTS\n" +
+      complaints +
+      "\n\nACTION PLAN\n" +
+      (
+        openNegative.length
+          ? "1. " +
+            openNegative.length +
+            " open negative review(s) ko priority se assign/resolve karein.\n"
+          : "1. No urgent negative review risk.\n"
+      ) +
+      (
+        dueFollowups.length
+          ? "2. " +
+            dueFollowups.length +
+            " due follow-up customer ko today call karein.\n"
+          : "2. No overdue follow-up.\n"
+      ) +
+      "\nCUSTOMER REPLY DRAFT\n" +
+      "Dear Customer, we are sorry for the inconvenience caused. Please share your order details so our support team can help with troubleshooting or replacement as per policy.\n\n" +
+      "HINDI TEAM NOTE\n" +
+      "Negative review ko ignore nahi karna hai. Issue type identify karein, customer ko call karein, resolution note update karein aur status properly move karein.\n\n" +
+      "SYSTEM NOTE\n" +
+      "This Review Intelligence portal is separate from Noor-CRM and uses Firebase project: " +
+      firebaseConfig.projectId
+    );
+  }
+
+  function exportManagementReport() {
+    const link =
+      document.createElement("a");
+
+    link.href =
+      URL.createObjectURL(
+        new Blob(
+          [buildManagementReportText()],
+          {
+            type:
+              "text/plain;charset=utf-8"
+          }
+        )
+      );
+
+    link.download =
+      "HELETT_Review_Management_Report.txt";
+
+    link.click();
+
+    URL.revokeObjectURL(link.href);
   }
 
   function clearReviewFilters() {
