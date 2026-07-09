@@ -29,7 +29,7 @@ body.dark{--bg:#0f141c;--card:#17202b;--card2:#1d2835;--text:#edf3fb;--muted:#a9
 <body>
 <section id="loginScreen" class="login"><div class="login-card"><span class="badge"><i class="fa-solid fa-shield-halved"></i> CLEAN REAL DATABASE</span><h1>HELETT Review Intelligence</h1><p>Only verified data. Inventory ASIN list is built into this code. No call-report or test-data import is shown.</p><form id="loginForm" style="display:grid;gap:12px"><label>Email<input id="loginEmail" type="email" autocomplete="username" required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button id="loginBtn" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button><button class="btn secondary" type="button" onclick="sendReset()"><i class="fa-solid fa-key"></i> Forgot Password</button><div id="loginMessage" class="warn hidden"></div></form></div></section>
 <div id="appShell" class="shell hidden"><aside class="side"><div class="brand"><h1>HELETT Review Intelligence</h1><p>Clean real database + Daily Work Assistant: embedded inventory ASIN, verified Amazon reviews only, no fake import.</p><span class="badge"><i class="fa-solid fa-database"></i> V6 DAILY WORK MODE</span></div><nav class="nav"><button class="active" data-page="dashboardPage"><i class="fa-solid fa-chart-line"></i> Dashboard</button><button data-page="dailyPage"><i class="fa-solid fa-list-check"></i> Daily Work</button><button data-page="productsPage"><i class="fa-solid fa-boxes-stacked"></i> Product Master</button><button data-page="reviewsPage"><i class="fa-solid fa-star"></i> Verified Reviews</button><button data-page="negativePage"><i class="fa-solid fa-triangle-exclamation"></i> Negative Center</button><button data-page="cleanupPage"><i class="fa-solid fa-broom"></i> Clean Database</button><button data-page="guidePage"><i class="fa-solid fa-brain"></i> AI Mind Guide</button></nav><div class="foot">This page uses only Review Intelligence Firebase. Existing Noor-CRM is not connected.</div></aside><main class="main"><header class="top"><div><h2 id="pageTitle">Dashboard</h2><p id="syncText">Connecting...</p></div><div class="actions"><span id="userChip" class="chip"></span><div class="clock"><span id="timeNow">--:--:--</span><small id="dateNow">--</small></div><button id="themeBtn" class="btn secondary">Theme</button><button id="logoutBtn" class="btn red">Logout</button></div></header>
-<section id="dashboardPage" class="page active"><div class="warn"><b>Real mode:</b> Inventory products are built into code. Negative Center shows only manually added/verified Amazon reviews. Old imported test/call data is not shown as review data.</div><div id="dashboardCards" class="cards"></div><div class="panel"><div class="head"><div><h3>Embedded Inventory Product Health</h3><p>All 47 ASINs from Helett inventory file are already inside this code.</p></div><div class="actions"><button class="btn green" onclick="syncProducts()"><i class="fa-solid fa-cloud-arrow-up"></i> Sync Products to Firebase</button><button class="btn secondary" onclick="exportProducts()"><i class="fa-solid fa-file-export"></i> Export Product List</button><button class="btn red" onclick="hardResetKeepProducts()"><i class="fa-solid fa-trash-can"></i> Delete Old Data / Start Fresh</button></div></div><div id="dashboardProducts" class="grid"></div></div></section>
+ review data.</div><div id="dashboardCards" class="cards"></div><div class="panel"><div class="head"><div><h3>Embedded Inventory Product Health</h3><p>All 47 ASINs from Helett inventory file are already inside this code.</p></div><div class="actions"><button class="btn green" onclick="syncProducts()"><i class="fa-solid fa-cloud-arrow-up"></i> Sync Products to Firebase</button><button class="btn secondary" onclick="exportProducts()"><i class="fa-solid fa-file-export"></i> Export Product List</button><button class="btn red" onclick="hardResetKeepProducts()"><i class="fa-solid fa-trash-can"></i> Delete Old Data / Start Fresh</button></div></div><div id="dashboardProducts" class="grid"></div></div></section>
 <section id="dailyPage" class="page">
   <div class="helper"><b>Daily Work Assistant:</b> Customer call details stay temporary on this page. Firebase stores only verified Amazon reviews. Use Excel for phone/order tracking, and this page for review request, Amazon check, matching, and verified review entry.</div>
   <div class="panel">
@@ -129,7 +129,7 @@ function reviewRequestText(){let p=productBySku($('dailySku')?.value||'');let na
 
 Thank you for choosing HELETT.
 
-If you are satisfied with the product${p?' ('+p.productName+')':''}, please share your genuine review on Amazon. Your feedback helps us improve product quality and support.
+If you are satisfied with the product${p?' ('+ProductName+')':''}, please share your genuine review on Amazon. Your feedback helps us improve product quality and support.
 
 After posting the review, please share a screenshot with us for confirmation.
 
@@ -157,10 +157,17 @@ function scoreMatch(row,sku,text){let r=norm(row),score=0;if(sku&&r.includes(nor
 function runMatchHelper(){let rows=($('matchSheet')?.value||'').split(/\n+/).map(x=>x.trim()).filter(Boolean),sku=$('matchSku')?.value||'',text=$('matchText')?.value||'';if(!rows.length)return $('matchResults').textContent='Paste your Excel rows first. This data is not saved.';let matches=rows.map(row=>({row,score:scoreMatch(row,sku,text)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,10);if(!matches.length){$('matchResults').textContent='No confident match found. Try reviewer name, product short name, order ID, or SKU words.';return}let out='Possible matches (not guaranteed):\n\n'+matches.map((m,i)=>`${i+1}. Score ${m.score}\n${m.row}`).join('\n\n')+'\n\nNext: verify by order/SKU/date before contacting customer.';$('matchResults').textContent=out}
 function copyReachScript(){let t=`Namaste Sir/Ma'am,
 
-Main HELETT support team se bol raha hoon. Aapne hamara product purchase kiya tha. Hume product use experience ke baare me check karna tha.
+Hello Sir/Ma’am, this is from the HELETT Support Team.
 
-Agar product me koi issue aa raha hai, please hume bataiye. Hum troubleshooting/support me help karenge.
+You recently purchased our product from Amazon, and I’m calling to check your product experience.
 
+Is the product working properly for you, or are you facing any issue while using it?
+
+If you are facing any problem, please let us know. Our support team will be happy to help you with troubleshooting and proper guidance.
+
+If you are satisfied with the product, we would really appreciate it if you could share your genuine feedback on Amazon. After posting the review, please share a screenshot with us so we can update our feedback record.
+
+Thank you for choosing HELETT.
 Thank you,
 HELETT Support Team`;copyText(t);if($('matchResults'))$('matchResults').textContent=t}
 function copyReachPlanForReview(id){let x=state.reviews.get(id)||{},p=productBySku(x.sku)||{};let t=`REVIEW REACH PLAN
