@@ -1,64 +1,796 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HELETT Review Control System</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HELETT Review Ops Pro</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--card2:#f8fafc;--text:#132033;--muted:#64748b;--line:#dbe4ef;--primary:#1769d2;--green:#12844a;--red:#c93636;--yellow:#b77900;--shadow:0 12px 30px rgba(23,32,51,.08)}body.dark{--bg:#0f141c;--card:#17202b;--card2:#1d2835;--text:#edf3fb;--muted:#a9b7c8;--line:#334457;--primary:#79adff;--shadow:0 12px 30px rgba(0,0,0,.28)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--primary);text-decoration:none}.hidden{display:none!important}.shell{min-height:100vh;display:grid;grid-template-columns:255px 1fr}.side{position:sticky;top:0;height:100vh;background:#111827;color:#fff;padding:20px 14px;overflow:auto}.brand{padding:0 10px 16px;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:16px}.brand h1{font-size:21px;margin:0}.brand p{font-size:12px;color:#aab5c5;line-height:1.45}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;background:#fbbf2426;color:#fbbf24;font-size:11px;font-weight:900}.nav{display:grid;gap:7px}.nav button{display:flex;gap:10px;align-items:center;border:0;border-radius:10px;background:transparent;color:#c7d2e3;text-align:left;padding:12px;font-weight:850}.nav button.active,.nav button:hover{background:var(--primary);color:#fff}.foot{font-size:12px;color:#aab5c5;line-height:1.5;border-top:1px solid rgba(255,255,255,.14);margin-top:20px;padding-top:14px}.main{padding:22px;min-width:0}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px 18px;margin-bottom:18px;box-shadow:var(--shadow)}.top h2{margin:0;font-size:22px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:var(--card2);padding:9px 11px;border-radius:10px;color:var(--muted);font-size:12px;font-weight:850}.clock{font-size:12px;line-height:1.35;text-align:right;color:var(--muted);font-weight:850}.page{display:none}.page.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}.card{padding:16px}.card small{display:block;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase}.card b{display:block;font-size:29px;margin:8px 0}.card span{color:var(--muted);font-size:12px}.panel{padding:18px;margin-bottom:18px}.head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}.head h3{margin:0}.head p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;background:var(--primary);color:#fff;font-weight:900;padding:10px 13px;white-space:nowrap}.btn.secondary{background:var(--card2);border:1px solid var(--line);color:var(--text)}.btn.red{background:var(--red)}.btn.green{background:var(--green)}.btn.small{padding:7px 9px;font-size:12px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--text);padding:11px 12px;outline:none}textarea{min-height:85px;resize:vertical}label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:900}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}.table{overflow:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:900px;background:var(--card)}th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:13px}th{font-size:11px;color:var(--muted);background:var(--card2);text-transform:uppercase}.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#e8eef6;color:#52637a;font-size:11px;font-weight:900}.positive{background:#dff5e8!important;color:#10743d!important}.neutral{background:#fff2cd!important;color:#8a6200!important}.negative{background:#fde2e2!important;color:#a62323!important}.info{background:#dfeeff!important;color:#1257a4!important}.muted{color:var(--muted)}.product{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:15px}.product h4{margin:0 0 6px}.product p{margin:4px 0;color:var(--muted);font-size:12px;line-height:1.45}.empty{padding:28px;text-align:center;color:var(--muted)}.toolbar{display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:10px;margin-bottom:14px}.modalbg{display:none;position:fixed;inset:0;z-index:3000;background:rgba(2,8,23,.68);padding:20px;overflow:auto}.modalbg.show{display:block}.modal{width:min(900px,100%);margin:20px auto;background:var(--card);border-radius:16px;padding:20px;box-shadow:0 25px 80px rgba(0,0,0,.35)}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.login{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(circle at top left,rgba(25,103,210,.18),transparent 38%),var(--bg)}.logincard{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}.logincard h1{margin:10px 0 5px}.logincard p{color:var(--muted)}.msg{display:none;border-radius:9px;padding:10px 12px;font-size:12px;font-weight:900}.msg.show{display:block}.msg.error{background:#fde2e2;color:#a62323}.msg.success{background:#dff5e8;color:#10743d}.toast{display:none;position:fixed;right:18px;bottom:18px;z-index:5000;background:#111827;color:#fff;border-radius:10px;padding:12px 15px;font-weight:900;max-width:440px}.toast.show{display:block}.toast.error{background:#b42323}.toast.info{background:#135bb0}.toast.success{background:#08753d}.copybox{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;white-space:pre-wrap;color:var(--text);font-size:13px;line-height:1.5}.help{background:#eaf3ff;border:1px solid #b8d7ff;color:#164d88;border-radius:12px;padding:12px;font-size:13px;line-height:1.55}body.dark .help{background:#13243a;border-color:#2d5585;color:#cfe5ff}@media(max-width:1000px){.cards{grid-template-columns:repeat(2,1fr)}.grid,.toolbar{grid-template-columns:1fr 1fr}}@media(max-width:760px){.shell{grid-template-columns:1fr}.side{position:relative;height:auto}.main{padding:14px}.top{flex-direction:column;align-items:flex-start}.cards,.grid,.formgrid,.toolbar{grid-template-columns:1fr}.full{grid-column:1}.btn{width:100%}.actions .btn{width:auto}}
+:root {
+  --bg:#f5f7fb; --card:#ffffff; --soft:#f8fafc; --line:#dbe4ef; --text:#172033; --muted:#66758c;
+  --primary:#1967d2; --primary2:#0f4fa8; --green:#12834a; --red:#c93636; --yellow:#b77900; --orange:#dd6b20; --purple:#7c3aed;
+  --shadow:0 12px 30px rgba(23,32,51,.08);
+}
+body.dark {
+  --bg:#0f141c; --card:#17202b; --soft:#1d2835; --line:#334457; --text:#edf3fb; --muted:#a9b7c8;
+  --primary:#79adff; --primary2:#4f8fe8; --shadow:0 12px 30px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif} button,input,select,textarea{font:inherit} button{cursor:pointer} a{color:var(--primary)} .hidden{display:none!important}
+.shell{min-height:100vh;display:grid;grid-template-columns:270px 1fr} .side{position:sticky;top:0;height:100vh;overflow:auto;background:#111827;color:#fff;padding:20px 14px}
+.brand{padding:0 10px 18px;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:16px} .brand h1{font-size:21px;margin:0} .brand p{font-size:12px;color:#aab5c5;line-height:1.45;margin:8px 0}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#f59e0b26;color:#fbbf24;font-weight:900;font-size:11px;padding:6px 9px}
+.nav{display:grid;gap:7px} .nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:#c7d2e3;border-radius:10px;padding:12px;text-align:left;font-weight:850}
+.nav button.active,.nav button:hover{background:var(--primary);color:#fff} .foot{font-size:12px;color:#aab5c5;line-height:1.45;border-top:1px solid rgba(255,255,255,.14);margin-top:18px;padding-top:14px}
+.main{padding:22px;min-width:0} .top{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px 18px;margin-bottom:18px;box-shadow:var(--shadow)}
+.top h2{margin:0;font-size:22px} .top p{margin:6px 0 0;color:var(--muted);font-size:13px} .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .chip{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:9px 11px;font-weight:800;font-size:12px;color:var(--muted)}
+.page{display:none} .page.active{display:block} .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px} .card,.panel{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)} .card{padding:16px} .card small{display:block;color:var(--muted);font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.4px} .card b{display:block;font-size:28px;margin:8px 0} .card span{font-size:12px;color:var(--muted)}
+.panel{padding:18px;margin-bottom:18px} .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px} .head h3{margin:0;font-size:18px} .head p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px} .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} .mini{background:var(--soft);border:1px solid var(--line);border-radius:13px;padding:14px} .mini h4{margin:0 0 7px} .mini p{margin:5px 0;color:var(--muted);font-size:12px;line-height:1.45}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;background:var(--primary);color:#fff;font-weight:900;padding:10px 13px;text-decoration:none;white-space:nowrap} .btn:hover{background:var(--primary2)} .btn.secondary{background:var(--soft);border:1px solid var(--line);color:var(--text)} .btn.red{background:var(--red)} .btn.green{background:var(--green)} .btn.orange{background:var(--orange)} .btn.small{font-size:12px;padding:7px 9px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--text);padding:11px 12px;outline:none} input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(25,103,210,.14)} textarea{min-height:90px;resize:vertical}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} .full{grid-column:1/-1} label{display:grid;gap:6px;color:var(--muted);font-weight:850;font-size:12px} .toolbar{display:grid;grid-template-columns:1.5fr repeat(3,.8fr) auto;gap:10px;margin-bottom:14px}
+.table{overflow:auto;border:1px solid var(--line);border-radius:12px} table{border-collapse:collapse;width:100%;min-width:1050px;background:var(--card)} th,td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;font-size:13px} th{background:var(--soft);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.3px} tr:hover td{background:rgba(25,103,210,.04)}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 8px;background:#e8eef6;color:#52637a;font-size:11px;font-weight:900;white-space:nowrap} .positive{background:#dff5e8!important;color:#10743d!important} .negative{background:#fde2e2!important;color:#a62323!important} .neutral{background:#fff2cd!important;color:#8a6200!important} .info{background:#dfeeff!important;color:#1257a4!important} .purple{background:#efe5ff!important;color:#6d28d9!important}
+.empty{padding:26px;text-align:center;color:var(--muted)} .muted{color:var(--muted)} .bar{height:9px;border-radius:999px;background:#e8eef6;overflow:hidden} .bar div{height:100%;background:var(--primary)} .rowbar{display:grid;grid-template-columns:160px 1fr 52px;gap:10px;align-items:center;margin:9px 0}
+.login{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(circle at top left,rgba(25,103,210,.20),transparent 38%),var(--bg)} .login-card{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)} .login-card h1{margin:10px 0 5px} .login-card p{color:var(--muted);line-height:1.5}
+.msg{display:none;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:900} .msg.show{display:block} .msg.error{background:#fde2e2;color:#a62323} .msg.success{background:#dff5e8;color:#10743d}
+.toast{display:none;position:fixed;right:18px;bottom:18px;z-index:5000;background:#111827;color:#fff;border-radius:11px;padding:12px 15px;font-weight:900;max-width:520px} .toast.show{display:block} .toast.error{background:#b42323} .toast.success{background:#08753d} .toast.info{background:#135bb0}
+.modalbg{display:none;position:fixed;inset:0;z-index:3000;background:rgba(2,8,23,.68);padding:20px;overflow:auto} .modalbg.show{display:block} .modal{width:min(920px,100%);background:var(--card);border-radius:16px;margin:20px auto;padding:20px;box-shadow:0 25px 80px rgba(0,0,0,.35)} .modalhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
+.preview{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:12px;white-space:pre-wrap;font-size:12px;color:var(--text)} .helpbox{border-left:4px solid var(--primary);background:var(--soft);padding:12px 14px;border-radius:10px;color:var(--muted);font-size:13px;line-height:1.5}
+@media(max-width:1100px){.cards,.grid,.two{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}} @media(max-width:760px){.shell{grid-template-columns:1fr}.side{height:auto;position:relative}.main{padding:14px}.top{flex-direction:column;align-items:flex-start}.cards,.grid,.two,.form,.toolbar{grid-template-columns:1fr}.full{grid-column:1}.btn{width:100%}.actions .btn{width:auto}}
 </style>
 </head>
 <body>
-<section id="loginScreen" class="login"><div class="logincard"><span class="badge"><i class="fa-solid fa-shield-halved"></i> SECURE REVIEW PORTAL</span><h1>HELETT Review Control</h1><p>Sign in with Review Intelligence admin account.</p><form id="loginForm" style="display:grid;gap:12px"><label>Email<input id="loginEmail" type="email" required autocomplete="username"></label><label>Password<input id="loginPassword" type="password" required autocomplete="current-password"></label><button id="loginBtn" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button><button class="btn secondary" type="button" onclick="sendReset()"><i class="fa-solid fa-key"></i> Forgot Password</button><div id="loginMessage" class="msg"></div></form></div></section>
-<div id="appShell" class="shell hidden"><aside class="side"><div class="brand"><h1>HELETT Review Control</h1><p>Simple daily work: call customer, open Amazon latest reviews, save verified review, track bad review.</p><span class="badge"><i class="fa-solid fa-database"></i> REAL DATA ONLY</span></div><nav class="nav"><button class="active" data-page="dailyPage"><i class="fa-solid fa-headset"></i> Daily Work</button><button data-page="dashboardPage"><i class="fa-solid fa-chart-line"></i> Dashboard</button><button data-page="productsPage"><i class="fa-solid fa-boxes-stacked"></i> Product Master</button><button data-page="reviewsPage"><i class="fa-solid fa-star"></i> Verified Reviews</button><button data-page="negativePage"><i class="fa-solid fa-triangle-exclamation"></i> Negative Center</button><button data-page="insightsPage"><i class="fa-solid fa-wand-magic-sparkles"></i> Smart Insights</button><button data-page="cleanPage"><i class="fa-solid fa-broom"></i> Clean Data</button></nav><div class="foot">No old sheet, no stock status, no fake import. SKU/ASIN list is built into this code.</div></aside>
-<main class="main"><header class="top"><div><h2 id="pageTitle">Daily Work</h2><p id="syncText">Connecting...</p></div><div class="actions"><span id="userChip" class="chip"><i class="fa-solid fa-user-shield"></i></span><span id="liveClock" class="clock"></span><button id="themeBtn" class="btn secondary"><i class="fa-solid fa-moon"></i> Theme</button><button id="logoutBtn" class="btn red"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></div></header>
-<section id="dailyPage" class="page active"><div class="panel"><div class="head"><div><h3>Daily Work Assistant</h3><p>Excel se customer name/phone lo, yahan SKU select karke message copy karo, Amazon latest reviews open karo. Phone data yahan save nahi hota.</p></div></div><div class="help"><b>Rule:</b> Screenshot received = Excel pending. Amazon par visible confirmed = Portal me verified review save.</div><br><div class="formgrid"><label>SKU / Product<select id="dwSku"></select></label><label>Call Date<input id="dwDate" type="date"></label><label>Customer Name (temporary only)<input id="dwCustomer" placeholder="Excel se copy"></label><label>Phone (temporary only)<input id="dwPhone" placeholder="Excel se copy"></label><label class="full">Call Notes<textarea id="dwNotes" placeholder="Customer satisfied / issue reported / screenshot promised..."></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" onclick="copyCallScript()"><i class="fa-solid fa-copy"></i> Copy Call Script</button><button class="btn secondary" onclick="copyWhatsappScript()"><i class="fa-brands fa-whatsapp"></i> Copy WhatsApp Message</button><button class="btn secondary" onclick="openDailyReview()"><i class="fa-brands fa-amazon"></i> Open Latest Reviews</button><button class="btn green" onclick="openReviewModal('', true)"><i class="fa-solid fa-check"></i> Add Verified Review</button></div><p class="muted" id="dwCheckDate"></p><div class="copybox" id="dailyScriptBox">Select SKU and copy script.</div></div>
-<div class="panel"><div class="head"><div><h3>Bad Review Customer Match Helper</h3><p>Amazon review se direct phone nahi milta. Reviewer name / review words ko apni Excel customer list se match karne ke liye helper.</p></div></div><div class="formgrid"><label>Reviewer Name / Keyword<input id="matchKeyword" placeholder="Amazon reviewer name or review words"></label><label>Review SKU<select id="matchSku"></select></label><label class="full">Paste Excel Rows<textarea id="matchRows" placeholder="Paste rows from Excel: customer name, phone, SKU, order id, notes..."></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" onclick="findMatches()"><i class="fa-solid fa-magnifying-glass"></i> Find Possible Customer</button><button class="btn secondary" onclick="clearMatch()">Clear</button></div><div id="matchResult" style="margin-top:12px"></div></div></section>
-<section id="dashboardPage" class="page"><div id="dashboardCards" class="cards"></div><div class="panel"><div class="head"><div><h3>Quick Product Review Access</h3><p>Select product and open Amazon product or latest reviews.</p></div></div><div class="toolbar"><input id="dashSearch" placeholder="Search SKU/product/ASIN"><select id="dashSku"></select><button class="btn secondary" onclick="openSelectedProduct()">Open Product</button><button class="btn" onclick="openSelectedReviews()">Latest Reviews</button></div></div></section>
-<section id="productsPage" class="page"><div class="panel"><div class="head"><div><h3>Product Master</h3><p>Only SKU, product name and ASIN. No stock / old sheet / unwanted fields.</p></div><div class="actions"><button class="btn green" onclick="syncProducts()"><i class="fa-solid fa-rotate"></i> Sync Products</button></div></div><div class="toolbar"><input id="productSearch" placeholder="Search product / SKU / ASIN"><button class="btn secondary" onclick="clearProductSearch()">Clear</button></div><div id="productsGrid" class="grid"></div></div></section>
-<section id="reviewsPage" class="page"><div class="panel"><div class="head"><div><h3>Verified Amazon Reviews</h3><p>Save only visible Amazon reviews. No screenshot-only/pending entries.</p></div><button class="btn" onclick="openReviewModal()"><i class="fa-solid fa-plus"></i> Add Verified Review</button></div><div class="toolbar"><input id="reviewSearch" placeholder="Search reviews"><select id="reviewSkuFilter"></select><select id="reviewSentimentFilter"><option value="">All Ratings</option><option>Positive</option><option>Neutral</option><option>Negative</option></select><button class="btn secondary" onclick="clearReviewFilters()">Clear</button></div><div class="table"><table><thead><tr><th>Date</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Actions</th></tr></thead><tbody id="reviewsBody"></tbody></table></div></div></section>
-<section id="negativePage" class="page"><div id="negativeCards" class="cards"></div><div class="panel"><div class="head"><div><h3>Negative Center</h3><p>Only verified 1–2 star Amazon reviews appear here.</p></div></div><div class="table"><table><thead><tr><th>Date</th><th>Product</th><th>Rating</th><th>Issue</th><th>Status</th><th>Action</th></tr></thead><tbody id="negativeBody"></tbody></table></div></div></section>
-<section id="insightsPage" class="page"><div class="panel"><div class="head"><div><h3>Smart Insights</h3><p>Simple management points from verified reviews.</p></div></div><div id="insightsGrid" class="grid"></div></div></section>
-<section id="cleanPage" class="page"><div class="panel"><div class="head"><div><h3>Clean Data</h3><p>Use carefully. This removes old wrong data and keeps only clean product list.</p></div></div><div class="help">Best for your current problem: click <b>Start Fresh: Products Only</b>. It removes old fake reviews, old followups, old audit logs, and syncs clean SKU/ASIN list.</div><br><div class="actions"><button class="btn red" onclick="startFresh()"><i class="fa-solid fa-broom"></i> Start Fresh: Products Only</button><button class="btn secondary" onclick="removeAllReviews()">Remove All Reviews</button><button class="btn secondary" onclick="syncProducts()">Sync Product List Only</button></div></div></section>
-</main></div>
-<div id="reviewModal" class="modalbg"><div class="modal"><div class="modalhead"><h3 id="reviewModalTitle">Add Verified Review</h3><button class="btn secondary small" onclick="closeModal('reviewModal')">X</button></div><form id="reviewForm"><input id="reviewId" type="hidden"><div class="help"><b>Verification:</b> Save only after review is visible on Amazon. Screenshot only = keep in Excel pending.</div><br><div class="formgrid"><label>Review Date<input id="reviewDate" type="date" required></label><label>SKU / Product<select id="reviewSku" required></select></label><label>ASIN<input id="reviewAsin" readonly></label><label>Rating<select id="reviewRating" required><option value="">Select</option><option value="1">1 Star</option><option value="2">2 Stars</option><option value="3">3 Stars</option><option value="4">4 Stars</option><option value="5">5 Stars</option></select></label><label class="full">Review Title<input id="reviewTitle" required placeholder="Amazon review title"></label><label class="full">Review Text<textarea id="reviewDescription" required placeholder="Amazon review text"></textarea></label><label>Reviewer Name<input id="reviewerName" placeholder="Amazon public name"></label><label>Review URL<input id="reviewUrl" type="url" placeholder="Amazon review/product review link"></label><label>Status<select id="reviewStatus"><option>New</option><option>Investigating</option><option>Customer Contacted</option><option>Waiting</option><option>Resolved</option><option>Closed</option></select></label><label>Assigned Staff<input id="reviewAssigned" placeholder="Noor / team member"></label><label class="full">Internal Notes<textarea id="reviewNotes" placeholder="Action note / customer matching details"></textarea></label></div><div class="actions" style="margin-top:14px"><button id="saveReviewBtn" class="btn green" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Verified Review</button><button class="btn secondary" type="button" onclick="closeModal('reviewModal')">Cancel</button></div></form></div></div>
+<section id="loginScreen" class="login">
+  <div class="login-card">
+    <span class="badge"><i class="fa-solid fa-shield-halved"></i> SECURE HELETT OPS</span>
+    <h1>HELETT Review Ops Pro</h1>
+    <p>Customer calling, Amazon review checking, negative review action and rating analytics in one place.</p>
+    <form id="loginForm" style="display:grid;gap:12px">
+      <label>Email<input id="loginEmail" type="email" required placeholder="Admin email"></label>
+      <label>Password<input id="loginPassword" type="password" required placeholder="Password"></label>
+      <button id="loginBtn" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+      <button class="btn secondary" type="button" onclick="resetPassword()"><i class="fa-solid fa-key"></i> Forgot Password</button>
+      <div id="loginMessage" class="msg"></div>
+    </form>
+  </div>
+</section>
+
+<div id="app" class="shell hidden">
+  <aside class="side">
+    <div class="brand">
+      <h1>HELETT Review Ops Pro</h1>
+      <p>Real work system: call customers, request genuine review, check Amazon visibility, track negative cases.</p>
+      <span class="badge"><i class="fa-solid fa-database"></i> REAL DATABASE</span>
+    </div>
+    <nav class="nav">
+      <button class="active" data-page="dashboardPage"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+      <button data-page="dailyPage"><i class="fa-solid fa-headset"></i> Daily Work</button>
+      <button data-page="productsPage"><i class="fa-solid fa-boxes-stacked"></i> Product Master</button>
+      <button data-page="callsPage"><i class="fa-solid fa-phone-volume"></i> Call Data</button>
+      <button data-page="ratingsPage"><i class="fa-solid fa-star-half-stroke"></i> Rating Analytics</button>
+      <button data-page="verifiedPage"><i class="fa-solid fa-circle-check"></i> Verified Reviews</button>
+      <button data-page="negativePage"><i class="fa-solid fa-triangle-exclamation"></i> Negative Cases</button>
+      <button data-page="matchPage"><i class="fa-solid fa-magnifying-glass-location"></i> Customer Match</button>
+      <button data-page="toolsPage"><i class="fa-solid fa-screwdriver-wrench"></i> Data Tools</button>
+    </nav>
+    <div class="foot">Rule: Excel = calling/private customer data. Portal = professional review operation and analysis. Verified Amazon review only after visibility confirmation.</div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div>
+        <h2 id="pageTitle">Dashboard</h2>
+        <p id="syncText">Connecting...</p>
+      </div>
+      <div class="actions">
+        <span id="clockChip" class="chip">--:--</span>
+        <span id="userChip" class="chip"><i class="fa-solid fa-user-shield"></i></span>
+        <button id="themeBtn" class="btn secondary"><i class="fa-solid fa-moon"></i> Theme</button>
+        <button id="logoutBtn" class="btn red"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+      </div>
+    </header>
+
+    <section id="dashboardPage" class="page active">
+      <div id="dashCards" class="cards"></div>
+      <div class="two">
+        <div class="panel">
+          <div class="head"><div><h3>Today / Pending Action</h3><p>Customer calling pipeline from saved/imported data.</p></div></div>
+          <div id="actionList"></div>
+        </div>
+        <div class="panel">
+          <div class="head"><div><h3>Top SKU Workload</h3><p>Most called SKUs and issue volume.</p></div></div>
+          <div id="skuBars"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="head">
+          <div><h3>Professional Daily Workflow</h3><p>Use this same process every day.</p></div>
+        </div>
+        <div class="grid">
+          <div class="mini"><h4>1. Call from Excel</h4><p>Take SKU, customer name/phone from your calling sheet. Save call result in Daily Work if needed.</p></div>
+          <div class="mini"><h4>2. Request genuine review</h4><p>Use Copy Script. Customer screenshot is pending proof, not final Amazon visibility.</p></div>
+          <div class="mini"><h4>3. Verify on Amazon</h4><p>After 2–3 days open Latest Reviews. If visible, save as Verified Review. 1–2 star goes to Negative Cases.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dailyPage" class="page">
+      <div class="panel">
+        <div class="head">
+          <div><h3>Daily Work Assistant</h3><p>Save real call work here. SKU dropdown always comes from built-in 47 ASIN product list + synced database.</p></div>
+          <div class="actions">
+            <button class="btn secondary" onclick="copyCallScript()"><i class="fa-solid fa-copy"></i> Copy Call Script</button>
+            <button class="btn green" onclick="openReviewModal()"><i class="fa-solid fa-circle-check"></i> Add Verified Review</button>
+          </div>
+        </div>
+        <div class="form">
+          <label>Product / SKU<select id="dailySku"></select></label>
+          <label>Call Date<input id="dailyCallDate" type="date"></label>
+          <label>Customer Name<input id="dailyCustomer" placeholder="Optional - from your Excel"></label>
+          <label>Phone Number<input id="dailyPhone" placeholder="Customer phone"></label>
+          <label>Order ID<input id="dailyOrder" placeholder="Optional"></label>
+          <label>Call Result<select id="dailyResult"><option>Connected</option><option>No Response</option><option>Review Requested</option><option>Screenshot Received</option><option>Issue Reported</option><option>Not Interested</option><option>Wrong Number</option></select></label>
+          <label>Review Request Sent<select id="dailyRequest"><option>No</option><option>Yes</option></select></label>
+          <label>Screenshot Received<select id="dailyScreenshot"><option>No</option><option>Yes</option></select></label>
+          <label>Amazon Visible<select id="dailyVisible"><option>Pending</option><option>Yes</option><option>No</option></select></label>
+          <label>Follow-up Date<input id="dailyFollowDate" type="date"></label>
+          <label class="full">Call Notes / Customer Issue<textarea id="dailyNotes" placeholder="Example: Customer agreed to give review / Bluetooth issue / no response"></textarea></label>
+        </div>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn green" onclick="saveDailyWork()"><i class="fa-solid fa-floppy-disk"></i> Save Daily Work</button>
+          <button class="btn" onclick="openSelectedProduct()"><i class="fa-brands fa-amazon"></i> Open Product</button>
+          <button class="btn secondary" onclick="openSelectedReviews()"><i class="fa-solid fa-star"></i> Open Latest Reviews</button>
+          <button class="btn secondary" onclick="clearDailyForm()">Clear</button>
+        </div>
+        <div class="helpbox" style="margin-top:14px">
+          <b>Rule:</b> Screenshot received = pending. Amazon visible = verified. Only verified visible review should be saved in Verified Reviews.
+        </div>
+      </div>
+      <div class="panel">
+        <div class="head"><div><h3>Recent Daily Work</h3><p>Saved call records from Daily Work and imports.</p></div></div>
+        <div class="toolbar"><input id="dailySearch" placeholder="Search phone, name, SKU, issue..."><select id="dailyStatusFilter"><option value="">All Results</option><option>Connected</option><option>No Response</option><option>Review Requested</option><option>Screenshot Received</option><option>Issue Reported</option></select><select id="dailySkuFilter"><option value="">All SKU</option></select><button class="btn secondary" onclick="clearDailyFilters()">Clear</button></div>
+        <div class="table"><table><thead><tr><th>Date</th><th>Customer / Phone</th><th>SKU</th><th>Result</th><th>Follow-up</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="dailyBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="productsPage" class="page">
+      <div class="panel">
+        <div class="head">
+          <div><h3>Product Master — 47 ASIN Connected</h3><p>No stock/out-of-stock display. Only product, SKU, ASIN and Amazon links.</p></div>
+          <div class="actions"><button class="btn green" onclick="syncProducts()"><i class="fa-solid fa-cloud-arrow-up"></i> Sync 47 Products</button></div>
+        </div>
+        <div class="toolbar"><input id="productSearch" placeholder="Search product, SKU, ASIN..."><select id="productType"><option value="">All Products</option><option value="printer">Printers</option><option value="scanner">Scanners</option><option value="lock">Locks</option><option value="other">Other</option></select><button class="btn secondary" onclick="renderProducts()">Search</button></div>
+        <div id="productsGrid" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="callsPage" class="page">
+      <div class="panel">
+        <div class="head">
+          <div><h3>Calling Data Analysis</h3><p>This is where June calling file data should go. It does not create fake Amazon reviews.</p></div>
+          <div class="actions"><button class="btn secondary" onclick="$('callImport').click()">Import June Calling File</button><input id="callImport" type="file" accept=".xlsx,.xls,.csv" hidden></div>
+        </div>
+        <div id="callCards" class="cards"></div>
+        <div class="toolbar"><input id="callSearch" placeholder="Search phone, SKU, remarks..."><select id="callOutcomeFilter"><option value="">All Outcomes</option></select><select id="callCategoryFilter"><option value="">All Issues</option></select><button class="btn secondary" onclick="clearCallFilters()">Clear</button></div>
+        <div class="table"><table><thead><tr><th>Source</th><th>Phone</th><th>SKU</th><th>Outcome</th><th>Issue Category</th><th>Remarks</th><th>Action</th></tr></thead><tbody id="callBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="ratingsPage" class="page">
+      <div class="panel">
+        <div class="head">
+          <div><h3>Rating Analytics</h3><p>Import Daily Rating Data file. System tracks rating, comment count growth and negative count by SKU/date.</p></div>
+          <div class="actions"><button class="btn secondary" onclick="$('ratingImport').click()">Import Daily Rating Data</button><input id="ratingImport" type="file" accept=".xlsx,.xls,.csv" hidden></div>
+        </div>
+        <div id="ratingCards" class="cards"></div>
+        <div class="two">
+          <div class="mini"><h4>Rating Risk SKUs</h4><div id="ratingRisk"></div></div>
+          <div class="mini"><h4>Comment Growth SKUs</h4><div id="commentGrowth"></div></div>
+        </div>
+        <div class="table" style="margin-top:14px"><table><thead><tr><th>Date</th><th>SKU</th><th>Rating</th><th>Comments</th><th>Negative</th></tr></thead><tbody id="ratingBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="verifiedPage" class="page">
+      <div class="panel">
+        <div class="head">
+          <div><h3>Verified Amazon Reviews</h3><p>Save only when review is visible on Amazon.</p></div>
+          <div class="actions"><button class="btn green" onclick="openReviewModal()">Add Verified Review</button></div>
+        </div>
+        <div class="toolbar"><input id="reviewSearch" placeholder="Search review, SKU, reviewer..."><select id="reviewRatingFilter"><option value="">All Rating</option><option value="1">1 Star</option><option value="2">2 Star</option><option value="3">3 Star</option><option value="4">4 Star</option><option value="5">5 Star</option></select><button class="btn secondary" onclick="clearReviewFilters()">Clear</button></div>
+        <div class="table"><table><thead><tr><th>Date</th><th>SKU / ASIN</th><th>Rating</th><th>Reviewer</th><th>Review</th><th>Status</th><th>Actions</th></tr></thead><tbody id="reviewBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="negativePage" class="page">
+      <div class="panel">
+        <div class="head"><div><h3>Negative Cases</h3><p>Includes verified 1–2 star reviews and imported negative comment details. Action tracking available.</p></div></div>
+        <div id="negativeCards" class="cards"></div>
+        <div class="toolbar"><input id="negSearch" placeholder="Search customer, phone, SKU, issue..."><select id="negStatusFilter"><option value="">All Status</option><option>New</option><option>In Progress</option><option>Customer Contacted</option><option>Resolved</option><option>Closed</option></select><button class="btn secondary" onclick="clearNegFilters()">Clear</button></div>
+        <div class="table"><table><thead><tr><th>Date</th><th>Customer / Phone</th><th>Product</th><th>Issue / Review</th><th>Action Taken</th><th>Status</th><th>Save</th></tr></thead><tbody id="negativeBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="matchPage" class="page">
+      <div class="panel">
+        <div class="head"><div><h3>Bad Review Customer Match Helper</h3><p>When Amazon shows a bad review but customer phone is not visible, use SKU + review words to find possible customer from calling data.</p></div></div>
+        <div class="form">
+          <label>Review SKU / Product<select id="matchSku"></select></label>
+          <label>Reviewer Name / Display Name<input id="matchReviewer" placeholder="Amazon public reviewer name"></label>
+          <label class="full">Bad Review Text<textarea id="matchText" placeholder="Paste Amazon review text here"></textarea></label>
+        </div>
+        <div class="actions" style="margin-top:14px"><button class="btn green" onclick="runMatch()">Find Possible Customer</button><button class="btn secondary" onclick="clearMatch()">Clear</button></div>
+      </div>
+      <div class="panel">
+        <div class="head"><div><h3>Possible Matches</h3><p>This is not 100% proof. Use it for investigation only.</p></div></div>
+        <div id="matchResults"></div>
+      </div>
+    </section>
+
+    <section id="toolsPage" class="page">
+      <div class="panel">
+        <div class="head"><div><h3>Data Tools</h3><p>Controlled import and clean options. Nothing creates fake reviews automatically.</p></div></div>
+        <div class="grid">
+          <div class="mini"><h4>Import Calling File</h4><p>Reads June calling data into Call Data only.</p><button class="btn secondary" onclick="$('callImport').click()">Import Calling</button></div>
+          <div class="mini"><h4>Import Rating File</h4><p>Reads Daily Rating Data and Negative Comment Details.</p><button class="btn secondary" onclick="$('ratingImport').click()">Import Rating</button></div>
+          <div class="mini"><h4>Sync Products</h4><p>Loads 47 ASIN product list into Firebase.</p><button class="btn green" onclick="syncProducts()">Sync Products</button></div>
+          <div class="mini"><h4>Clean Old Junk</h4><p>Removes old paths from previous versions: customer_followups, amazon_reviews, audit_logs.</p><button class="btn orange" onclick="cleanOldJunk()">Clean Old Junk</button></div>
+          <div class="mini"><h4>Fresh Start</h4><p>Deletes call/rating/review/negative data and keeps products only.</p><button class="btn red" onclick="freshStart()">Fresh Start: Products Only</button></div>
+          <div class="mini"><h4>Export Snapshot</h4><p>Download current operational data as JSON backup.</p><button class="btn secondary" onclick="exportBackup()">Export Backup</button></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Import Preview / Log</h3>
+        <div id="importPreview" class="preview">No import yet.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="reviewModal" class="modalbg">
+  <div class="modal">
+    <div class="modalhead"><h3>Add Verified Amazon Review</h3><button class="btn secondary small" onclick="closeModal('reviewModal')">X</button></div>
+    <div class="form">
+      <label>Product / SKU<select id="rvSku"></select></label>
+      <label>Review Date<input id="rvDate" type="date"></label>
+      <label>Rating<select id="rvRating"><option value="">Select</option><option value="1">1 Star</option><option value="2">2 Star</option><option value="3">3 Star</option><option value="4">4 Star</option><option value="5">5 Star</option></select></label>
+      <label>Reviewer Name<input id="rvReviewer" placeholder="Amazon public name"></label>
+      <label class="full">Review Title<input id="rvTitle" placeholder="Review title"></label>
+      <label class="full">Review Text<textarea id="rvText" placeholder="Visible Amazon review text"></textarea></label>
+      <label class="full">Review / Product URL<input id="rvUrl" placeholder="Amazon review/product page URL"></label>
+      <label>Status<select id="rvStatus"><option>New</option><option>In Progress</option><option>Customer Contacted</option><option>Resolved</option><option>Closed</option></select></label>
+      <label>Assigned To<input id="rvAssigned" placeholder="Team member"></label>
+      <label class="full">Internal Notes<textarea id="rvNotes" placeholder="Action / investigation notes"></textarea></label>
+    </div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn green" onclick="saveVerifiedReview()">Save Verified Review</button>
+      <button class="btn secondary" onclick="closeModal('reviewModal')">Cancel</button>
+    </div>
+    <div class="helpbox" style="margin-top:14px"><b>Guard:</b> Save only after review is visible on Amazon. Do not save screenshot-only/pending reviews here.</div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
+
 <script>
-const firebaseConfig={apiKey:"AIzaSyBA65EAwVGe324MBNhPBJ9ggZcZ5-YDqJg",authDomain:"helett-review-intelligence-dev.firebaseapp.com",databaseURL:"https://helett-review-intelligence-dev-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"helett-review-intelligence-dev",storageBucket:"helett-review-intelligence-dev.firebasestorage.app",messagingSenderId:"610178751592",appId:"1:610178751592:web:d14f1d1f71830cf5f66fdd"};
-const ADMIN_UID="dtAXFz4B6ZVQbVqkOEzhTEU2oTx1", ROOT="noor_product_reviews";
-const BUILTIN_PRODUCTS=[{"sku": "Logic View Monitor HLT550", "productName": "Logic View Monitor HLT550", "asin": "B0GPCQ9KLN", "amazonUrl": "https://www.amazon.in/dp/B0GPCQ9KLN", "reviewUrl": "https://www.amazon.in/product-reviews/B0GPCQ9KLN?sortBy=recent"}, {"sku": "UY16 UHF Wireless mic", "productName": "UY16 UHF Wireless mic", "asin": "B0C8JRN652", "amazonUrl": "https://www.amazon.in/dp/B0C8JRN652", "reviewUrl": "https://www.amazon.in/product-reviews/B0C8JRN652?sortBy=recent"}, {"sku": "Helett travel-Fi 4G", "productName": "Helett travel-Fi 4G", "asin": "B0G1YY4MJK", "amazonUrl": "https://www.amazon.in/dp/B0G1YY4MJK", "reviewUrl": "https://www.amazon.in/product-reviews/B0G1YY4MJK?sortBy=recent"}, {"sku": "Helett HLT550 Portable Monitor", "productName": "Helett HLT550 Portable Monitor", "asin": "B0FLK7RSCV", "amazonUrl": "https://www.amazon.in/dp/B0FLK7RSCV", "reviewUrl": "https://www.amazon.in/product-reviews/B0FLK7RSCV?sortBy=recent"}, {"sku": "Helett H55C Thermal Label Printer", "productName": "Helett H55C Thermal Label Printer", "asin": "B0DL5PXZ65", "amazonUrl": "https://www.amazon.in/dp/B0DL5PXZ65", "reviewUrl": "https://www.amazon.in/product-reviews/B0DL5PXZ65?sortBy=recent"}, {"sku": "Helett H65C Label Printer", "productName": "Helett H65C Label Printer", "asin": "B0FZSJRV5F", "amazonUrl": "https://www.amazon.in/dp/B0FZSJRV5F", "reviewUrl": "https://www.amazon.in/product-reviews/B0FZSJRV5F?sortBy=recent"}, {"sku": "Helett A4L Pro Thermal Printer", "productName": "Helett A4L Pro Thermal Printer", "asin": "B0DKXD4N4R", "amazonUrl": "https://www.amazon.in/dp/B0DKXD4N4R", "reviewUrl": "https://www.amazon.in/product-reviews/B0DKXD4N4R?sortBy=recent"}, {"sku": "H30c printer (White)", "productName": "H30c printer (White)", "asin": "B0CJVGCB4K", "amazonUrl": "https://www.amazon.in/dp/B0CJVGCB4K", "reviewUrl": "https://www.amazon.in/product-reviews/B0CJVGCB4K?sortBy=recent"}, {"sku": "HT320 Digital Door MFN", "productName": "HT320 Digital Door MFN", "asin": "B0CRB2KDC6", "amazonUrl": "https://www.amazon.in/dp/B0CRB2KDC6", "reviewUrl": "https://www.amazon.in/product-reviews/B0CRB2KDC6?sortBy=recent"}, {"sku": "UNIY UY610 Smart Door Lock FBA", "productName": "UNIY UY610 Smart Door Lock FBA", "asin": "B0BFFW365Y", "amazonUrl": "https://www.amazon.in/dp/B0BFFW365Y", "reviewUrl": "https://www.amazon.in/product-reviews/B0BFFW365Y?sortBy=recent"}, {"sku": "UY40 Projector FBA", "productName": "UY40 Projector FBA", "asin": "B0BPHT9WY9", "amazonUrl": "https://www.amazon.in/dp/B0BPHT9WY9", "reviewUrl": "https://www.amazon.in/product-reviews/B0BPHT9WY9?sortBy=recent"}, {"sku": "Helett AC1200 Dual Band Wifi Router", "productName": "Helett AC1200 Dual Band Wifi Router", "asin": "B0DGF32QRT", "amazonUrl": "https://www.amazon.in/dp/B0DGF32QRT", "reviewUrl": "https://www.amazon.in/product-reviews/B0DGF32QRT?sortBy=recent"}, {"sku": "Helett H30CLite BT Printer FBA", "productName": "Helett H30CLite BT Printer FBA", "asin": "B0GYSTLWT3", "amazonUrl": "https://www.amazon.in/dp/B0GYSTLWT3", "reviewUrl": "https://www.amazon.in/product-reviews/B0GYSTLWT3?sortBy=recent"}, {"sku": "Helett HT15 wired desktop scanner", "productName": "Helett HT15 wired desktop scanner", "asin": "B0D39NNN57", "amazonUrl": "https://www.amazon.in/dp/B0D39NNN57", "reviewUrl": "https://www.amazon.in/product-reviews/B0D39NNN57?sortBy=recent"}, {"sku": "H58i BillQuick Go", "productName": "H58i BillQuick Go", "asin": "B0H5X3VCM5", "amazonUrl": "https://www.amazon.in/dp/B0H5X3VCM5", "reviewUrl": "https://www.amazon.in/product-reviews/B0H5X3VCM5?sortBy=recent"}, {"sku": "HT410 wired Barcode scanner FBA", "productName": "HT410 wired Barcode scanner FBA", "asin": "B0CBC9G7W2", "amazonUrl": "https://www.amazon.in/dp/B0CBC9G7W2", "reviewUrl": "https://www.amazon.in/product-reviews/B0CBC9G7W2?sortBy=recent"}, {"sku": "HT20pro Wirelss Barcode Scanner", "productName": "HT20pro Wirelss Barcode Scanner", "asin": "B0DPCRLRNJ", "amazonUrl": "https://www.amazon.in/dp/B0DPCRLRNJ", "reviewUrl": "https://www.amazon.in/product-reviews/B0DPCRLRNJ?sortBy=recent"}, {"sku": "helett HLT552 Portable Monitor Pro", "productName": "helett HLT552 Portable Monitor Pro", "asin": "B0H5R8L5LW", "amazonUrl": "https://www.amazon.in/dp/B0H5R8L5LW", "reviewUrl": "https://www.amazon.in/product-reviews/B0H5R8L5LW?sortBy=recent"}, {"sku": "U19 wireless Training Mic", "productName": "U19 wireless Training Mic", "asin": "B0C72FSCFM", "amazonUrl": "https://www.amazon.in/dp/B0C72FSCFM", "reviewUrl": "https://www.amazon.in/product-reviews/B0C72FSCFM?sortBy=recent"}, {"sku": "HT210 Door lock", "productName": "HT210 Door lock", "asin": "B0CBXG8CLB", "amazonUrl": "https://www.amazon.in/dp/B0CBXG8CLB", "reviewUrl": "https://www.amazon.in/product-reviews/B0CBXG8CLB?sortBy=recent"}, {"sku": "helett H58i Bluetooth Printer FBA", "productName": "helett H58i Bluetooth Printer FBA", "asin": "B0CXN44J7J", "amazonUrl": "https://www.amazon.in/dp/B0CXN44J7J", "reviewUrl": "https://www.amazon.in/product-reviews/B0CXN44J7J?sortBy=recent"}, {"sku": "Helett HL96 Hair Dryer FBA", "productName": "Helett HL96 Hair Dryer FBA", "asin": "B0GV4K1P7L", "amazonUrl": "https://www.amazon.in/dp/B0GV4K1P7L", "reviewUrl": "https://www.amazon.in/product-reviews/B0GV4K1P7L?sortBy=recent"}, {"sku": "Helett HL96 Hair Dryer FBA", "productName": "Helett HL96 Hair Dryer FBA", "asin": "B0D9LS2P2F", "amazonUrl": "https://www.amazon.in/dp/B0D9LS2P2F", "reviewUrl": "https://www.amazon.in/product-reviews/B0D9LS2P2F?sortBy=recent"}, {"sku": "Helett H30CLite Printer", "productName": "Helett H30CLite Printer", "asin": "B0DW8DX2M9", "amazonUrl": "https://www.amazon.in/dp/B0DW8DX2M9", "reviewUrl": "https://www.amazon.in/product-reviews/B0DW8DX2M9?sortBy=recent"}, {"sku": "HT410 Lite wired Barcode scanner FBA", "productName": "HT410 Lite wired Barcode scanner FBA", "asin": "B0GYSMFZC1", "amazonUrl": "https://www.amazon.in/dp/B0GYSMFZC1", "reviewUrl": "https://www.amazon.in/product-reviews/B0GYSMFZC1?sortBy=recent"}, {"sku": "Helett H30C Printer New FBA", "productName": "Helett H30C Printer New FBA", "asin": "B0FSSL1Q2X", "amazonUrl": "https://www.amazon.in/dp/B0FSSL1Q2X", "reviewUrl": "https://www.amazon.in/product-reviews/B0FSSL1Q2X?sortBy=recent"}, {"sku": "Helett Ht15e Desktop Barcode Scanner FBA", "productName": "Helett Ht15e Desktop Barcode Scanner FBA", "asin": "B0F8QKDJN3", "amazonUrl": "https://www.amazon.in/dp/B0F8QKDJN3", "reviewUrl": "https://www.amazon.in/product-reviews/B0F8QKDJN3?sortBy=recent"}, {"sku": "Helett 4x6 Thermal Label", "productName": "Helett 4x6 Thermal Label", "asin": "B0DW8PCP6D", "amazonUrl": "https://www.amazon.in/dp/B0DW8PCP6D", "reviewUrl": "https://www.amazon.in/product-reviews/B0DW8PCP6D?sortBy=recent"}, {"sku": "H80i Autocut Thermal Printer", "productName": "H80i Autocut Thermal Printer", "asin": "B0CZ99K438", "amazonUrl": "https://www.amazon.in/dp/B0CZ99K438", "reviewUrl": "https://www.amazon.in/product-reviews/B0CZ99K438?sortBy=recent"}, {"sku": "helett HE24 Label Printer", "productName": "helett HE24 Label Printer", "asin": "B0DDL3TR1L", "amazonUrl": "https://www.amazon.in/dp/B0DDL3TR1L", "reviewUrl": "https://www.amazon.in/product-reviews/B0DDL3TR1L?sortBy=recent"}, {"sku": "Helett Ht20 Barcode Scanner", "productName": "Helett Ht20 Barcode Scanner", "asin": "B0CPDPTHVN", "amazonUrl": "https://www.amazon.in/dp/B0CPDPTHVN", "reviewUrl": "https://www.amazon.in/product-reviews/B0CPDPTHVN?sortBy=recent"}, {"sku": "Helett Z567 Tyre Inflator NEW", "productName": "Helett Z567 Tyre Inflator NEW", "asin": "B0GSZRF4M5", "amazonUrl": "https://www.amazon.in/dp/B0GSZRF4M5", "reviewUrl": "https://www.amazon.in/product-reviews/B0GSZRF4M5?sortBy=recent"}, {"sku": "Helett H65C 2in1 Thermal Printer", "productName": "Helett H65C 2in1 Thermal Printer", "asin": "B0D1P7SC46", "amazonUrl": "https://www.amazon.in/dp/B0D1P7SC46", "reviewUrl": "https://www.amazon.in/product-reviews/B0D1P7SC46?sortBy=recent"}, {"sku": "HE24 Label Tape", "productName": "HE24 Label Tape", "asin": "B0DTNVQ34H", "amazonUrl": "https://www.amazon.in/dp/B0DTNVQ34H", "reviewUrl": "https://www.amazon.in/product-reviews/B0DTNVQ34H?sortBy=recent"}, {"sku": "Helett H65Clite Printer", "productName": "Helett H65Clite Printer", "asin": "B0FLV3V1W4", "amazonUrl": "https://www.amazon.in/dp/B0FLV3V1W4", "reviewUrl": "https://www.amazon.in/product-reviews/B0FLV3V1W4?sortBy=recent"}, {"sku": "Helett Ht15 Desktop Barcode Scanner", "productName": "Helett Ht15 Desktop Barcode Scanner", "asin": "B0FGCT1MWB", "amazonUrl": "https://www.amazon.in/dp/B0FGCT1MWB", "reviewUrl": "https://www.amazon.in/product-reviews/B0FGCT1MWB?sortBy=recent"}, {"sku": "H41", "productName": "H41", "asin": "B0CR75SMCQ", "amazonUrl": "https://www.amazon.in/dp/B0CR75SMCQ", "reviewUrl": "https://www.amazon.in/product-reviews/B0CR75SMCQ?sortBy=recent"}, {"sku": "Helett H30C Pro Thermal Printer", "productName": "Helett H30C Pro Thermal Printer", "asin": "B0DZGPV245", "amazonUrl": "https://www.amazon.in/dp/B0DZGPV245", "reviewUrl": "https://www.amazon.in/product-reviews/B0DZGPV245?sortBy=recent"}, {"sku": "Helett HE760 Mobile Printer", "productName": "Helett HE760 Mobile Printer", "asin": "B0DQGQY98X", "amazonUrl": "https://www.amazon.in/dp/B0DQGQY98X", "reviewUrl": "https://www.amazon.in/product-reviews/B0DQGQY98X?sortBy=recent"}, {"sku": "2x1 Label Roll Pack of 4", "productName": "2x1 Label Roll Pack of 4", "asin": "B0H6QGN526", "amazonUrl": "https://www.amazon.in/dp/B0H6QGN526", "reviewUrl": "https://www.amazon.in/product-reviews/B0H6QGN526?sortBy=recent"}, {"sku": "Helett H01 Label Holder FBA", "productName": "Helett H01 Label Holder FBA", "asin": "B0D9T8R3W8", "amazonUrl": "https://www.amazon.in/dp/B0D9T8R3W8", "reviewUrl": "https://www.amazon.in/product-reviews/B0D9T8R3W8?sortBy=recent"}, {"sku": "Helett H30C Pro Printer", "productName": "Helett H30C Pro Printer", "asin": "B0FKZPDH66", "amazonUrl": "https://www.amazon.in/dp/B0FKZPDH66", "reviewUrl": "https://www.amazon.in/product-reviews/B0FKZPDH66?sortBy=recent"}, {"sku": "Helett 4x6 Thermal Label (400) FBA", "productName": "Helett 4x6 Thermal Label (400) FBA", "asin": "B0H1HP2K4L", "amazonUrl": "https://www.amazon.in/dp/B0H1HP2K4L", "reviewUrl": "https://www.amazon.in/product-reviews/B0H1HP2K4L?sortBy=recent"}, {"sku": "UY 14 UHF Wireless MIC", "productName": "UY 14 UHF Wireless MIC", "asin": "B0BLV54ZQK", "amazonUrl": "https://www.amazon.in/dp/B0BLV54ZQK", "reviewUrl": "https://www.amazon.in/product-reviews/B0BLV54ZQK?sortBy=recent"}, {"sku": "UNIY UY720 Smartdoor Lock FBA", "productName": "UNIY UY720 Smartdoor Lock FBA", "asin": "B0DBCW1PS4", "amazonUrl": "https://www.amazon.in/dp/B0DBCW1PS4", "reviewUrl": "https://www.amazon.in/product-reviews/B0DBCW1PS4?sortBy=recent"}, {"sku": "ECO- D3-BT", "productName": "ECO- D3-BT", "asin": "B0CQM5THV3", "amazonUrl": "https://www.amazon.in/dp/B0CQM5THV3", "reviewUrl": "https://www.amazon.in/product-reviews/B0CQM5THV3?sortBy=recent"}, {"sku": "Helett InfiniStick android stick", "productName": "Helett InfiniStick android stick", "asin": "B0GDKY6QHN", "amazonUrl": "https://www.amazon.in/dp/B0GDKY6QHN", "reviewUrl": "https://www.amazon.in/product-reviews/B0GDKY6QHN?sortBy=recent"}];
-firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.database(),root=db.ref(ROOT),reviewsRef=root.child('amazon_reviews'),productsRef=root.child('product_master'),auditRef=root.child('audit_logs'),followupsRef=root.child('customer_followups');
-const $=id=>document.getElementById(id);const state={user:null,reviews:new Map(),listeners:[]};
-function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
-function norm(v){return String(v??'').toLowerCase().trim().replace(/\s+/g,' ')}function today(){return new Date().toISOString().slice(0,10)}function fmt(v){if(!v)return'—';let d=new Date(Number(v)||v);return isNaN(d)?String(v):d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}
-function sentiment(r){r=Number(r);return r<=2?'Negative':r===3?'Neutral':'Positive'}function productBySku(sku){return BUILTIN_PRODUCTS.find(p=>p.sku===sku)||null}function allReviews(){return [...state.reviews.values()].filter(x=>x&&x.isDeleted!==true)}
-function toast(m,type='success'){let b=$('toast');b.textContent=m;b.className='toast show '+type;clearTimeout(toast.t);toast.t=setTimeout(()=>b.className='toast',4200)}function setMsg(m,type='error'){let b=$('loginMessage');b.textContent=m;b.className='msg show '+type}
-function openModal(id){$(id).classList.add('show')}function closeModal(id){$(id).classList.remove('show')}
-function updateClock(){let d=new Date();$('liveClock').innerHTML=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'<br>'+d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}setInterval(updateClock,1000);updateClock();
-function listen(){stop();state.reviews.clear();const add=s=>{state.reviews.set(s.key,{...s.val(),_id:s.key});renderAll()};const rem=s=>{state.reviews.delete(s.key);renderAll()};reviewsRef.on('child_added',add,err);reviewsRef.on('child_changed',add,err);reviewsRef.on('child_removed',rem,err);state.listeners.push(()=>{reviewsRef.off('child_added',add);reviewsRef.off('child_changed',add);reviewsRef.off('child_removed',rem)});$('syncText').textContent='Live Firebase sync active · Products built-in: '+BUILTIN_PRODUCTS.length}
-function stop(){state.listeners.forEach(f=>f());state.listeners=[]}function err(e){toast('Firebase error: '+e.message,'error')}async function audit(a,s){if(!state.user)return;await auditRef.push().set({action:a,summary:s||'',userEmail:state.user.email||'',createdAt:firebase.database.ServerValue.TIMESTAMP})}
-auth.onAuthStateChanged(async u=>{if(!u){state.user=null;stop();$('loginScreen').classList.remove('hidden');$('appShell').classList.add('hidden');return}if(u.uid!==ADMIN_UID){await auth.signOut();setMsg('This account is not authorized.');return}state.user=u;$('loginScreen').classList.add('hidden');$('appShell').classList.remove('hidden');$('userChip').innerHTML='<i class="fa-solid fa-user-shield"></i> '+esc(u.email);listen();fillOptions();renderAll()});
-$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginMessage').className='msg';try{await auth.signInWithEmailAndPassword($('loginEmail').value.trim(),$('loginPassword').value);$('loginPassword').value=''}catch(er){setMsg(er.code==='auth/invalid-login-credentials'?'Email or password is incorrect.':er.message)}};async function sendReset(){let email=$('loginEmail').value.trim();if(!email)return setMsg('Pehle email likho.');try{await auth.sendPasswordResetEmail(email);setMsg('Password reset email sent.','success')}catch(e){setMsg(e.message)}}
-$('logoutBtn').onclick=()=>auth.signOut();$('themeBtn').onclick=()=>document.body.classList.toggle('dark');document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.page).classList.add('active');$('pageTitle').textContent=b.textContent.trim();renderAll()});
-function fillOptions(){let opts='<option value="">Select SKU / Product</option>'+BUILTIN_PRODUCTS.map(p=>`<option value="${esc(p.sku)}">${esc(p.sku)} — ${esc(p.productName)}</option>`).join('');['dwSku','matchSku','reviewSku','dashSku','reviewSkuFilter'].forEach(id=>{if($(id)){let cur=$(id).value;$(id).innerHTML=(id==='reviewSkuFilter'?'<option value="">All SKUs</option>':'')+opts;if([...$(id).options].some(o=>o.value===cur))$(id).value=cur}})}
-function renderAll(){dashboard();renderProducts();renderReviews();renderNegatives();renderInsights()}
-function dashboard(){let r=allReviews(),neg=r.filter(x=>Number(x.rating)<=2),open=neg.filter(x=>!['Resolved','Closed'].includes(x.status)),avg=r.length?(r.reduce((s,x)=>s+Number(x.rating||0),0)/r.length).toFixed(2):'0.00';let cards=[['Products',BUILTIN_PRODUCTS.length,'SKU/ASIN connected'],['Verified Reviews',r.length,'Amazon visible only'],['Average Rating',avg,'Saved verified reviews'],['Open Negative',open.length,'Need action']];$('dashboardCards').innerHTML=cards.map(c=>`<div class="card"><small>${c[0]}</small><b>${c[1]}</b><span>${c[2]}</span></div>`).join('')}
-function productCard(p){return `<div class="product"><h4>${esc(p.productName)}</h4><p><b>SKU:</b> ${esc(p.sku)}</p><p><b>ASIN:</b> ${esc(p.asin)}</p><div class="actions"><a class="btn small" target="_blank" href="${esc(p.amazonUrl)}"><i class="fa-brands fa-amazon"></i> Product</a><a class="btn secondary small" target="_blank" href="${esc(p.reviewUrl)}"><i class="fa-solid fa-star"></i> Latest Reviews</a><button class="btn green small" onclick="prefillSku('${esc(p.sku)}')">Add Review</button></div></div>`}
-function renderProducts(){let q=norm($('productSearch')?.value||'');let list=BUILTIN_PRODUCTS.filter(p=>!q||norm(p.sku+' '+p.productName+' '+p.asin).includes(q));$('productsGrid').innerHTML=list.map(productCard).join('')||'<div class="empty">No product found.</div>'}function clearProductSearch(){$('productSearch').value='';renderProducts()}$('productSearch')?.addEventListener('input',renderProducts);
-function renderReviews(){let q=norm($('reviewSearch')?.value||''),sku=$('reviewSkuFilter')?.value||'',sen=$('reviewSentimentFilter')?.value||'';let list=allReviews().filter(x=>(!q||norm([x.sku,x.asin,x.title,x.description,x.reviewerName,x.status].join(' ')).includes(q))&&(!sku||x.sku===sku)&&(!sen||x.sentiment===sen)).sort((a,b)=>String(b.reviewDate||'').localeCompare(String(a.reviewDate||'')));$('reviewsBody').innerHTML=list.map(x=>`<tr><td>${esc(x.reviewDate||'')}</td><td><b>${esc(x.sku)}</b><br><span class="muted">${esc(x.asin)}</span></td><td><span class="pill ${x.sentiment.toLowerCase()}">${x.rating} ★ ${x.sentiment}</span></td><td><b>${esc(x.title)}</b><br><span class="muted">${esc(x.description)}</span>${x.reviewUrl?'<br><a target="_blank" href="'+esc(x.reviewUrl)+'">Open review</a>':''}</td><td><select onchange="changeStatus('${x._id}',this.value)">${['New','Investigating','Customer Contacted','Waiting','Resolved','Closed'].map(s=>`<option ${x.status===s?'selected':''}>${s}</option>`).join('')}</select><br><span class="muted">Created: ${fmt(x.createdAt)}</span></td><td><button class="btn secondary small" onclick="openReviewModal('${x._id}')">Edit</button> <button class="btn red small" onclick="deleteReview('${x._id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No verified reviews saved yet.</td></tr>'}
-function renderNegatives(){let list=allReviews().filter(x=>Number(x.rating)<=2).sort((a,b)=>String(b.reviewDate||'').localeCompare(String(a.reviewDate||'')));$('negativeCards').innerHTML=[['Negative',list.length,'1–2 star'],['Open',list.filter(x=>!['Resolved','Closed'].includes(x.status)).length,'Need action'],['Resolved',list.filter(x=>x.status==='Resolved'||x.status==='Closed').length,'Done'],['Products Affected',new Set(list.map(x=>x.sku)).size,'SKU count']].map(c=>`<div class="card"><small>${c[0]}</small><b>${c[1]}</b><span>${c[2]}</span></div>`).join('');$('negativeBody').innerHTML=list.map(x=>`<tr><td>${esc(x.reviewDate)}</td><td><b>${esc(x.sku)}</b><br>${esc(x.asin)}</td><td><span class="pill negative">${x.rating} ★</span></td><td><b>${esc(x.title)}</b><br><span class="muted">${esc(x.description)}</span></td><td><select onchange="changeStatus('${x._id}',this.value)">${['New','Investigating','Customer Contacted','Waiting','Resolved','Closed'].map(s=>`<option ${x.status===s?'selected':''}>${s}</option>`).join('')}</select></td><td><button class="btn secondary small" onclick="openReviewModal('${x._id}')">Edit</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No verified negative reviews.</td></tr>'}
-function renderInsights(){let r=allReviews(),neg=r.filter(x=>Number(x.rating)<=2),open=neg.filter(x=>!['Resolved','Closed'].includes(x.status));let bySku={};neg.forEach(x=>bySku[x.sku]=(bySku[x.sku]||0)+1);let top=Object.entries(bySku).sort((a,b)=>b[1]-a[1])[0];let items=[['Database Rule','Only Amazon visible reviews are saved. Screenshot-only records stay in Excel.'],['Open Negative',open.length+' case(s) need status update.'],['Top Risk SKU',top?top[0]+' has '+top[1]+' negative review(s).':'No negative pattern yet.'],['Next Action','Daily: call customers from Excel, check Amazon latest reviews after 2–3 days, then save verified review.']];$('insightsGrid').innerHTML=items.map(x=>`<div class="product"><h4>${esc(x[0])}</h4><p>${esc(x[1])}</p></div>`).join('')}
-function openReviewModal(id='',fromDaily=false){$('reviewForm').reset();$('reviewId').value='';$('reviewDate').value=today();$('reviewStatus').value='New';$('reviewModalTitle').textContent=id?'Edit Verified Review':'Add Verified Review';if(id){let x=state.reviews.get(id);if(!x)return;$('reviewId').value=id;$('reviewDate').value=x.reviewDate||'';$('reviewSku').value=x.sku||'';$('reviewAsin').value=x.asin||'';$('reviewRating').value=x.rating||'';$('reviewTitle').value=x.title||'';$('reviewDescription').value=x.description||'';$('reviewerName').value=x.reviewerName||'';$('reviewUrl').value=x.reviewUrl||'';$('reviewStatus').value=x.status||'New';$('reviewAssigned').value=x.assignedTo||'';$('reviewNotes').value=x.notes||''}else if(fromDaily&&$('dwSku').value){$('reviewSku').value=$('dwSku').value;setReviewAsin()}openModal('reviewModal')}function prefillSku(sku){openReviewModal();$('reviewSku').value=sku;setReviewAsin()}function setReviewAsin(){let p=productBySku($('reviewSku').value);$('reviewAsin').value=p?p.asin:''}$('reviewSku').onchange=setReviewAsin;
-$('reviewForm').onsubmit=async e=>{e.preventDefault();let id=$('reviewId').value,p=productBySku($('reviewSku').value);if(!p)return toast('Please select SKU.','error');if(!$('reviewTitle').value.trim()||!$('reviewDescription').value.trim()||!$('reviewRating').value)return toast('Title, text and rating required.','error');let rec={reviewDate:$('reviewDate').value,sku:p.sku,asin:p.asin,rating:Number($('reviewRating').value),sentiment:sentiment($('reviewRating').value),title:$('reviewTitle').value.trim(),description:$('reviewDescription').value.trim(),reviewerName:$('reviewerName').value.trim(),reviewUrl:$('reviewUrl').value.trim(),status:$('reviewStatus').value,assignedTo:$('reviewAssigned').value.trim(),notes:$('reviewNotes').value.trim(),source:'Manual Verified Entry',isDeleted:false,updatedAt:firebase.database.ServerValue.TIMESTAMP,updatedBy:state.user.uid,updatedByEmail:state.user.email||''};if(!id){rec.createdAt=firebase.database.ServerValue.TIMESTAMP;rec.createdBy=state.user.uid;rec.createdByEmail=state.user.email||''}else{let old=state.reviews.get(id)||{};rec.createdAt=old.createdAt||firebase.database.ServerValue.TIMESTAMP;rec.createdBy=old.createdBy||state.user.uid;rec.createdByEmail=old.createdByEmail||state.user.email||''}try{let key=id||reviewsRef.push().key;await reviewsRef.child(key).set(rec);await audit(id?'UPDATE_REVIEW':'CREATE_REVIEW',rec.sku+' '+rec.title);closeModal('reviewModal');toast('Verified review saved.')}catch(er){toast('Save failed: '+er.message,'error')}};
-async function changeStatus(id,status){try{await reviewsRef.child(id).update({status,updatedAt:firebase.database.ServerValue.TIMESTAMP});await audit('STATUS_UPDATE',id+' '+status);toast('Status updated.')}catch(e){toast(e.message,'error')}}async function deleteReview(id){if(!confirm('Delete this review?'))return;try{await reviewsRef.child(id).update({isDeleted:true,deletedAt:firebase.database.ServerValue.TIMESTAMP});toast('Review moved to deleted.')}catch(e){toast(e.message,'error')}}
-function dailyProduct(){return productBySku($('dwSku').value)}function openDailyReview(){let p=dailyProduct();if(!p)return toast('Select SKU first.','error');window.open(p.reviewUrl,'_blank')}function openSelectedProduct(){let p=productBySku($('dashSku').value);if(!p)return toast('Select SKU.','error');window.open(p.amazonUrl,'_blank')}function openSelectedReviews(){let p=productBySku($('dashSku').value);if(!p)return toast('Select SKU.','error');window.open(p.reviewUrl,'_blank')}function updateDaily(){let base=$('dwDate').value||today(),d=new Date(base+'T00:00:00');d.setDate(d.getDate()+3);$('dwCheckDate').textContent='Amazon visibility check date: '+d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});let p=dailyProduct();$('dailyScriptBox').textContent=p?'Product selected: '+p.productName+' | ASIN: '+p.asin:'Select SKU to prepare call.'}['dwSku','dwDate'].forEach(id=>$(id).onchange=updateDaily);$('dwDate').value=today();updateDaily();
-function callScript(){let p=dailyProduct();return `Hello Sir/Ma'am, this is from the HELETT Support Team.\n\nYou recently purchased our product${p?' — '+p.productName:''} from Amazon, and I am calling to check your product experience.\n\nIs the product working properly for you, or are you facing any issue while using it?\n\nIf you are facing any problem, please let us know. Our support team will be happy to help you with troubleshooting and proper guidance.\n\nIf you are satisfied with the product, we would appreciate your genuine feedback on Amazon. After posting the review, please share a screenshot with us for confirmation.\n\nThank you for choosing HELETT.`}function copyCallScript(){let t=callScript();navigator.clipboard.writeText(t);$('dailyScriptBox').textContent=t;toast('Call script copied.')}function copyWhatsappScript(){copyCallScript()}
-function findMatches(){let key=norm($('matchKeyword').value),sku=norm($('matchSku').value),rows=$('matchRows').value.split(/\n+/).filter(Boolean);let scored=rows.map(r=>{let n=norm(r);let score=0;if(key&&n.includes(key))score+=5;if(sku&&n.includes(sku))score+=3;key.split(' ').filter(w=>w.length>2).forEach(w=>{if(n.includes(w))score++});return{r,score}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,10);$('matchResult').innerHTML=scored.length?'<div class="table"><table><thead><tr><th>Possible Match</th><th>Score</th></tr></thead><tbody>'+scored.map(x=>`<tr><td>${esc(x.r)}</td><td>${x.score}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">No possible match found. Try reviewer name, SKU or review words.</div>'}function clearMatch(){$('matchKeyword').value='';$('matchRows').value='';$('matchResult').innerHTML=''}
-async function syncProducts(){let updates={};BUILTIN_PRODUCTS.forEach(p=>{updates[norm(p.sku).replace(/[^a-z0-9]+/g,'_')]={sku:p.sku,productName:p.productName,asin:p.asin,amazonUrl:p.amazonUrl,reviewUrl:p.reviewUrl,active:true,updatedAt:firebase.database.ServerValue.TIMESTAMP}});try{await productsRef.set(updates);await audit('SYNC_PRODUCTS','Clean SKU/ASIN products synced');toast('Clean product list synced.')}catch(e){toast(e.message,'error')}}async function removeAllReviews(){if(!confirm('Remove all reviews?'))return;try{await reviewsRef.remove();await audit('REMOVE_ALL_REVIEWS','All reviews removed');toast('All reviews removed.')}catch(e){toast(e.message,'error')}}async function startFresh(){if(!confirm('Start fresh? This removes old reviews/followups/audit/products and syncs clean products.'))return;if(!confirm('Final confirm?'))return;try{await reviewsRef.remove();await followupsRef.remove();await auditRef.remove();await productsRef.remove();await syncProducts();toast('Fresh clean database ready.')}catch(e){toast(e.message,'error')}}
-function clearReviewFilters(){$('reviewSearch').value='';$('reviewSkuFilter').value='';$('reviewSentimentFilter').value='';renderReviews()}['reviewSearch','reviewSkuFilter','reviewSentimentFilter'].forEach(id=>$(id)?.addEventListener('input',renderReviews));$('reviewSkuFilter')?.addEventListener('change',renderReviews);$('reviewSentimentFilter')?.addEventListener('change',renderReviews);$('dashSearch')?.addEventListener('input',()=>{let q=norm($('dashSearch').value);let p=BUILTIN_PRODUCTS.find(x=>norm(x.sku+' '+x.productName+' '+x.asin).includes(q));if(p)$('dashSku').value=p.sku});
+const firebaseConfig = {
+  apiKey: "AIzaSyBA65EAwVGe324MBNhPBJ9ggZcZ5-YDqJg",
+  authDomain: "helett-review-intelligence-dev.firebaseapp.com",
+  databaseURL: "https://helett-review-intelligence-dev-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "helett-review-intelligence-dev",
+  storageBucket: "helett-review-intelligence-dev.firebasestorage.app",
+  messagingSenderId: "610178751592",
+  appId: "1:610178751592:web:d14f1d1f71830cf5f66fdd"
+};
+const ADMIN_UID = "dtAXFz4B6ZVQbVqkOEzhTEU2oTx1";
+const ROOT_PATH = "noor_product_reviews";
+const BUILT_IN_PRODUCTS = [
+  {
+    "name": "Logic View Monitor HLT550",
+    "sku": "Logic View Monitor HLT550",
+    "asin": "B0GPCQ9KLN"
+  },
+  {
+    "name": "UY16 UHF Wireless mic",
+    "sku": "UY16 UHF Wireless mic",
+    "asin": "B0C8JRN652"
+  },
+  {
+    "name": "Helett travel-Fi 4G",
+    "sku": "Helett travel-Fi 4G",
+    "asin": "B0G1YY4MJK"
+  },
+  {
+    "name": "Helett HLT550 Portable Monitor",
+    "sku": "Helett HLT550 Portable Monitor",
+    "asin": "B0FLK7RSCV"
+  },
+  {
+    "name": "Helett H55C Thermal Label Printer",
+    "sku": "Helett H55C Thermal Label Printer",
+    "asin": "B0DL5PXZ65"
+  },
+  {
+    "name": "Helett H65C Label Printer",
+    "sku": "Helett H65C Label Printer",
+    "asin": "B0FZSJRV5F"
+  },
+  {
+    "name": "Helett A4L Pro Thermal Printer",
+    "sku": "Helett A4L Pro Thermal Printer",
+    "asin": "B0DKXD4N4R"
+  },
+  {
+    "name": "H30c printer (White)",
+    "sku": "H30c printer (White)",
+    "asin": "B0CJVGCB4K"
+  },
+  {
+    "name": "HT320 Digital Door MFN",
+    "sku": "HT320 Digital Door MFN",
+    "asin": "B0CRB2KDC6"
+  },
+  {
+    "name": "UNIY UY610 Smart Door Lock FBA",
+    "sku": "UNIY UY610 Smart Door Lock FBA",
+    "asin": "B0BFFW365Y"
+  },
+  {
+    "name": "UY40 Projector FBA",
+    "sku": "UY40 Projector FBA",
+    "asin": "B0BPHT9WY9"
+  },
+  {
+    "name": "Helett AC1200 Dual Band Wifi Router",
+    "sku": "Helett AC1200 Dual Band Wifi Router",
+    "asin": "B0DGF32QRT"
+  },
+  {
+    "name": "Helett H30CLite BT Printer FBA",
+    "sku": "Helett H30CLite BT Printer FBA",
+    "asin": "B0GYSTLWT3"
+  },
+  {
+    "name": "Helett HT15 wired desktop scanner",
+    "sku": "Helett HT15 wired desktop scanner",
+    "asin": "B0D39NNN57"
+  },
+  {
+    "name": "H58i BillQuick Go",
+    "sku": "H58i BillQuick Go",
+    "asin": "B0H5X3VCM5"
+  },
+  {
+    "name": "HT410 wired Barcode scanner FBA",
+    "sku": "HT410 wired Barcode scanner FBA",
+    "asin": "B0CBC9G7W2"
+  },
+  {
+    "name": "HT20pro Wirelss Barcode Scanner",
+    "sku": "HT20pro Wirelss Barcode Scanner",
+    "asin": "B0DPCRLRNJ"
+  },
+  {
+    "name": "helett HLT552 Portable Monitor Pro",
+    "sku": "helett HLT552 Portable Monitor Pro",
+    "asin": "B0H5R8L5LW"
+  },
+  {
+    "name": "U19 wireless Training Mic",
+    "sku": "U19 wireless Training Mic",
+    "asin": "B0C72FSCFM"
+  },
+  {
+    "name": "HT210 Door lock",
+    "sku": "HT210 Door lock",
+    "asin": "B0CBXG8CLB"
+  },
+  {
+    "name": "helett H58i Bluetooth Printer FBA",
+    "sku": "helett H58i Bluetooth Printer FBA",
+    "asin": "B0CXN44J7J"
+  },
+  {
+    "name": "Helett HL96 Hair Dryer FBA",
+    "sku": "Helett HL96 Hair Dryer FBA",
+    "asin": "B0GV4K1P7L"
+  },
+  {
+    "name": "Helett HL96 Hair Dryer FBA",
+    "sku": "Helett HL96 Hair Dryer FBA",
+    "asin": "B0D9LS2P2F"
+  },
+  {
+    "name": "Helett H30CLite Printer",
+    "sku": "Helett H30CLite Printer",
+    "asin": "B0DW8DX2M9"
+  },
+  {
+    "name": "HT410 Lite wired Barcode scanner FBA",
+    "sku": "HT410 Lite wired Barcode scanner FBA",
+    "asin": "B0GYSMFZC1"
+  },
+  {
+    "name": "Helett H30C Printer New FBA",
+    "sku": "Helett H30C Printer New FBA",
+    "asin": "B0FSSL1Q2X"
+  },
+  {
+    "name": "Helett Ht15e Desktop Barcode Scanner FBA",
+    "sku": "Helett Ht15e Desktop Barcode Scanner FBA",
+    "asin": "B0F8QKDJN3"
+  },
+  {
+    "name": "Helett 4x6 Thermal Label",
+    "sku": "Helett 4x6 Thermal Label",
+    "asin": "B0DW8PCP6D"
+  },
+  {
+    "name": "H80i Autocut Thermal Printer",
+    "sku": "H80i Autocut Thermal Printer",
+    "asin": "B0CZ99K438"
+  },
+  {
+    "name": "helett HE24 Label Printer",
+    "sku": "helett HE24 Label Printer",
+    "asin": "B0DDL3TR1L"
+  },
+  {
+    "name": "Helett Ht20 Barcode Scanner",
+    "sku": "Helett Ht20 Barcode Scanner",
+    "asin": "B0CPDPTHVN"
+  },
+  {
+    "name": "Helett Z567 Tyre Inflator NEW",
+    "sku": "Helett Z567 Tyre Inflator NEW",
+    "asin": "B0GSZRF4M5"
+  },
+  {
+    "name": "Helett H65C 2in1 Thermal Printer",
+    "sku": "Helett H65C 2in1 Thermal Printer",
+    "asin": "B0D1P7SC46"
+  },
+  {
+    "name": "HE24 Label Tape",
+    "sku": "HE24 Label Tape",
+    "asin": "B0DTNVQ34H"
+  },
+  {
+    "name": "Helett H65Clite Printer",
+    "sku": "Helett H65Clite Printer",
+    "asin": "B0FLV3V1W4"
+  },
+  {
+    "name": "Helett Ht15 Desktop Barcode Scanner",
+    "sku": "Helett Ht15 Desktop Barcode Scanner",
+    "asin": "B0FGCT1MWB"
+  },
+  {
+    "name": "H41",
+    "sku": "H41",
+    "asin": "B0CR75SMCQ"
+  },
+  {
+    "name": "Helett H30C Pro Thermal Printer",
+    "sku": "Helett H30C Pro Thermal Printer",
+    "asin": "B0DZGPV245"
+  },
+  {
+    "name": "Helett HE760 Mobile Printer",
+    "sku": "Helett HE760 Mobile Printer",
+    "asin": "B0DQGQY98X"
+  },
+  {
+    "name": "2x1 Label Roll Pack of 4",
+    "sku": "2x1 Label Roll Pack of 4",
+    "asin": "B0H6QGN526"
+  },
+  {
+    "name": "Helett H01 Label Holder FBA",
+    "sku": "Helett H01 Label Holder FBA",
+    "asin": "B0D9T8R3W8"
+  },
+  {
+    "name": "Helett H30C Pro Printer",
+    "sku": "Helett H30C Pro Printer",
+    "asin": "B0FKZPDH66"
+  },
+  {
+    "name": "Helett 4x6 Thermal Label (400) FBA",
+    "sku": "Helett 4x6 Thermal Label (400) FBA",
+    "asin": "B0H1HP2K4L"
+  },
+  {
+    "name": "UY 14 UHF Wireless MIC",
+    "sku": "UY 14 UHF Wireless MIC",
+    "asin": "B0BLV54ZQK"
+  },
+  {
+    "name": "UNIY UY720 Smartdoor Lock FBA",
+    "sku": "UNIY UY720 Smartdoor Lock FBA",
+    "asin": "B0DBCW1PS4"
+  },
+  {
+    "name": "ECO- D3-BT",
+    "sku": "ECO- D3-BT",
+    "asin": "B0CQM5THV3"
+  },
+  {
+    "name": "Helett InfiniStick android stick",
+    "sku": "Helett InfiniStick android stick",
+    "asin": "B0GDKY6QHN"
+  }
+];
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const root = db.ref(ROOT_PATH);
+const refs = {
+  products: root.child("product_master"),
+  calls: root.child("call_records"),
+  ratings: root.child("rating_snapshots"),
+  monthly: root.child("monthly_feedback"),
+  negative: root.child("negative_cases"),
+  reviews: root.child("verified_reviews")
+};
+const $ = id => document.getElementById(id);
+const state = {user:null, products:new Map(), calls:new Map(), ratings:new Map(), monthly:new Map(), negative:new Map(), reviews:new Map(), listeners:[], active:"dashboardPage"};
+
+function today(){return new Date().toISOString().slice(0,10)}
+function addDays(d,n){if(!d)return ""; const x=new Date(d+"T00:00:00"); if(isNaN(x))return ""; x.setDate(x.getDate()+n); return x.toISOString().slice(0,10)}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function norm(v){return String(v??"").toLowerCase().trim().replace(/\s+/g," ")}
+function skuNorm(v){return String(v??"").toUpperCase().replace(/\s+/g,"").replace(/-/g,"")}
+function fmtDate(v){if(!v)return "—"; const d=new Date(v); return isNaN(d)?String(v):d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}
+function fmtDT(v){if(!v)return "—"; const d=new Date(Number(v)||v); return isNaN(d)?String(v):d.toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}
+function toast(m,t="success"){const b=$("toast"); b.textContent=m; b.className="toast show "+t; clearTimeout(toast.timer); toast.timer=setTimeout(()=>b.className="toast",4200)}
+function setMsg(m,t="error"){$("loginMessage").textContent=m; $("loginMessage").className="msg show "+t}
+function closeModal(id){$(id).classList.remove("show")}
+function openModal(id){$(id).classList.add("show")}
+function activeArr(map){return Array.from(map.values()).filter(x=>x && x.isDeleted!==true)}
+function productList(){const dbp=activeArr(state.products); const keys=new Set(dbp.map(p=>skuNorm(p.sku))); const built=BUILT_IN_PRODUCTS.filter(p=>!keys.has(skuNorm(p.sku))).map((p,i)=>({...p,_id:"builtin_"+i,active:true})); return dbp.concat(built).sort((a,b)=>String(a.sku).localeCompare(String(b.sku)))}
+function productBySku(sku){const s=skuNorm(sku); return productList().find(p=>skuNorm(p.sku)===s || skuNorm(p.name)===s) || null}
+function productType(p){const t=norm((p.name||"")+" "+(p.sku||"")); if(t.includes("printer")||t.includes("label")||t.includes("thermal"))return"printer"; if(t.includes("scanner"))return"scanner"; if(t.includes("lock"))return"lock"; return"other"}
+function amazonProductUrl(p){return p&&p.asin ? "https://www.amazon.in/dp/"+encodeURIComponent(p.asin) : ""}
+function amazonReviewUrl(p){return p&&p.asin ? "https://www.amazon.in/product-reviews/"+encodeURIComponent(p.asin)+"?sortBy=recent" : ""}
+function keySafe(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,120) || "item"}
+
+function classifyIssue(text){
+  const t=norm(text);
+  if(/print|label|paper|blank|alignment|cut|size/.test(t)) return "Printing / Label";
+  if(/scan|scanner|barcode|qr/.test(t)) return "Scanning";
+  if(/bluetooth|connect|pair|driver|usb|mobile|app|software/.test(t)) return "Connection / Software";
+  if(/warranty|return|replace|repair/.test(t)) return "Warranty / Return";
+  if(/no response|disconnect|later/.test(t)) return "No Response";
+  if(/enquiry|asking|wants|service/.test(t)) return "Enquiry";
+  return t ? "Other" : "Blank";
+}
+function classifyOutcome(text, flag){
+  const t=norm(text), f=String(flag||"").toUpperCase();
+  if(f==="Y" || /given the review|agree to give review|give review|feedback/.test(t)) return "Review Interest/Given";
+  if(/no response|disconnect/.test(t)) return "No Response";
+  if(/return|refund/.test(t)) return "Return/Refund";
+  if(/resolved|solved/.test(t)) return "Resolved";
+  if(/issue|not working|error|problem/.test(t)) return "Issue Pending";
+  if(/enquiry/.test(t)) return "Enquiry";
+  return "Follow-up Needed";
+}
+
+function startClock(){setInterval(()=>{const d=new Date(); $("clockChip").textContent=d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})+" · "+d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"})},1000)}
+startClock();
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){state.user=null; detach(); $("loginScreen").classList.remove("hidden"); $("app").classList.add("hidden"); return}
+  if(user.uid!==ADMIN_UID){await auth.signOut(); setMsg("This account is not authorized for Review Ops database."); return}
+  state.user=user; $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); $("userChip").innerHTML='<i class="fa-solid fa-user-shield"></i> '+esc(user.email||"Admin"); attach();
+});
+
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  try{await auth.signInWithEmailAndPassword($("loginEmail").value.trim(), $("loginPassword").value); $("loginPassword").value=""}
+  catch(err){setMsg(err.code==="auth/invalid-login-credentials"?"Email/password galat hai.":err.message)}
+});
+async function resetPassword(){const email=$("loginEmail").value.trim(); if(!email)return setMsg("Email likho phir Forgot Password dabao."); try{await auth.sendPasswordResetEmail(email); setMsg("Password reset email sent.","success")}catch(e){setMsg(e.message)}}
+$("logoutBtn").onclick=()=>auth.signOut();
+$("themeBtn").onclick=()=>document.body.classList.toggle("dark");
+document.querySelectorAll(".nav button").forEach(btn=>btn.onclick=()=>{document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active")); document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); btn.classList.add("active"); state.active=btn.dataset.page; $(state.active).classList.add("active"); $("pageTitle").textContent=btn.textContent.trim(); renderAll();});
+
+function detach(){state.listeners.forEach(fn=>fn()); state.listeners=[]}
+function listen(ref,map){const add=s=>{map.set(s.key,{...s.val(),_id:s.key}); scheduleRender()}; const rem=s=>{map.delete(s.key); scheduleRender()}; ref.on("child_added",add); ref.on("child_changed",add); ref.on("child_removed",rem); state.listeners.push(()=>{ref.off("child_added",add);ref.off("child_changed",add);ref.off("child_removed",rem)})}
+function attach(){detach(); Object.values(state).forEach(v=>{if(v instanceof Map)v.clear()}); listen(refs.products,state.products); listen(refs.calls,state.calls); listen(refs.ratings,state.ratings); listen(refs.monthly,state.monthly); listen(refs.negative,state.negative); listen(refs.reviews,state.reviews); $("syncText").textContent="Live Firebase sync active · Last connected "+new Date().toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"});}
+let renderTimer=null; function scheduleRender(){clearTimeout(renderTimer); renderTimer=setTimeout(renderAll,120)}
+
+function renderAll(){renderOptions(); renderDashboard(); renderDaily(); renderProducts(); renderCalls(); renderRatings(); renderVerified(); renderNegative();}
+function renderOptions(){
+  const opts=productList().map(p=>`<option value="${esc(p.sku)}">${esc(p.sku)} — ${esc(p.asin||"")}</option>`).join("");
+  ["dailySku","rvSku","matchSku"].forEach(id=>{if(!$(id))return; const cur=$(id).value; $(id).innerHTML='<option value="">Select product / SKU</option>'+opts; if([...$(id).options].some(o=>o.value===cur))$(id).value=cur;});
+  ["dailySkuFilter"].forEach(id=>{if(!$(id))return; const cur=$(id).value; $(id).innerHTML='<option value="">All SKU</option>'+opts; if([...$(id).options].some(o=>o.value===cur))$(id).value=cur;});
+}
+function renderDashboard(){
+  const calls=activeArr(state.calls), reviews=activeArr(state.reviews), neg=activeArr(state.negative).concat(reviews.filter(r=>Number(r.rating)<=2));
+  const req=calls.filter(c=>c.reviewRequestSent==="Yes"||/review/i.test(c.outcome||c.result||"")).length;
+  const screenshot=calls.filter(c=>c.screenshotReceived==="Yes"||/screenshot/i.test(c.notes||"")).length;
+  const noResp=calls.filter(c=>/No Response/i.test(c.outcome||c.result||"")).length;
+  const visible=reviews.length;
+  const due=calls.filter(c=>c.followupDate && c.amazonVisible!=="Yes" && new Date(c.followupDate+"T23:59:59")<=new Date()).length;
+  const cards=[["Products",productList().length,"ASIN connected"],["Total Calls",calls.length,"Imported + daily saved"],["Review Requested",req,"Customer asked"],["Screenshot",screenshot,"Pending verify"],["Amazon Visible",visible,"Verified saved"],["Negative Cases",neg.length,"Needs action"],["No Response",noResp,"Follow-up required"],["Due Today/Overdue",due,"Check now"]];
+  $("dashCards").innerHTML=cards.map(c=>`<div class="card"><small>${esc(c[0])}</small><b>${esc(c[1])}</b><span>${esc(c[2])}</span></div>`).join("");
+  const action=calls.filter(c=>c.followupDate && c.amazonVisible!=="Yes").sort((a,b)=>String(a.followupDate).localeCompare(String(b.followupDate))).slice(0,8);
+  $("actionList").innerHTML=action.length?action.map(c=>`<div class="mini" style="margin-bottom:8px"><b>${esc(c.sku)}</b> · ${esc(c.customerName||c.phone||"")}<p>Follow-up: ${fmtDate(c.followupDate)} · ${esc(c.result||c.outcome||"")}</p></div>`).join(""):'<div class="empty">No pending action yet.</div>';
+  const skuCounts={}; calls.forEach(c=>{const s=c.sku||"Unknown"; skuCounts[s]=(skuCounts[s]||0)+1});
+  const top=Object.entries(skuCounts).sort((a,b)=>b[1]-a[1]).slice(0,8); const max=Math.max(1,...top.map(x=>x[1]));
+  $("skuBars").innerHTML=top.length?top.map(([s,v])=>`<div class="rowbar"><b>${esc(s)}</b><div class="bar"><div style="width:${v/max*100}%"></div></div><span>${v}</span></div>`).join(""):'<div class="empty">Import or save calls to see workload.</div>';
+}
+function renderDaily(){
+  const q=norm($("dailySearch")?.value), st=$("dailyStatusFilter")?.value||"", sku=$("dailySkuFilter")?.value||"";
+  let arr=activeArr(state.calls).filter(c=>!q || norm([c.customerName,c.phone,c.sku,c.notes,c.remark,c.issue,c.outcome,c.result].join(" ")).includes(q)).filter(c=>(!st || c.result===st || c.outcome===st)).filter(c=>(!sku || c.sku===sku)).sort((a,b)=>Number(b.createdAt||0)-Number(a.createdAt||0)).slice(0,60);
+  $("dailyBody").innerHTML=arr.length?arr.map(c=>`<tr><td>${fmtDate(c.callDate||c.sourceDate)}</td><td><b>${esc(c.customerName||"")}</b><br><span class="muted">${esc(c.phone||"")}</span></td><td>${esc(c.sku||"")}</td><td><span class="pill info">${esc(c.result||c.outcome||"")}</span><br>${c.reviewRequestSent==="Yes"?'<span class="pill positive">Request Sent</span>':""} ${c.screenshotReceived==="Yes"?'<span class="pill neutral">Screenshot</span>':""} ${c.amazonVisible==="Yes"?'<span class="pill positive">Visible</span>':""}</td><td>${fmtDate(c.followupDate)}</td><td>${esc(c.notes||c.latestRemark||c.issue||"")}</td><td><button class="btn small" onclick="loadToDaily('${c._id}')">Load</button></td></tr>`).join(""):'<tr><td colspan="7" class="empty">No call records yet. Save Daily Work or import calling file.</td></tr>';
+}
+function renderProducts(){
+  const q=norm($("productSearch")?.value), type=$("productType")?.value||"";
+  const list=productList().filter(p=>(!q||norm([p.name,p.sku,p.asin].join(" ")).includes(q))).filter(p=>(!type||productType(p)===type));
+  $("productsGrid").innerHTML=list.map(p=>`<div class="mini"><h4>${esc(p.name||p.sku)}</h4><p><b>SKU:</b> ${esc(p.sku)}<br><b>ASIN:</b> ${esc(p.asin)}</p><div class="actions"><a class="btn small" target="_blank" href="${amazonProductUrl(p)}">Amazon Product</a><a class="btn secondary small" target="_blank" href="${amazonReviewUrl(p)}">Latest Reviews</a><button class="btn secondary small" onclick="selectDailySku('${esc(p.sku)}')">Use Daily</button></div></div>`).join("") || '<div class="empty">No products found.</div>';
+}
+function renderCalls(){
+  const calls=activeArr(state.calls); const out={}, cat={}; calls.forEach(c=>{out[c.outcome||c.result||"Other"]=(out[c.outcome||c.result||"Other"]||0)+1; cat[c.issueCategory||"Other"]=(cat[c.issueCategory||"Other"]||0)+1});
+  $("callCards").innerHTML=[["Total Calls",calls.length,"All records"],["Review Interest",out["Review Interest/Given"]||0,"Agree/given"],["No Response",out["No Response"]||0,"Need retry"],["Issue Pending",out["Issue Pending"]||0,"Support action"]].map(c=>`<div class="card"><small>${c[0]}</small><b>${c[1]}</b><span>${c[2]}</span></div>`).join("");
+  fillFilter("callOutcomeFilter",Object.keys(out)); fillFilter("callCategoryFilter",Object.keys(cat));
+  const q=norm($("callSearch")?.value), of=$("callOutcomeFilter")?.value||"", cf=$("callCategoryFilter")?.value||"";
+  const arr=calls.filter(c=>(!q||norm([c.phone,c.sku,c.issue,c.latestRemark,c.outcome,c.issueCategory].join(" ")).includes(q))).filter(c=>(!of||(c.outcome||c.result)===of)).filter(c=>(!cf||c.issueCategory===cf)).slice(0,250);
+  $("callBody").innerHTML=arr.length?arr.map(c=>`<tr><td>${esc(c.sourceSheet||"Daily")}<br><span class="muted">Row ${esc(c.sourceRow||"")}</span></td><td>${esc(c.phone||"")}</td><td>${esc(c.sku||"")}</td><td><span class="pill info">${esc(c.outcome||c.result||"")}</span></td><td>${esc(c.issueCategory||"")}</td><td><b>${esc(c.issue||"")}</b><br><span class="muted">${esc(c.latestRemark||c.notes||"")}</span></td><td><button class="btn small" onclick="loadToDaily('${c._id}')">Use</button></td></tr>`).join(""):'<tr><td colspan="7" class="empty">No calls imported.</td></tr>';
+}
+function renderRatings(){
+  const ratings=activeArr(state.ratings).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,400);
+  const latest={}; activeArr(state.ratings).forEach(r=>{if(!latest[r.sku] || String(r.date)>String(latest[r.sku].date)) latest[r.sku]=r});
+  const risks=Object.values(latest).filter(r=>Number(r.rating)<4 || Number(r.negative||0)>0).sort((a,b)=>Number(a.rating)-Number(b.rating)).slice(0,8);
+  const avg=Object.values(latest).length?(Object.values(latest).reduce((s,r)=>s+Number(r.rating||0),0)/Object.values(latest).length).toFixed(2):"0.00";
+  $("ratingCards").innerHTML=[["Tracked SKUs",Object.keys(latest).length,"Latest rating"],["Average Rating",avg,"Latest snapshot"],["Risk SKUs",risks.length,"Rating <4 or negative"],["Snapshots",activeArr(state.ratings).length,"Daily rows"]].map(c=>`<div class="card"><small>${c[0]}</small><b>${c[1]}</b><span>${c[2]}</span></div>`).join("");
+  $("ratingRisk").innerHTML=risks.length?risks.map(r=>`<p><b>${esc(r.sku)}</b> · Rating ${esc(r.rating)} · Negative ${esc(r.negative||0)}</p>`).join(""):'<p>No risk found yet.</p>';
+  const growth=Object.values(latest).sort((a,b)=>Number(b.comments||0)-Number(a.comments||0)).slice(0,8);
+  $("commentGrowth").innerHTML=growth.map(r=>`<p><b>${esc(r.sku)}</b> · Comments ${esc(r.comments||0)} · Rating ${esc(r.rating||"")}</p>`).join("");
+  $("ratingBody").innerHTML=ratings.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.sku)}</td><td>${esc(r.rating)}</td><td>${esc(r.comments)}</td><td>${esc(r.negative||"")}</td></tr>`).join("") || '<tr><td colspan="5" class="empty">No rating data imported.</td></tr>';
+}
+function renderVerified(){
+  const q=norm($("reviewSearch")?.value), rf=$("reviewRatingFilter")?.value||"";
+  const arr=activeArr(state.reviews).filter(r=>(!q||norm([r.sku,r.reviewerName,r.title,r.text,r.status].join(" ")).includes(q))).filter(r=>(!rf||String(r.rating)===rf)).sort((a,b)=>String(b.reviewDate).localeCompare(String(a.reviewDate)));
+  $("reviewBody").innerHTML=arr.length?arr.map(r=>`<tr><td>${fmtDate(r.reviewDate)}</td><td><b>${esc(r.sku)}</b><br><span class="muted">${esc(r.asin||"")}</span></td><td><span class="pill ${Number(r.rating)<=2?'negative':Number(r.rating)>=4?'positive':'neutral'}">${esc(r.rating)} ★</span></td><td>${esc(r.reviewerName||"")}</td><td><b>${esc(r.title||"")}</b><br><span class="muted">${esc(r.text||"")}</span>${r.url?`<br><a target="_blank" href="${esc(r.url)}">Open</a>`:""}</td><td>${esc(r.status||"New")}</td><td><button class="btn red small" onclick="deleteRecord('reviews','${r._id}')">Delete</button></td></tr>`).join(""):'<tr><td colspan="7" class="empty">No verified reviews saved yet.</td></tr>';
+}
+function renderNegative(){
+  const neg=activeArr(state.negative).concat(activeArr(state.reviews).filter(r=>Number(r.rating)<=2).map(r=>({...r, product:r.sku, issue:r.text||r.title, customer:r.reviewerName, source:"Verified Review"})));
+  $("negativeCards").innerHTML=[["Negative Cases",neg.length,"All"],["Open",neg.filter(n=>!["Resolved","Closed"].includes(n.status)).length,"Need action"],["Resolved",neg.filter(n=>/resolved|closed|changed|deleted/i.test(n.status||"")).length,"Closed/changed"],["With Phone",neg.filter(n=>n.phone).length,"Reachable"]].map(c=>`<div class="card"><small>${c[0]}</small><b>${c[1]}</b><span>${c[2]}</span></div>`).join("");
+  const q=norm($("negSearch")?.value), st=$("negStatusFilter")?.value||"";
+  const arr=neg.filter(n=>(!q||norm([n.customer,n.phone,n.product,n.issue,n.action,n.status].join(" ")).includes(q))).filter(n=>(!st||n.status===st)).slice(0,200);
+  $("negativeBody").innerHTML=arr.length?arr.map(n=>`<tr><td>${fmtDate(n.date||n.reviewDate)}</td><td><b>${esc(n.customer||"")}</b><br><span class="muted">${esc(n.phone||"")}</span></td><td>${esc(n.product||n.sku||"")}</td><td>${esc(n.issue||n.text||"")}</td><td><textarea id="act_${n._id}">${esc(n.action||n.notes||"")}</textarea></td><td><select id="st_${n._id}"><option ${(n.status||"New")==="New"?"selected":""}>New</option><option ${n.status==="In Progress"?"selected":""}>In Progress</option><option ${n.status==="Customer Contacted"?"selected":""}>Customer Contacted</option><option ${n.status==="Resolved"?"selected":""}>Resolved</option><option ${n.status==="Closed"?"selected":""}>Closed</option></select></td><td>${n.source==="Verified Review"?"<span class='pill info'>Verified Review</span>":`<button class="btn small" onclick="updateNegative('${n._id}')">Save</button>`}</td></tr>`).join(""):'<tr><td colspan="7" class="empty">No negative cases yet.</td></tr>';
+}
+function fillFilter(id, values){const el=$(id); if(!el)return; const cur=el.value; const first=el.options[0]?.outerHTML||'<option value="">All</option>'; el.innerHTML=first+[...new Set(values)].sort().map(v=>`<option>${esc(v)}</option>`).join(""); if([...el.options].some(o=>o.value===cur))el.value=cur;}
+function clearDailyFilters(){$("dailySearch").value=""; $("dailyStatusFilter").value=""; $("dailySkuFilter").value=""; renderDaily()}
+function clearCallFilters(){$("callSearch").value=""; $("callOutcomeFilter").value=""; $("callCategoryFilter").value=""; renderCalls()}
+function clearReviewFilters(){$("reviewSearch").value=""; $("reviewRatingFilter").value=""; renderVerified()}
+function clearNegFilters(){$("negSearch").value=""; $("negStatusFilter").value=""; renderNegative()}
+
+$("dailyCallDate").value=today(); $("dailyFollowDate").value=addDays(today(),3);
+$("dailyCallDate").addEventListener("change",()=>{if(!$("dailyFollowDate").value)$("dailyFollowDate").value=addDays($("dailyCallDate").value,3)});
+
+function selectDailySku(sku){document.querySelector('[data-page="dailyPage"]').click(); setTimeout(()=>{$("dailySku").value=sku; renderOptions()},60)}
+function clearDailyForm(){["dailyCustomer","dailyPhone","dailyOrder","dailyNotes"].forEach(id=>$(id).value=""); $("dailyResult").value="Connected"; $("dailyRequest").value="No"; $("dailyScreenshot").value="No"; $("dailyVisible").value="Pending"; $("dailyCallDate").value=today(); $("dailyFollowDate").value=addDays(today(),3)}
+function copyCallScript(){
+  const text=`Hello Sir/Ma’am, this is from the HELETT Support Team.
+
+You recently purchased our product from Amazon, and I’m calling to check if the product is working properly for you.
+
+If you are facing any issue, please let us know. We will be happy to help you with support and troubleshooting.
+
+If you are satisfied with the product, we would appreciate your genuine feedback on Amazon. After posting the review, please share a screenshot with us for confirmation.
+
+Thank you.`;
+  navigator.clipboard.writeText(text).then(()=>toast("Professional call script copied.","success")).catch(()=>prompt("Copy this script:",text));
+}
+function openSelectedProduct(){const p=productBySku($("dailySku").value); if(!p)return toast("Select SKU first.","error"); window.open(amazonProductUrl(p),"_blank")}
+function openSelectedReviews(){const p=productBySku($("dailySku").value); if(!p)return toast("Select SKU first.","error"); window.open(amazonReviewUrl(p),"_blank")}
+async function saveDailyWork(){
+  const sku=$("dailySku").value; if(!sku)return toast("SKU select karo.","error");
+  const rec={source:"Daily Work", callDate:$("dailyCallDate").value||today(), customerName:$("dailyCustomer").value.trim(), phone:$("dailyPhone").value.trim(), orderId:$("dailyOrder").value.trim(), sku, result:$("dailyResult").value, reviewRequestSent:$("dailyRequest").value, screenshotReceived:$("dailyScreenshot").value, amazonVisible:$("dailyVisible").value, followupDate:$("dailyFollowDate").value, notes:$("dailyNotes").value.trim(), issueCategory:classifyIssue($("dailyNotes").value), outcome:$("dailyResult").value, isDeleted:false, createdAt:firebase.database.ServerValue.TIMESTAMP, createdBy:state.user.email};
+  const key="daily_"+keySafe([rec.callDate,rec.phone,rec.sku,Date.now()].join("_"));
+  await refs.calls.child(key).set(rec); toast("Daily work saved successfully.","success"); clearDailyForm();
+}
+function loadToDaily(id){const c=state.calls.get(id); if(!c)return; document.querySelector('[data-page="dailyPage"]').click(); setTimeout(()=>{$("dailySku").value=c.sku||""; $("dailyCallDate").value=c.callDate||c.sourceDate||today(); $("dailyCustomer").value=c.customerName||""; $("dailyPhone").value=c.phone||""; $("dailyOrder").value=c.orderId||""; $("dailyResult").value=c.result||c.outcome||"Connected"; $("dailyNotes").value=c.notes||c.latestRemark||c.issue||""; $("dailyFollowDate").value=c.followupDate||addDays(today(),3);},60)}
+
+async function syncProducts(){
+  const updates={}; BUILT_IN_PRODUCTS.forEach((p,i)=>{updates[keySafe(p.asin+"_"+p.sku)]={...p, active:true, updatedAt:firebase.database.ServerValue.TIMESTAMP}});
+  await refs.products.update(updates); toast("47 products synced to Firebase.","success");
+}
+
+function openReviewModal(){$("rvDate").value=today(); $("rvRating").value=""; $("rvReviewer").value=""; $("rvTitle").value=""; $("rvText").value=""; $("rvUrl").value=""; $("rvStatus").value="New"; $("rvAssigned").value=""; $("rvNotes").value=""; openModal("reviewModal")}
+async function saveVerifiedReview(){
+  const sku=$("rvSku").value, rating=Number($("rvRating").value), text=$("rvText").value.trim(), title=$("rvTitle").value.trim();
+  if(!sku||!rating||!title||!text)return toast("SKU, rating, title and review text required.","error");
+  const p=productBySku(sku);
+  const rec={sku, asin:p?.asin||"", reviewDate:$("rvDate").value||today(), rating, reviewerName:$("rvReviewer").value.trim(), title, text, url:$("rvUrl").value.trim(), status:$("rvStatus").value, assignedTo:$("rvAssigned").value.trim(), notes:$("rvNotes").value.trim(), source:"Manual Verified Amazon Review", isDeleted:false, createdAt:firebase.database.ServerValue.TIMESTAMP, createdBy:state.user.email};
+  const key="rv_"+keySafe([rec.reviewDate,rec.sku,rec.reviewerName,rec.title].join("_"));
+  await refs.reviews.child(key).set(rec); toast("Verified review saved.","success"); closeModal("reviewModal");
+}
+
+function cell(row,i){return row && row[i]!=null ? String(row[i]).trim() : ""}
+function excelDate(v){if(!v)return ""; if(typeof v==="number"){const d=new Date(Math.round((v-25569)*86400*1000)); return isNaN(d)?"":d.toISOString().slice(0,10)} const s=String(v).replace(",","").trim(); const m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/); if(m){let y=+m[3]; if(y<100)y+=2000; return new Date(y,+m[2]-1,+m[1]).toISOString().slice(0,10)} const d=new Date(s); return isNaN(d)?"":d.toISOString().slice(0,10)}
+function parseWorkbook(file, cb){const reader=new FileReader(); reader.onload=e=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"}); cb(wb)}; reader.readAsArrayBuffer(file)}
+$("callImport").addEventListener("change",e=>{const file=e.target.files[0]; if(file) parseWorkbook(file, wb=>importCalls(wb,file.name)); e.target.value=""});
+$("ratingImport").addEventListener("change",e=>{const file=e.target.files[0]; if(file) parseWorkbook(file, wb=>importRatings(wb,file.name)); e.target.value=""});
+
+async function importCalls(wb, fileName){
+  let updates={}, count=0, outcomes={}, cats={};
+  wb.SheetNames.forEach(sheet=>{
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,defval:""});
+    rows.slice(1).forEach((row,idx)=>{
+      const phone=cell(row,3), sku=cell(row,4); if(!phone || !sku || sku.toLowerCase()==="sku") return;
+      const issue=cell(row,5);
+      const rest=row.slice(6).map(x=>String(x||"").trim()).filter(Boolean);
+      const flag=[...rest].reverse().find(x=>["Y","N"].includes(x.toUpperCase()))||"";
+      const textParts=[issue].concat(rest.filter(x=>!["Y","N","RESOLVED"].includes(x.toUpperCase())));
+      let latest=""; for(let i=textParts.length-1;i>=0;i--){if(textParts[i] && textParts[i].length>2 && !/^\d{1,2}[.\/-]\d{1,2}[.\/-]\d{2,4}$/.test(textParts[i])){latest=textParts[i];break}}
+      const outcome=classifyOutcome(latest,flag), issueCategory=classifyIssue(issue+" "+latest);
+      outcomes[outcome]=(outcomes[outcome]||0)+1; cats[issueCategory]=(cats[issueCategory]||0)+1;
+      const rec={source:"Calling Import", sourceFile:fileName, sourceSheet:sheet, sourceRow:idx+2, phone, sku, callDate:excelDate(cell(row,1)), sourceDate:excelDate(cell(row,1)), issue, latestRemark:latest, outcome, issueCategory, reviewFlag:flag, isDeleted:false, importedAt:firebase.database.ServerValue.TIMESTAMP};
+      updates["call_"+keySafe([fileName,sheet,idx+2,phone,sku].join("_"))]=rec; count++;
+    });
+  });
+  await refs.calls.update(updates);
+  $("importPreview").textContent=`Calling import completed.\nFile: ${fileName}\nRecords: ${count}\n\nOutcomes:\n${Object.entries(outcomes).map(([k,v])=>"- "+k+": "+v).join("\n")}\n\nIssue Categories:\n${Object.entries(cats).map(([k,v])=>"- "+k+": "+v).join("\n")}`;
+  toast("Calling data imported: "+count+" records.","success");
+}
+
+async function importRatings(wb, fileName){
+  let ratingUpdates={}, negUpdates={}, monthlyUpdates={}, snap=0, neg=0, mon=0;
+  const day=wb.Sheets["Day wise"]; if(day){
+    const rows=XLSX.utils.sheet_to_json(day,{header:1,defval:""});
+    let dateRows=[]; rows.forEach((row,ri)=>{if(row.some(v=>/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(String(v).trim()))) dateRows.push(ri)});
+    dateRows.forEach((ri,di)=>{
+      const end=di+1<dateRows.length?dateRows[di+1]:rows.length;
+      rows[ri].forEach((dateVal,c)=>{
+        const date=String(dateVal||"").trim(); if(!/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(date)) return;
+        for(let r=ri+2;r<end;r++){const row=rows[r]||[]; const sku=cell(row,c+1); if(!sku||sku.toLowerCase()==="sku")continue; const rating=cell(row,c+2), comments=cell(row,c+3), negative=cell(row,c+4); if(!rating&&!comments&&!negative)continue; const iso=excelDate(date); ratingUpdates["rate_"+keySafe([iso,sku].join("_"))]={date:iso||date, sku, rating, comments, negative, sourceFile:fileName, importedAt:firebase.database.ServerValue.TIMESTAMP}; snap++;}
+      });
+    });
+  }
+  const month=wb.Sheets["Month wise feedback data"]; if(month){
+    const rows=XLSX.utils.sheet_to_json(month,{header:1,defval:""});
+    rows.slice(2).forEach((row,idx)=>{const sku=cell(row,0); if(!sku||sku.toLowerCase()==="sku")return; monthlyUpdates["month_"+keySafe(sku+"_"+idx)]={sku, feedback:cell(row,1), organicFeedback:cell(row,2), negative:cell(row,3), totalPositive:cell(row,4), currentRating:cell(row,5), date:excelDate(cell(row,6)), negativeFeedback:cell(row,7), remark:cell(row,8), sourceFile:fileName, importedAt:firebase.database.ServerValue.TIMESTAMP}; mon++;});
+  }
+  const negSheet=wb.Sheets["Negative comt details"]; if(negSheet){
+    const rows=XLSX.utils.sheet_to_json(negSheet,{header:1,defval:""});
+    rows.slice(1).forEach((row,idx)=>{if(!cell(row,1)&&!cell(row,4))return; negUpdates["neg_"+keySafe([cell(row,0),cell(row,1),cell(row,3),idx].join("_"))]={date:excelDate(cell(row,0))||cell(row,0), customer:cell(row,1), phone:cell(row,2), product:cell(row,3), issue:cell(row,4), action:cell(row,5), status:cell(row,6)||"New", sourceFile:fileName, importedAt:firebase.database.ServerValue.TIMESTAMP}; neg++;});
+  }
+  await Promise.all([refs.ratings.update(ratingUpdates), refs.monthly.update(monthlyUpdates), refs.negative.update(negUpdates)]);
+  $("importPreview").textContent=`Rating import completed.\nFile: ${fileName}\nDaily rating snapshots: ${snap}\nMonthly feedback rows: ${mon}\nNegative comment cases: ${neg}`;
+  toast("Rating data imported successfully.","success");
+}
+
+async function updateNegative(id){const n=state.negative.get(id); if(!n)return; await refs.negative.child(id).update({action:$("act_"+id).value, status:$("st_"+id).value, updatedAt:firebase.database.ServerValue.TIMESTAMP, updatedBy:state.user.email}); toast("Negative case updated.","success")}
+async function deleteRecord(type,id){if(!confirm("Delete this record?"))return; await refs[type].child(id).remove(); toast("Deleted.","success")}
+
+function runMatch(){
+  const sku=$("matchSku").value, txt=norm($("matchText").value), reviewer=norm($("matchReviewer").value);
+  if(!sku && !txt && !reviewer)return toast("SKU or review text enter karo.","error");
+  const words=txt.split(/\W+/).filter(w=>w.length>3).slice(0,20);
+  const rows=activeArr(state.calls).map(c=>{
+    let score=0; if(sku && skuNorm(c.sku)===skuNorm(sku))score+=40; const hay=norm([c.customerName,c.phone,c.sku,c.issue,c.latestRemark,c.notes].join(" ")); words.forEach(w=>{if(hay.includes(w))score+=5}); if(reviewer && hay.includes(reviewer))score+=25; return {...c,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,20);
+  $("matchResults").innerHTML=rows.length?`<div class="table"><table><thead><tr><th>Score</th><th>Customer/Phone</th><th>SKU</th><th>Outcome</th><th>Remarks</th><th>Action</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r.score}</b></td><td>${esc(r.customerName||"")}<br>${esc(r.phone||"")}</td><td>${esc(r.sku)}</td><td>${esc(r.outcome||r.result||"")}</td><td>${esc(r.latestRemark||r.notes||r.issue||"")}</td><td><button class="btn small" onclick="loadToDaily('${r._id}')">Load</button></td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">No possible match found. Try SKU + more review text.</div>';
+}
+function clearMatch(){$("matchSku").value=""; $("matchReviewer").value=""; $("matchText").value=""; $("matchResults").innerHTML=""}
+
+async function cleanOldJunk(){if(!confirm("Remove old version paths: amazon_reviews, customer_followups, audit_logs?"))return; await Promise.all([root.child("amazon_reviews").remove(), root.child("customer_followups").remove(), root.child("audit_logs").remove()]); toast("Old junk paths cleaned.","success")}
+async function freshStart(){if(!confirm("Fresh start: delete calls, ratings, monthly, negative cases, verified reviews and keep products only?"))return; if(!confirm("Final confirm?"))return; await Promise.all([refs.calls.remove(),refs.ratings.remove(),refs.monthly.remove(),refs.negative.remove(),refs.reviews.remove(),root.child("amazon_reviews").remove(),root.child("customer_followups").remove(),root.child("audit_logs").remove()]); await syncProducts(); toast("Fresh start completed. Products kept.","success")}
+function exportBackup(){const data={products:activeArr(state.products), calls:activeArr(state.calls), ratings:activeArr(state.ratings), monthly:activeArr(state.monthly), negative:activeArr(state.negative), reviews:activeArr(state.reviews)}; const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"})); a.download="HELETT_Review_Ops_Backup_"+today()+".json"; a.click(); URL.revokeObjectURL(a.href)}
+
+["dailySearch","callSearch","reviewSearch","negSearch"].forEach(id=>{setTimeout(()=>{if($(id))$(id).addEventListener("input",()=>renderAll())},0)});
+["dailyStatusFilter","dailySkuFilter","callOutcomeFilter","callCategoryFilter","reviewRatingFilter","negStatusFilter","productType"].forEach(id=>{setTimeout(()=>{if($(id))$(id).addEventListener("change",()=>renderAll())},0)});
+setTimeout(()=>{renderOptions(); renderProducts();},500);
 </script>
 </body>
 </html>
