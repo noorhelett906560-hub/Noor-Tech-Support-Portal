@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HELETT Software Home</title>
+
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="application-name" content="HELETT Software Home">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.25), transparent 35%),
+        linear-gradient(135deg, #0f172a, #111827 55%, #020617);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .wrap {
+      width: min(1100px, 100%);
+    }
+
+    .top {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .logo {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 16px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 20px 50px rgba(37, 99, 235, 0.35);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .logo span {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 54px);
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      max-width: 720px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    .icon {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      margin-bottom: 18px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 25px;
+    }
+
+    .card p {
+      margin: 0 0 22px;
+      color: #cbd5e1;
+      line-height: 1.55;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 15px 18px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: white;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.28);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .note {
+      margin-top: 24px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .install-box {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #cbd5e1;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">
+        <span>H</span>
+      </div>
+
+      <h1>HELETT Software Home</h1>
+
+      <p class="subtitle">
+        One professional home page for HELETT internal tools. Open CRM for customer support and Review Ops Pro for Amazon review operations.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🛡️</div>
+        <h2>HELETT Support CRM</h2>
+        <p>
+          Warranty hub, replacement engine, critical complaint queue, customer service tracking and support workflow.
+        </p>
+        <a class="btn" href="index.html">Open Support CRM</a>
+      </div>
+
+      <div class="card">
+        <div class="icon">⭐</div>
+        <h2>HELETT Review Ops Pro</h2>
+        <p>
+          Daily calling work, product ASIN master, Amazon review checking, rating analytics and negative case tracking.
+        </p>
+        <a class="btn" href="product-reviews.html">Open Review Software</a>
+      </div>
+    </div>
+
+    <div class="install-box">
+      Laptop Chrome: 3 dots → Cast, save and share → Create shortcut / Install page as app.<br>
+      Mobile Chrome: 3 dots → Add to Home screen.
+    </div>
+
+    <div class="note">
+      Secure access depends on each software login and Firebase rules. Do not share admin login details publicly.
+    </div>
+  </div>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("service-worker.js").catch(function () {
+          console.log("Service worker not ready yet.");
+        });
+      });
+    }
+  </script>
+</body>
+</html>
