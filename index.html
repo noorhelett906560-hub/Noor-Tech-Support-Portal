@@ -16,6 +16,9 @@
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
@@ -816,6 +819,20 @@ tr:hover {
             </form>
         </div>
 
+        <div class="card" style="margin-bottom:18px;border-color:var(--secondary);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div>
+                    <h3 style="margin:0 0 5px;"><i class="fas fa-file-import"></i> CRM Import & Files</h3>
+                    <small>Import Excel/CSV or text-based PDF into CRM records, or attach files to any record.</small>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn blue" type="button" onclick="openImportCenter()"><i class="fas fa-file-arrow-up"></i> Import Excel / CSV / PDF</button>
+                    <button class="btn light" type="button" onclick="downloadCRMTemplate()"><i class="fas fa-table"></i> Template</button>
+                    <button class="btn light" type="button" onclick="openImportHistory()"><i class="fas fa-clock-rotate-left"></i> Import History</button>
+                </div>
+            </div>
+        </div>
+
         <div class="toolbar">
             <input id="wSearch" placeholder="Search all warranty and old records...">
 
@@ -1099,6 +1116,55 @@ tr:hover {
 </div>
 
 <!-- ====== UPDATED EDIT MODAL WITH INVOICE & EXPIRY DATE ====== -->
+
+<!-- ===== CRM IMPORT CENTER ===== -->
+<div id="importModal" class="modal">
+  <div class="modal-content" style="max-width:900px;">
+    <span class="close" onclick="closeImportCenter()">&times;</span>
+    <h3><i class="fas fa-file-import" style="color:var(--secondary);"></i> CRM Import Center</h3>
+    <p style="color:var(--muted);">Import Excel/CSV customer rows or extract text from a PDF. Nothing is saved until you press Import & Save.</p>
+    <div class="grid">
+      <select id="importTarget">
+        <option value="warranty">Warranty Hub</option>
+        <option value="service">Replacement Engine</option>
+        <option value="critical">Critical Complaint Queue</option>
+      </select>
+      <input id="importFile" type="file" accept=".xlsx,.xls,.csv,.pdf">
+    </div>
+    <div id="importStatus" style="margin-top:12px;padding:12px;background:var(--soft);border-radius:10px;display:none;"></div>
+    <div id="importPreview" style="margin-top:12px;max-height:340px;overflow:auto;"></div>
+    <div class="buttons" style="margin-top:14px;">
+      <button class="btn blue" type="button" onclick="previewCRMImport()"><i class="fas fa-eye"></i> Preview File</button>
+      <button id="saveImportBtn" class="btn green" type="button" onclick="saveCRMImport()" disabled><i class="fas fa-cloud-arrow-up"></i> Import & Save</button>
+      <button class="btn light" type="button" onclick="closeImportCenter()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ATTACHMENTS ===== -->
+<div id="attachmentModal" class="modal">
+  <div class="modal-content" style="max-width:800px;">
+    <span class="close" onclick="closeAttachments()">&times;</span>
+    <h3><i class="fas fa-paperclip" style="color:var(--secondary);"></i> Record Files</h3>
+    <p id="attachmentRecordLabel" style="font-weight:700;color:var(--muted);"></p>
+    <input id="attachmentInput" type="file" multiple>
+    <div class="buttons" style="margin-top:12px;">
+      <button class="btn blue" type="button" onclick="uploadAttachments()"><i class="fas fa-upload"></i> Upload Selected</button>
+      <button class="btn light" type="button" onclick="closeAttachments()">Close</button>
+    </div>
+    <div id="attachmentList" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<!-- ===== IMPORT HISTORY ===== -->
+<div id="importHistoryModal" class="modal">
+  <div class="modal-content" style="max-width:850px;">
+    <span class="close" onclick="closeImportHistory()">&times;</span>
+    <h3><i class="fas fa-clock-rotate-left" style="color:var(--secondary);"></i> Import History</h3>
+    <div id="importHistoryList"></div>
+  </div>
+</div>
+
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -1750,6 +1816,7 @@ function renderWarranty() {
                     <td>
                         <div class="actions">
                             ${editButton}
+                            <button class="small" style="background:#e0f2fe;color:#0369a1;border:0;" onclick="openAttachments('${esc(record._path)}')"><i class="fas fa-paperclip"></i> Files</button>
                             <button class="small delete" onclick="${deleteAction}">
                                 <i class="fas fa-trash"></i>
                                 Delete
@@ -1838,6 +1905,7 @@ function renderService() {
                                 <i class="fas fa-pen"></i>
                                 Edit
                             </button>
+                            <button class="small" style="background:#e0f2fe;color:#0369a1;border:0;" onclick="openAttachments('${esc(record._path)}')"><i class="fas fa-paperclip"></i> Files</button>
                             <button class="small delete" onclick="deleteService('${esc(record._path)}')">
                                 <i class="fas fa-trash"></i>
                                 Delete
@@ -1927,7 +1995,8 @@ function renderCritical() {
                     </td>
                     <td>${esc(record.followupDate || record.followup || "Not set")}</td>
                     <td>
-                        <button class="small delete" onclick="deleteCritical('${esc(record._path)}')">
+                        <button class="small" style="background:#e0f2fe;color:#0369a1;border:0;" onclick="openAttachments('${esc(record._path)}')"><i class="fas fa-paperclip"></i> Files</button>
+                            <button class="small delete" onclick="deleteCritical('${esc(record._path)}')">
                             <i class="fas fa-trash"></i>
                             Delete
                         </button>
@@ -2422,6 +2491,237 @@ window.addEventListener("click", event => {
         closeModal();
     }
 });
+
+/* ==================== ADVANCED CRM IMPORT + FILES ==================== */
+const crmStorage = firebase.storage();
+let currentAttachmentPath = null;
+let pendingImportRows = [];
+let pendingImportFileName = "";
+
+function setImportStatus(message, type="info") {
+    const el = $("importStatus");
+    if (!el) return;
+    el.style.display = "block";
+    el.className = "toast show " + type;
+    el.style.position = "static";
+    el.style.maxWidth = "none";
+    el.textContent = message;
+}
+
+function openImportCenter() {
+    $("importModal").style.display = "block";
+    $("importPreview").innerHTML = "";
+    $("importStatus").style.display = "none";
+    $("saveImportBtn").disabled = true;
+    pendingImportRows = [];
+}
+function closeImportCenter() { $("importModal").style.display = "none"; }
+
+function normalizeImportKey(v) {
+    return String(v || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+function findValue(row, names) {
+    const keys = Object.keys(row);
+    for (const wanted of names) {
+        const key = keys.find(k => normalizeImportKey(k) === normalizeImportKey(wanted));
+        if (key && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") return String(row[key]).trim();
+    }
+    return "";
+}
+function excelDateToISO(v) {
+    if (!v) return "";
+    if (v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+    if (typeof v === "number" && window.XLSX && XLSX.SSF) {
+        const d = XLSX.SSF.parse_date_code(v);
+        if (d) return `${d.y}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`;
+    }
+    const d = new Date(v);
+    return isNaN(d) ? String(v) : d.toISOString().slice(0,10);
+}
+function mapImportRow(row, target) {
+    const name = findValue(row,["Customer Name","Name","Customer","Client Name","CustomerName"]);
+    const phone = findValue(row,["Phone","Mobile","Mobile Number","Phone Number","Contact"]);
+    const inv = findValue(row,["Invoice","Invoice No","Invoice Number","Order ID","OrderId","Order"]);
+    const sku = findValue(row,["SKU","Product SKU","Model"]);
+    const serial = findValue(row,["Serial","Serial Number","S/N","SN"]);
+    const source = findValue(row,["Source","Channel"]) || "Excel Import";
+    const note = findValue(row,["Notes","Note","Issue","Complaint","Details","Description"]);
+    const awb = findValue(row,["AWB","AWB No","AWB Number","Tracking Number"]);
+    const courier = findValue(row,["Courier","Delivery Partner"]);
+    const purchase = excelDateToISO(findValue(row,["Purchase Date","PurchaseDate","Date"]));
+    const expiry = excelDateToISO(findValue(row,["Warranty Expiry","Warranty Expiry Date","Expiry Date"]));
+    const status = findValue(row,["Status","Current Status"]);
+    const category = findValue(row,["Category"]);
+    const priority = findValue(row,["Priority"]);
+    const title = findValue(row,["Title","Complaint Title"]);
+    const owner = findValue(row,["Owner","Assigned To"]);
+    const followup = excelDateToISO(findValue(row,["Follow-up","Followup Date","Follow-up Date"]));
+    const now = new Date().toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"});
+    if (target === "warranty") return {
+        recordType:"warranty", name, phone, inv, sku, serial:serial||"N/A", source,
+        purchaseDate:purchase, warrantyExpiry:expiry, warrantyNote:note,
+        attachedToPipeline:false, linkedServiceKey:"", pipelineTicketId:"", pipelineStatus:"",
+        pipelineAwb:"", pipelineCourier:"", date:now, importSource:pendingImportFileName
+    };
+    if (target === "service") return {
+        recordType:"service", name, phone, inv, sku, serial:serial||"N/A", sn:serial||"N/A", source,
+        awbNo:awb, courier, status:status||"Pending", note, inwardDate:"", outwardDate:"", date:now,
+        importSource:pendingImportFileName
+    };
+    return {
+        recordType:"critical", name, phone, inv, sku, category:category||"General", priority:priority||"High",
+        title:title||note||"Imported Complaint", criticalStatus:status||"Open", owner, followupDate:followup,
+        details:note, actionTaken:"", date:now, importSource:pendingImportFileName
+    };
+}
+
+async function previewCRMImport() {
+    const input = $("importFile");
+    const file = input.files && input.files[0];
+    if (!file) { setImportStatus("Please select an Excel, CSV or PDF file.","error"); return; }
+    pendingImportFileName = file.name;
+    pendingImportRows = [];
+    const target = $("importTarget").value;
+    try {
+        if (/\.pdf$/i.test(file.name)) {
+            if (!window.pdfjsLib) throw new Error("PDF reader library did not load. Refresh the page and try again.");
+            const buffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data:buffer}).promise;
+            let text = "";
+            for (let i=1;i<=pdf.numPages;i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(x=>x.str).join(" ") + "\n";
+            }
+            if (!text.trim()) throw new Error("This PDF has no selectable text. A scanned/image-only PDF needs OCR before it can be imported.");
+            const lines = text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+            pendingImportRows = lines.map(line=>({"Details":line,"Customer Name":"","Phone":"","SKU":""}));
+            setImportStatus(`PDF read successfully: ${pdf.numPages} page(s), ${pendingImportRows.length} text row(s) detected. Check preview before saving.`,"success");
+        } else {
+            if (!window.XLSX) throw new Error("Excel reader library did not load. Refresh the page and try again.");
+            const buffer = await file.arrayBuffer();
+            const wb = XLSX.read(buffer,{type:"array",cellDates:true});
+            const first = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(first,{defval:""});
+            pendingImportRows = rows;
+            setImportStatus(`File read successfully: ${rows.length} row(s) found from sheet "${wb.SheetNames[0]}".`,"success");
+        }
+        const mapped = pendingImportRows.slice(0,20).map(r=>mapImportRow(r,target));
+        $("importPreview").innerHTML = `<div style="overflow:auto"><table><thead><tr><th>Name</th><th>Phone</th><th>Invoice/Order</th><th>SKU</th><th>Serial</th><th>Notes</th></tr></thead><tbody>${mapped.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone)}</td><td>${esc(r.inv)}</td><td>${esc(r.sku)}</td><td>${esc(r.serial||r.sn)}</td><td>${esc(r.warrantyNote||r.note||r.details)}</td></tr>`).join("")}</tbody></table></div>${pendingImportRows.length>20?`<small>Showing first 20 rows only. All ${pendingImportRows.length} rows will be imported.</small>`:""}`;
+        $("saveImportBtn").disabled = !pendingImportRows.length;
+    } catch (e) {
+        setImportStatus("Import preview failed: " + e.message,"error");
+        $("saveImportBtn").disabled = true;
+    }
+}
+
+async function saveCRMImport() {
+    if (!pendingImportRows.length) return;
+    const target = $("importTarget").value;
+    const prefix = target === "warranty" ? "_warranty_records" : target === "service" ? "" : "_critical_complaints";
+    const batchId = "IMP-" + Date.now();
+    const updates = {};
+    let saved = 0, skipped = 0;
+    try {
+        for (const raw of pendingImportRows) {
+            const rec = mapImportRow(raw,target);
+            const meaningful = [rec.name,rec.phone,rec.inv,rec.sku,rec.serial,rec.note,rec.details].some(Boolean);
+            if (!meaningful) { skipped++; continue; }
+            rec.importBatchId = batchId;
+            rec.createdAt = firebase.database.ServerValue.TIMESTAMP;
+            const key = target === "warranty" ? warrantyRef.push().key : target === "critical" ? criticalRef.push().key : root.push().key;
+            rec.id = key;
+            updates[(prefix ? prefix+"/" : "") + key] = rec;
+            saved++;
+        }
+        if (!saved) throw new Error("No usable rows were found.");
+        await root.update(updates);
+        await firebase.database().ref("noor_crm_import_batches/"+batchId).set({
+            id:batchId,fileName:pendingImportFileName,target,recordCount:saved,skipped,createdAt:firebase.database.ServerValue.TIMESTAMP
+        });
+        toast(`Import complete: ${saved} records saved. Batch ${batchId}.`);
+        closeImportCenter();
+    } catch(e) { setImportStatus("Save failed: "+e.message,"error"); }
+}
+
+function downloadCRMTemplate() {
+    const rows = [["Customer Name","Phone","Invoice / Order ID","SKU","Serial Number","Purchase Date","Warranty Expiry Date","AWB","Courier","Status","Notes"]];
+    const ws = XLSX.utils.aoa_to_sheet(rows), wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"CRM Import");
+    XLSX.writeFile(wb,"HELETT_CRM_Import_Template.xlsx");
+}
+
+function openImportHistory() {
+    $("importHistoryModal").style.display="block";
+    const el=$("importHistoryList"); el.innerHTML="Loading...";
+    firebase.database().ref("noor_crm_import_batches").once("value").then(s=>{
+        const data=s.val()||{}; const arr=Object.values(data).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        el.innerHTML=arr.length?arr.map(b=>`<div class="card" style="margin:10px 0"><strong>${esc(b.fileName||"Unknown file")}</strong><br><small>${esc(b.target||"")} • ${esc(String(b.recordCount||0))} records • ${b.createdAt?new Date(b.createdAt).toLocaleString("en-IN"):""}</small><br><button class="small delete" onclick="deleteImportBatch('${esc(b.id)}','${esc(b.target)}')"><i class="fas fa-trash"></i> Delete This Import</button></div>`).join(""):"<p>No import history yet.</p>";
+    }).catch(e=>el.innerHTML="Could not load history: "+esc(e.message));
+}
+function closeImportHistory(){ $("importHistoryModal").style.display="none"; }
+async function deleteImportBatch(batchId,target) {
+    if(!confirm(`Delete all CRM records imported in ${batchId}? This will not delete manually created records.`)) return;
+    const ref=target==="warranty"?warrantyRef:target==="critical"?criticalRef:root;
+    try {
+        const snap=await ref.once("value"); const updates={}; let count=0;
+        snap.forEach(ch=>{const v=ch.val(); if(v&&v.importBatchId===batchId){updates[ch.key]=null;count++;}});
+        if(count) await ref.update(updates);
+        await firebase.database().ref("noor_crm_import_batches/"+batchId).remove();
+        toast(`Deleted ${count} records from import ${batchId}.`);
+        openImportHistory();
+    } catch(e){toast("Batch delete failed: "+e.message,"error");}
+}
+
+async function openAttachments(path) {
+    currentAttachmentPath=path;
+    $("attachmentModal").style.display="block";
+    $("attachmentRecordLabel").textContent="CRM Record: "+path;
+    $("attachmentInput").value="";
+    await renderAttachments();
+}
+function closeAttachments(){ $("attachmentModal").style.display="none"; currentAttachmentPath=null; }
+async function renderAttachments(){
+    const el=$("attachmentList"); if(!currentAttachmentPath)return; el.innerHTML="Loading files...";
+    try{
+        const snap=await root.child(currentAttachmentPath.replace(/^noor_cloud_tickets\//,"" )).child("attachments").once("value");
+        const files=snap.val()||{}; const arr=Object.entries(files);
+        el.innerHTML=arr.length?arr.map(([id,f])=>`<div class="card" style="margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><strong>${esc(f.name)}</strong><br><small>${esc(f.type||"")} • ${Math.round((f.size||0)/1024)} KB • ${f.createdAt?new Date(f.createdAt).toLocaleString("en-IN"):""}</small></div><div><a class="small edit" href="${esc(f.url)}" target="_blank" rel="noopener">Open</a> <button class="small delete" onclick="deleteAttachment('${esc(id)}')">Delete</button></div></div>`).join(""):"<p style='color:var(--muted)'>No files attached yet.</p>";
+    }catch(e){el.innerHTML="Could not load attachments: "+esc(e.message);}
+}
+async function uploadAttachments(){
+    if(!currentAttachmentPath)return;
+    const input=$("attachmentInput"); if(!input.files.length){toast("Select at least one file.","error");return;}
+    try{
+        const cleanPath=currentAttachmentPath.replace(/^noor_cloud_tickets\//,"");
+        for(const file of input.files){
+            if(file.size>25*1024*1024) throw new Error(file.name+" is larger than 25 MB.");
+            const id=firebase.database().ref().push().key;
+            const storagePath=`crm_attachments/${cleanPath.replace(/\//g,"_")}/${id}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+            const task=await crmStorage.ref(storagePath).put(file);
+            const url=await task.ref.getDownloadURL();
+            await root.child(cleanPath).child("attachments").child(id).set({id,name:file.name,type:file.type||"application/octet-stream",size:file.size,storagePath:url?storagePath:"",url,createdAt:firebase.database.ServerValue.TIMESTAMP});
+        }
+        input.value=""; toast("File attachment uploaded successfully."); await renderAttachments();
+    }catch(e){toast("Upload failed: "+e.message,"error");}
+}
+async function deleteAttachment(id){
+    if(!confirm("Delete this attached file? The CRM customer record will remain safe."))return;
+    try{
+        const cleanPath=currentAttachmentPath.replace(/^noor_cloud_tickets\//,"");
+        const snap=await root.child(cleanPath).child("attachments").child(id).once("value"); const f=snap.val();
+        if(f&&f.storagePath){try{await crmStorage.ref(f.storagePath).delete();}catch(storageErr){console.warn(storageErr);}}
+        await root.child(cleanPath).child("attachments").child(id).remove();
+        toast("Attachment deleted."); await renderAttachments();
+    }catch(e){toast("Delete attachment failed: "+e.message,"error");}
+}
+
+window.addEventListener("click",event=>{
+    if(event.target===$("importModal"))closeImportCenter();
+    if(event.target===$("attachmentModal"))closeAttachments();
+    if(event.target===$("importHistoryModal"))closeImportHistory();
+});
+
 </script>
 </body>
 </html>
